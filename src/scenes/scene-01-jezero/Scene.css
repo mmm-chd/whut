@@ -2,7 +2,9 @@
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: linear-gradient(180deg, #f7d9d0 0%, #c98770 45%, #7b4636 75%, #4d2a23 100%);
+  /* Shown until the canvas is ready: the colour of the top of the sky art, so
+     the opening frame never flashes a different backdrop. */
+  background: #060a1a;
   color: #2b1a16;
 }
 

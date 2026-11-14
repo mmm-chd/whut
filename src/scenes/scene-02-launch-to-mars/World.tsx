@@ -471,6 +471,43 @@ export function P02World({ nodes }: { nodes: P02Nodes }) {
           window art is never magnified. It cross-fades as one finished picture. */}
       <FrameSpace>
         <FadeGroup node={nodes.closeup} order={ORDER.closeup}>
+          {/* The close-up covers the whole host. On a host that is not 16:9 it
+              reaches past the frame, so the art continues there (clean sky above,
+              mirrored sky, sea and ground at the sides, flipped ground below). */}
+          <GradientLayer
+            x={-1920}
+            y={-2600}
+            w={5760}
+            h={4000}
+            stops={BACKDROP_STOPS}
+            order={-2}
+          />
+          {SKY_STRIPS.map((strip, index) => (
+            <SpriteLayer
+              key={`closeup-sky-strip-${index}`}
+              asset="p02-bg-sky"
+              x={strip.left}
+              y={strip.top}
+              w={SKY.width}
+              h={strip.height}
+              crop={skyCrop(strip.srcTop, strip.height)}
+              flipX={strip.flipX}
+              flipY={strip.flipY}
+              order={-1}
+            />
+          ))}
+          {([-1920, 1920] as const).map((left) => (
+            <SpriteLayer
+              key={`closeup-side-${left}`}
+              asset="p02-bg-sky"
+              x={left}
+              y={SKY.top}
+              w={SKY.width}
+              h={SKY.height}
+              flipX
+              order={0}
+            />
+          ))}
           <SpriteLayer
             asset="p02-bg-sky"
             x={0}
@@ -479,6 +516,31 @@ export function P02World({ nodes }: { nodes: P02Nodes }) {
             h={SKY.height}
             order={0}
           />
+          {([-1920, 1920] as const).map((left) => (
+            <SpriteLayer
+              key={`closeup-sea-${left}`}
+              asset="p02-sea"
+              x={left}
+              y={720}
+              w={1920}
+              h={110}
+              flipX
+              order={1}
+            />
+          ))}
+          {([-1920, 1920] as const).map((left) => (
+            <SpriteLayer
+              key={`closeup-ground-${left}`}
+              asset="p02-ground"
+              x={left}
+              y={750}
+              w={1920}
+              h={351}
+              flipX
+              order={2}
+            />
+          ))}
+          <SpriteLayer asset="p02-ground" x={0} y={1101} w={1920} h={351} flipY order={2} />
           <SpriteLayer asset="p02-sea" x={0} y={720} w={1920} h={110} order={1} />
           <SpriteLayer asset="p02-ground" x={0} y={750} w={1920} h={351} order={2} />
           <ServiceTower box={P02_CLOSEUP_SERVICE_TOWER} order={3} />

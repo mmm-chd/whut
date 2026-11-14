@@ -25,10 +25,10 @@ describe('p02DialogueLines', () => {
     expect(new Set(labels).size).toBe(labels.length);
   });
 
-  it('keeps every line narrated, manual, bare, and right aligned', () => {
+  it('keeps every line narrated, voiced, manual, bare, and right aligned', () => {
     for (const line of p02DialogueLines) {
       expect(line.speaker).toBe('narrator');
-      expect(line.audioId).toBeNull();
+      expect(line.audioId).toBe(`p02-vo-${line.id.replace('p02-', '')}`);
       expect(line.advance).toBe('manual');
       expect(line.delay).toBeUndefined();
       expect(line.holdsStory).toBe(true);

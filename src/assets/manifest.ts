@@ -32,7 +32,12 @@ import p02ExhaustUrl from './drafts/p02/exhaust.svg';
 import cruiseSpaceUrl from './fixed/space-filler.png';
 import crayonFontUrl from './fonts/DK Cool Crayon.ttf';
 import kindredSpiritsUrl from '../audio/bgm/Kindred Spirits - Howard Harper-Barnes.mp3';
+import p01NarratorUrl from '../audio/voice-over/perseverance/[P01 - Narrator 1 - 2].mp3';
+import p01Percy1Url from '../audio/voice-over/perseverance/percy/P01 - Percy 1.mp3';
+import p01Percy2Url from '../audio/voice-over/perseverance/percy/P01 - Percy 2.mp3';
+import p01Percy3Url from '../audio/voice-over/perseverance/percy/P01 - Percy 3.mp3';
 import p02Narrator1Url from '../audio/voice-over/perseverance/P02 - Narrator 1.mp3';
+import p02Narrator2Url from '../audio/voice-over/perseverance/P02 - Narrator 2.mp3';
 import p02Narrator3Url from '../audio/voice-over/perseverance/P02 - Narrator 3.mp3';
 import p02TransitionUrl from '../audio/voice-over/perseverance/P02 - Transisi Quote.mp3';
 import placeholderUrl from './placeholder.svg';
@@ -46,6 +51,11 @@ export interface AssetEntry {
   path: string;
   status: AssetStatus;
   alt?: string;
+  /**
+   * Plays only this slice of the file, in milliseconds: [start, duration].
+   * Lets two dialogue lines share one recording.
+   */
+  sprite?: readonly [number, number];
 }
 
 function imageAsset(id: string, alt: string): AssetEntry {
@@ -70,6 +80,14 @@ function draftImage(id: string, path: string, alt: string): AssetEntry {
 
 function finalAsset(id: string, type: AssetType, path: string, alt?: string): AssetEntry {
   return { id, type, path, status: 'final', alt };
+}
+
+function voiceAsset(
+  id: string,
+  path: string,
+  sprite?: readonly [number, number],
+): AssetEntry {
+  return { id, type: 'audio', path, status: 'final', sprite };
 }
 
 function deferredAsset(id: string, type: AssetType): AssetEntry {
@@ -163,12 +181,14 @@ export const assetManifest: Record<string, AssetEntry> = {
   'dust-particles': deferredAsset('dust-particles', 'effect'),
 
   // Audio
-  'vo-narrator-01': deferredAsset('vo-narrator-01', 'audio'),
-  'vo-narrator-02': deferredAsset('vo-narrator-02', 'audio'),
-  'vo-percy-01': deferredAsset('vo-percy-01', 'audio'),
-  'vo-percy-02': deferredAsset('vo-percy-02', 'audio'),
-  'vo-percy-03': deferredAsset('vo-percy-03', 'audio'),
-  'vo-percy-closing': deferredAsset('vo-percy-closing', 'audio'),
+  // P-01 voice-over. The narrator recorded lines 1 and 2 as one file with a
+  // pause between them (measured silence 9.84-11.30 s), so each line plays its
+  // own slice of it. The text order matches docs-base/assets/dialog-perseverance.pdf.
+  'vo-narrator-01': voiceAsset('vo-narrator-01', p01NarratorUrl, [0, 10000]),
+  'vo-narrator-02': voiceAsset('vo-narrator-02', p01NarratorUrl, [11150, 7300]),
+  'vo-percy-01': voiceAsset('vo-percy-01', p01Percy1Url),
+  'vo-percy-02': voiceAsset('vo-percy-02', p01Percy2Url),
+  'vo-percy-03': voiceAsset('vo-percy-03', p01Percy3Url),
   'sfx-slide-in': deferredAsset('sfx-slide-in', 'audio'),
   'sfx-card-open': deferredAsset('sfx-card-open', 'audio'),
   'sfx-card-close': deferredAsset('sfx-card-close', 'audio'),
@@ -177,12 +197,11 @@ export const assetManifest: Record<string, AssetEntry> = {
   'amb-mars-wind': deferredAsset('amb-mars-wind', 'audio'),
   'music-kindred-spirits': finalAsset('music-kindred-spirits', 'audio', kindredSpiritsUrl),
 
-  // P-02 voice-over (only the lines that were delivered with the P-02 pull)
-  'p02-vo-narrator-01': finalAsset('p02-vo-narrator-01', 'audio', p02Narrator1Url),
-  'p02-vo-narrator-03': finalAsset('p02-vo-narrator-03', 'audio', p02Narrator3Url),
-  'p02-vo-transition': finalAsset('p02-vo-transition', 'audio', p02TransitionUrl),
-  'p02-vo-narrator-02': deferredAsset('p02-vo-narrator-02', 'audio'),
-  'p02-vo-narrator-04': deferredAsset('p02-vo-narrator-04', 'audio'),
+  // P-02 voice-over, one file per line, in the order of dialog-perseverance.pdf.
+  'p02-vo-narrator-01': voiceAsset('p02-vo-narrator-01', p02Narrator1Url),
+  'p02-vo-narrator-02': voiceAsset('p02-vo-narrator-02', p02Narrator2Url),
+  'p02-vo-narrator-03': voiceAsset('p02-vo-narrator-03', p02Narrator3Url),
+  'p02-vo-narrator-04': voiceAsset('p02-vo-narrator-04', p02TransitionUrl),
   'p02-sfx-window-pop': deferredAsset('p02-sfx-window-pop', 'audio'),
   'p02-sfx-countdown': deferredAsset('p02-sfx-countdown', 'audio'),
   'p02-sfx-liftoff': deferredAsset('p02-sfx-liftoff', 'audio'),

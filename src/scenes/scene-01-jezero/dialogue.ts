@@ -79,7 +79,8 @@ export const dialogueLines: readonly DialogueLine[] = [
     id: 'card-closing',
     speaker: 'percy',
     text: "Every rock has a story. Let's check the others!",
-    audioId: 'vo-percy-closing',
+    // No recording exists for this line yet; it stays silent.
+    audioId: null,
     timelineLabel: 'waiting',
     placement: 'prompt-right',
     advance: 'auto',

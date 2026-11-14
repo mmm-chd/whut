@@ -237,7 +237,7 @@ export function Scene01Jezero() {
       <div className="stage" ref={stageRef}>
         <WebGLStage
           label="Percy the rover on the red surface of Mars, under a wide sky."
-          background="#4d2a23"
+          background="#060a1a"
           preload={p01WorldTextureIds}
         >
           <P01World

@@ -8,7 +8,9 @@ import { SpriteMesh } from './SpriteLayer';
 import type { LoadedTexture } from './textures';
 
 const MAX_TARGET_WIDTH = 2560;
-const PIVOT = [DESIGN_WIDTH / 2, DESIGN_HEIGHT / 2] as const;
+const CENTER_X = DESIGN_WIDTH / 2;
+const CENTER_Y = DESIGN_HEIGHT / 2;
+const PIVOT = [CENTER_X, CENTER_Y] as const;
 
 interface FadeGroupProps {
   /** Opacity and transform of the whole composition. */
@@ -26,10 +28,18 @@ interface FadeGroupProps {
  *
  * Children use frame coordinates (y down from the top-left). Place the group
  * inside <FrameSpace> to keep it glued to the frame while the camera moves.
+ *
+ * The target covers the whole host, not just the 1920x1080 frame: on a host
+ * that is not 16:9 it reaches past the frame on the short axis, so children
+ * must draw art beyond the frame edges or the world shows through as bars.
  */
 export function FadeGroup({ node, order, children }: FadeGroupProps) {
   const gl = useThree((state) => state.gl);
   const size = useThree((state) => state.size);
+  const fitNow = fitScale(size.width, size.height);
+  // Visible area in frame pixels, never smaller than the frame itself.
+  const visibleWidth = Math.max(DESIGN_WIDTH, fitNow > 0 ? size.width / fitNow : DESIGN_WIDTH);
+  const visibleHeight = Math.max(DESIGN_HEIGHT, fitNow > 0 ? size.height / fitNow : DESIGN_HEIGHT);
 
   const scene = useMemo(() => new Scene(), []);
   const camera = useMemo(() => {
@@ -62,8 +72,15 @@ export function FadeGroup({ node, order, children }: FadeGroupProps) {
       return;
     }
     const pixelRatio = gl.getPixelRatio();
-    const width = Math.min(MAX_TARGET_WIDTH, Math.ceil(DESIGN_WIDTH * fit * pixelRatio));
-    const height = Math.ceil((width * DESIGN_HEIGHT) / DESIGN_WIDTH);
+    const vw = Math.max(DESIGN_WIDTH, size.width / fit);
+    const vh = Math.max(DESIGN_HEIGHT, size.height / fit);
+    const width = Math.min(MAX_TARGET_WIDTH, Math.ceil(vw * fit * pixelRatio));
+    const height = Math.ceil((width * vh) / vw);
+    camera.left = CENTER_X - vw / 2;
+    camera.right = CENTER_X + vw / 2;
+    camera.top = vh / 2 - CENTER_Y;
+    camera.bottom = -CENTER_Y - vh / 2;
+    camera.updateProjectionMatrix();
     if (target.width !== width || target.height !== height) {
       target.setSize(width, height);
     }
@@ -86,10 +103,10 @@ export function FadeGroup({ node, order, children }: FadeGroupProps) {
         <SpriteMesh
           source={source}
           order={order}
-          x={0}
-          y={0}
-          w={DESIGN_WIDTH}
-          h={DESIGN_HEIGHT}
+          x={CENTER_X - visibleWidth / 2}
+          y={CENTER_Y - visibleHeight / 2}
+          w={visibleWidth}
+          h={visibleHeight}
         />
       </SceneGroup>
     </>

@@ -1,6 +1,18 @@
 import { Howl } from 'howler';
 import { assetManifest } from '../assets/manifest';
 
+/** Name of the single slice a sprite manifest entry plays. */
+const SPRITE = 'clip';
+
+/**
+ * Looping music plays at this share of the master volume, so it stays a quiet
+ * bed under the narration instead of covering it.
+ */
+export const MUSIC_GAIN = 0.1;
+
+/** Voice-over is boosted (capped at full scale) so it stays clear over the music. */
+export const VOICE_GAIN = 1.25;
+
 /**
  * Owns Howler instances outside React and Zustand.
  * Missing or placeholder audio is a supported state: text keeps working.
@@ -12,6 +24,13 @@ export class AudioManager {
   private muted = false;
   private volume = 0.8;
   private warned = new Set<string>();
+  private musicIds = new Set<string>();
+
+  private levelFor(id: string): number {
+    return this.musicIds.has(id)
+      ? this.volume * MUSIC_GAIN
+      : Math.min(1, this.volume * VOICE_GAIN);
+  }
 
   setMuted(muted: boolean): void {
     this.muted = muted;
@@ -20,7 +39,7 @@ export class AudioManager {
 
   setVolume(volume: number): void {
     this.volume = Math.min(1, Math.max(0, volume));
-    this.sounds.forEach((sound) => sound.volume(this.volume));
+    this.sounds.forEach((sound, id) => sound.volume(this.levelFor(id)));
   }
 
   play(id: string): boolean {
@@ -34,6 +53,11 @@ export class AudioManager {
 
   private playSound(id: string, options: { stopCurrent: boolean; loop: boolean }): boolean {
     const entry = assetManifest[id];
+    if (options.loop) {
+      this.musicIds.add(id);
+    } else {
+      this.musicIds.delete(id);
+    }
 
     if (!entry || entry.type !== 'audio' || !entry.path) {
       if (!this.warned.has(id)) {
@@ -51,7 +75,8 @@ export class AudioManager {
     if (!sound) {
       sound = new Howl({
         src: [entry.path],
-        volume: this.volume,
+        sprite: entry.sprite ? { [SPRITE]: [...entry.sprite] } : undefined,
+        volume: this.levelFor(id),
         mute: this.muted,
         loop: options.loop,
         onloaderror: (_soundId, error) => {
@@ -67,8 +92,13 @@ export class AudioManager {
     sound.stop();
     sound.loop(options.loop);
     sound.mute(this.muted);
-    sound.volume(this.volume);
-    sound.play();
+    sound.volume(this.levelFor(id));
+    // A sprite entry plays its slice of the shared file.
+    if (entry.sprite) {
+      sound.play(SPRITE);
+    } else {
+      sound.play();
+    }
     this.currentId = id;
     this.pausedIds.delete(id);
     return true;
