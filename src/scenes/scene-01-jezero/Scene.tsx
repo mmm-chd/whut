@@ -1,15 +1,16 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
 import { useAudioManager } from '../../audio/useAudioManager';
-import { Dust } from './components/Dust';
-import { Percy } from './components/Percy';
-import { Rock } from './components/Rock';
-import { SkyEvents } from './components/SkyEvents';
-import { StageLayers } from './components/StageLayers';
+import { RockProxy } from './components/RockProxy';
 import { OpeningTitle } from './components/OpeningTitle';
+import { WebGLStage } from '../../three/WebGLStage';
+import { DESCENT_END_PERCENT, layoutP01, rockHostRect } from './layout';
+import { createP01Nodes, resetP01Nodes } from './nodes';
+import { p01WorldTextureIds } from './assets';
+import { P01World, type RockViewState } from './World';
 import { scene01Config } from './scene.config';
 import { createSceneTimeline, type SceneGate } from './timeline';
 import { dialogueLines, getTimelineDialogue, storyHoldingLineIds } from './dialogue';
@@ -30,8 +31,50 @@ gsap.registerPlugin(useGSAP);
 
 type Gate = null | 'title';
 
+const ROCK_IDS: readonly RockId[] = ['rock-a', 'rock-b', 'rock-c'];
+
+/** Resting rectangle of a rock after the pan, as percent of the host. */
+function restStyle(rockId: RockId) {
+  const layout = layoutP01(1920, 1080);
+  const rock = layout.rocks.find((item) => item.id === rockId);
+  if (!rock) {
+    return { left: '0%', top: '0%', width: '0%', height: '0%' };
+  }
+  const rect = rockHostRect(layout, rock, 1.7, {
+    scale: 1.05,
+    originX: 0.5,
+    originY: 0.5,
+    scrollPercent: DESCENT_END_PERCENT,
+    pan: 1,
+  });
+  return {
+    left: `${(rect.left / 1920) * 100}%`,
+    top: `${(rect.top / 1080) * 100}%`,
+    width: `${(rect.width / 1920) * 100}%`,
+    height: `${(rect.height / 1080) * 100}%`,
+  };
+}
+
 export function Scene01Jezero() {
   const stageRef = useRef<HTMLDivElement>(null);
+  // Animation state the timeline drives and the WebGL world reads.
+  const [nodes] = useState(createP01Nodes);
+  const hoverRefs = useRef<Record<RockId, MutableRefObject<number>>>({
+    'rock-a': { current: 0 },
+    'rock-b': { current: 0 },
+    'rock-c': { current: 0 },
+  });
+  const proxies = useRef<Partial<Record<RockId, HTMLElement | null>>>({});
+  const registerProxy = useCallback((id: RockId, element: HTMLButtonElement | null) => {
+    proxies.current[id] = element;
+  }, []);
+  const restStyles = useMemo(
+    () => Object.fromEntries(ROCK_IDS.map((id) => [id, restStyle(id)])) as Record<
+      RockId,
+      ReturnType<typeof restStyle>
+    >,
+    [],
+  );
   const { resume, markWaiting, attachTimeline } = useNarrativeController();
   const startScene = useStoryStore((state) => state.startScene);
   const markInteractionComplete = useStoryStore((state) => state.markInteractionComplete);
@@ -80,43 +123,35 @@ export function Scene01Jezero() {
     if (!interaction || openCardId || focusedRockId) return;
 
     setFocusedRockId(rockId);
-    const world = stageRef.current?.querySelector<HTMLElement>('[data-stage-world]');
     const duration = reducedMotion ? 0.01 : 0.34;
     const openCard = () => {
       markInteractionComplete(interaction.id);
       setOpenCardId(interaction.id);
     };
 
-    if (!world) {
-      openCard();
-      return;
-    }
-
-    gsap.to(world, {
+    gsap.to(nodes.world, {
       scale: reducedMotion ? 1.06 : 1.13,
-      transformOrigin: `${(rocksConfig.find((rock) => rock.id === rockId)?.screenX ?? 0.5) * 100}% 63%`,
+      originX: rocksConfig.find((rock) => rock.id === rockId)?.screenX ?? 0.5,
+      originY: 0.63,
       duration,
       ease: 'power2.out',
       onComplete: openCard,
     });
-  }, [focusedRockId, markInteractionComplete, openCardId, reducedMotion]);
+  }, [focusedRockId, markInteractionComplete, nodes, openCardId, reducedMotion]);
 
   const handleCardClose = useCallback(() => {
     setOpenCardId(null);
     setFocusedRockId(null);
-    const world = stageRef.current?.querySelector<HTMLElement>('[data-stage-world]');
-    if (world) {
-      gsap.to(world, {
-        scale: reducedMotion ? 1 : 1.05,
-        duration: reducedMotion ? 0.01 : 0.28,
-        ease: 'power2.out',
-      });
-    }
+    gsap.to(nodes.world, {
+      scale: reducedMotion ? 1 : 1.05,
+      duration: reducedMotion ? 0.01 : 0.28,
+      ease: 'power2.out',
+    });
     const closingLine = dialogueLines.find((l) => l.id === 'card-closing');
     if (closingLine) {
       useDialogueStore.getState().cue(closingLine);
     }
-  }, [reducedMotion]);
+  }, [nodes, reducedMotion]);
 
   // The opening (space + title) plays on mount and pauses at the title gate.
   // The story status stays idle until the player presses that gate, so the
@@ -142,7 +177,11 @@ export function Scene01Jezero() {
       // must not linger (its labels will re-cue everything they need).
       useDialogueStore.getState().clear();
 
+      // A rebuilt timeline replays from rest: the world starts on its first frame.
+      resetP01Nodes(nodes);
+
       const timeline = createSceneTimeline({
+        nodes,
         root: stageRef.current,
         onComplete: markWaiting,
         onLabel: (label) => handleLabelRef.current(label),
@@ -166,12 +205,27 @@ export function Scene01Jezero() {
         attachTimeline(null);
       };
     },
-    { scope: stageRef, dependencies: [attachTimeline, markWaiting, reducedMotion] },
+    { scope: stageRef, dependencies: [attachTimeline, markWaiting, nodes, reducedMotion] },
   );
 
   const inspectedIds = new Set(
     completedInteractions.filter((id) => id === 'rock-a' || id === 'rock-b' || id === 'rock-c'),
   );
+
+  const rockViews = Object.fromEntries(
+    ROCK_IDS.map((id): [RockId, RockViewState] => [
+      id,
+      {
+        inspected: inspectedIds.has(id),
+        sonarMode: getSonarMode({
+          status,
+          inspected: inspectedIds.has(id),
+          paused: isPaused,
+          cardOpen: openCardId !== null,
+        }),
+      },
+    ]),
+  ) as Record<RockId, RockViewState>;
 
   return (
     <main
@@ -181,34 +235,33 @@ export function Scene01Jezero() {
       data-reduced-motion={reducedMotion}
     >
       <div className="stage" ref={stageRef}>
-        <div className="stage__world" data-stage-world data-sky-phase="space">
-          <StageLayers>
-            <SkyEvents reducedMotion={reducedMotion} />
-            <div className="stage__actors">
-              <Percy state="idle" />
-              <div className="rocks" role="group" aria-label="Three rocks to inspect">
-                {rocksConfig.map((rock) => (
-                  <Rock
-                    key={rock.id}
-                    config={rock}
-                    inspected={inspectedIds.has(rock.id)}
-                    onInspect={handleRockClick}
-                    disabled={status !== 'waiting' || focusedRockId !== null}
-                    sonarMode={getSonarMode({
-                      status,
-                      inspected: inspectedIds.has(rock.id),
-                      paused: isPaused,
-                      cardOpen: openCardId !== null,
-                    })}
-                    reducedMotion={reducedMotion}
-                  />
-                ))}
-              </div>
-            </div>
-          </StageLayers>
+        <WebGLStage
+          label="Percy the rover on the red surface of Mars, under a wide sky."
+          background="#4d2a23"
+          preload={p01WorldTextureIds}
+        >
+          <P01World
+            nodes={nodes}
+            rocks={rockViews}
+            reducedMotion={reducedMotion}
+            hover={hoverRefs.current}
+            proxies={proxies}
+          />
+        </WebGLStage>
+        <div className="rocks" role="group" aria-label="Three rocks to inspect">
+          {rocksConfig.map((rock) => (
+            <RockProxy
+              key={rock.id}
+              config={rock}
+              inspected={inspectedIds.has(rock.id)}
+              onInspect={handleRockClick}
+              disabled={status !== 'waiting' || focusedRockId !== null}
+              hover={hoverRefs.current[rock.id]}
+              register={registerProxy}
+              restStyle={restStyles[rock.id]}
+            />
+          ))}
         </div>
-        <Dust />
-        <div className="stage__vignette" aria-hidden="true" />
         <OpeningTitle />
       </div>
 

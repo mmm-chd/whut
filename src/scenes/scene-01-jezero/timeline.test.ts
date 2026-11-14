@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStoryStore } from '../../stores/story.store';
+import { DESCENT_END_PERCENT } from './layout';
+import { createP01Nodes } from './nodes';
 import { createSceneTimeline } from './timeline';
 
 function resetStore() {
@@ -13,32 +15,11 @@ function resetStore() {
 
 beforeEach(resetStore);
 
+// The timeline only looks up the DOM opening title; everything else it drives
+// is plain node state.
 function buildStage() {
   const root = document.createElement('div');
-  root.innerHTML = `
-    <div data-stage-world>
-      <div data-sky-scroll>
-        <img class="sky-scroll__image" />
-      </div>
-      <div data-sky-events></div>
-      <div data-clouds></div>
-      <div data-title></div>
-      <div data-layer="far"></div>
-      <div data-layer="far-dup"></div>
-      <div data-layer="mid"></div>
-      <div data-layer="mid-dup"></div>
-      <div data-layer="fore"></div>
-      <div data-layer="fore-dup"></div>
-      <div data-fg="v1"></div>
-      <div data-fg="v2"></div>
-      <div data-percy>
-        <div data-percy-glow></div>
-      </div>
-      <div data-rock="rock-a"></div>
-      <div data-rock="rock-b"></div>
-      <div data-rock="rock-c"></div>
-    </div>
-  `;
+  root.innerHTML = '<div data-title></div>';
   return root;
 }
 
@@ -50,6 +31,7 @@ describe('createSceneTimeline', () => {
   it('exposes the opening labels and legacy aliases', () => {
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
     });
 
@@ -83,6 +65,7 @@ describe('createSceneTimeline', () => {
     const onGate = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       onGate,
     });
@@ -100,6 +83,7 @@ describe('createSceneTimeline', () => {
     const onGate = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       onGate,
       holdLineIds: HOLDING_IDS,
@@ -121,6 +105,7 @@ describe('createSceneTimeline', () => {
     const onGate = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       onGate,
       holdLineIds: HOLDING_IDS,
@@ -144,6 +129,7 @@ describe('createSceneTimeline', () => {
     const onGate = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       onLabel,
       onGate,
@@ -165,6 +151,7 @@ describe('createSceneTimeline', () => {
     const onGate = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       onGate,
       holdLineIds: HOLDING_IDS,
@@ -184,6 +171,7 @@ describe('createSceneTimeline', () => {
     const onGate = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       onGate,
     });
@@ -197,20 +185,47 @@ describe('createSceneTimeline', () => {
   });
 
   it('marks the sky phase space at the start and sky once the camera lands', () => {
-    const root = buildStage();
-    const world = root.querySelector('[data-stage-world]')!;
+    const nodes = createP01Nodes();
     const timeline = createSceneTimeline({
-      root,
+      root: buildStage(),
+      nodes,
       onComplete: vi.fn(),
     });
 
     timeline.pause();
     timeline.seek(3.4);
-    expect(world.getAttribute('data-sky-phase')).toBe('space');
+    expect(nodes.flags.skyPhase).toBe('space');
 
     // The phase flips at land (7.0): comets stop spawning from then on.
     timeline.seek(7.1);
-    expect(world.getAttribute('data-sky-phase')).toBe('sky');
+    expect(nodes.flags.skyPhase).toBe('sky');
+
+    timeline.kill();
+  });
+
+  it('descends the camera, zooms, then pans every layer with one progress value', () => {
+    const nodes = createP01Nodes();
+    const timeline = createSceneTimeline({
+      root: buildStage(),
+      nodes,
+      onComplete: vi.fn(),
+    });
+
+    timeline.pause();
+    expect(nodes.skyScroll.yPercent).toBe(0);
+
+    timeline.seek(7.1, true);
+    expect(nodes.skyScroll.yPercent).toBeCloseTo(DESCENT_END_PERCENT);
+
+    timeline.seek(10.5, true);
+    expect(nodes.world.scale).toBeCloseTo(1.12);
+    expect(nodes.pan.value).toBe(0);
+
+    timeline.seek(21, true);
+    expect(nodes.pan.value).toBe(1);
+    expect(nodes.world.scale).toBeCloseTo(1.05);
+    expect(nodes.fgV2.opacity).toBe(1);
+    expect(nodes.fgV1.opacity).toBe(0);
 
     timeline.kill();
   });
@@ -218,6 +233,7 @@ describe('createSceneTimeline', () => {
   it('never completes the scene while the opening plays', () => {
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: () => useStoryStore.getState().setStatus('waiting'),
     });
 
@@ -234,6 +250,7 @@ describe('createSceneTimeline', () => {
   it('pans to the rocks without completing the scene', () => {
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: () => useStoryStore.getState().setStatus('waiting'),
     });
 
@@ -252,6 +269,7 @@ describe('createSceneTimeline', () => {
     // Mirrors Scene.tsx: the timeline end only marks the scene waiting.
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: () => useStoryStore.getState().setStatus('waiting'),
     });
 
@@ -268,6 +286,7 @@ describe('createSceneTimeline', () => {
     const onComplete = vi.fn();
     const timeline = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete,
     });
 
@@ -282,6 +301,7 @@ describe('createSceneTimeline', () => {
   it('accepts reducedMotion and keeps the opening labels in place', () => {
     const normal = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       reducedMotion: false,
     });
@@ -289,6 +309,7 @@ describe('createSceneTimeline', () => {
 
     const reduced = createSceneTimeline({
       root: buildStage(),
+      nodes: createP01Nodes(),
       onComplete: vi.fn(),
       reducedMotion: true,
     });

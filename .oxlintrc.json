@@ -4,5 +4,15 @@
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+  },
+  "overrides": [
+    {
+      // WebGL code mutates three.js objects and uniforms in the frame loop on
+      // purpose; the React immutability rule does not apply to them.
+      "files": ["src/three/**", "src/scenes/**/World.tsx", "src/scenes/**/SkyStreaks.tsx", "src/scenes/**/RockProxy.tsx"],
+      "rules": {
+        "react/immutability": "off"
+      }
+    }
+  ]
 }

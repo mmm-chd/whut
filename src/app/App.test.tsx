@@ -53,14 +53,29 @@ describe('App end screen', () => {
     await app.unmount();
   });
 
-  it('shows the end screen when status is completed', async () => {
-    useStoryStore.setState({ status: 'completed' });
+  it('shows the end screen only after the terminal cruise scene completes', async () => {
+    useStoryStore.setState({
+      activeSceneId: 'filler-scene-01-cruise',
+      status: 'completed',
+    });
 
     const app = renderApp();
     await app.render();
 
     expect(app.container.querySelector('[data-scene="p01-jezero"]')).toBeNull();
-    expect(app.container.textContent).toContain('P-02 not built yet');
+    expect(app.container.textContent).toContain('To be continued');
+
+    await app.unmount();
+  });
+
+  it('does not end the story when P-01 completes', async () => {
+    useStoryStore.setState({ activeSceneId: 'p01-jezero', status: 'completed' });
+
+    const app = renderApp();
+    await app.render();
+
+    expect(app.container.querySelector('.end-screen')).toBeNull();
+    expect(app.container.querySelector('[data-scene="p01-jezero"]')).not.toBeNull();
 
     await app.unmount();
   });

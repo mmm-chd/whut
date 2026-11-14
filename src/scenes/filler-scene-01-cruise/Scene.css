@@ -1,0 +1,42 @@
+.cruise-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: #fff6e2;
+  background: #0b1020;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.cruise-scene__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: min(46rem, 82vw);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.cruise-scene__eyebrow {
+  margin: 0 0 0.8rem;
+  color: #e6b96d;
+  font-size: clamp(0.75rem, 1.2vw, 1rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.cruise-scene__title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.cruise-scene__body {
+  margin: 1.4rem auto 0;
+  max-width: 34rem;
+  color: #dfe7f2;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+}

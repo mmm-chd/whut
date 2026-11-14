@@ -1,9 +1,13 @@
 import gsap from 'gsap';
-import { CAMERA_X, DESIGN_WIDTH, PARALLAX } from './camera';
+import { DESCENT_END_PERCENT } from './layout';
+import type { P01Nodes } from './nodes';
 
 export type SceneGate = 'title' | { kind: 'dialogue'; lineId: string };
 
 export interface SceneTimelineOptions {
+  /** Animation state the world reads (camera, parallax, Percy, layers). */
+  nodes: P01Nodes;
+  /** Only the DOM opening title is looked up here: `[data-title]`. */
   root: HTMLElement;
   onComplete: () => void;
   onLabel?: (label: string) => void;
@@ -50,6 +54,7 @@ const DIALOGUE_GATE_DELAY = 0.01;
  * ~20.7 prompt             held by its dialogue gate until Continue
  */
 export function createSceneTimeline({
+  nodes,
   root,
   onComplete,
   onLabel,
@@ -59,23 +64,8 @@ export function createSceneTimeline({
   reducedMotion = false,
 }: SceneTimelineOptions): gsap.core.Timeline {
   const q = gsap.utils.selector(root);
-  const world = q('[data-stage-world]');
-  const skyScroll = q('[data-sky-scroll]');
-  const skyImage = q('.sky-scroll__image');
-  const skyEvents = q('[data-sky-events]');
-  const clouds = q('[data-clouds]');
   const title = q('[data-title]');
-  const far = q('[data-layer="far"]');
-  const farDup = q('[data-layer="far-dup"]');
-  const mid = q('[data-layer="mid"]');
-  const midDup = q('[data-layer="mid-dup"]');
-  const fore = q('[data-layer="fore"]');
-  const foreDup = q('[data-layer="fore-dup"]');
-  const fgV1 = q('[data-fg="v1"]');
-  const fgV2 = q('[data-fg="v2"]');
-  const percy = q('[data-percy]');
-  const glow = q('[data-percy-glow]');
-  const rocks = q('[data-rock]');
+  const { world, skyScroll, pan, percy, glow, fgV1, fgV2, flags } = nodes;
 
   const timeline = gsap.timeline({
     defaults: { ease: 'power2.out' },
@@ -112,18 +102,15 @@ export function createSceneTimeline({
   // --- Opening: space, title, first gate -------------------------------------
   // Everything spawns in its final position: the landscape is anchored to the
   // world bottom and the camera starts at the top of the world.
-  timeline.set(world, { scale: 1, yPercent: 0, transformOrigin: '50% 50%' });
-  timeline.set(skyScroll, { yPercent: 0, transformOrigin: '50% 0%' });
-  // The phase lives on the world element (the same one SkyEvents reads via
-  // closest()), so spawn logic and the timeline never disagree.
-  timeline.set(world, { attr: { 'data-sky-phase': 'space' } }, 0);
-  timeline.set(percy, {
-    xPercent: -50,
-    yPercent: 0,
-    opacity: 1,
-    attr: { 'data-state': 'idle' },
-  });
+  timeline.set(world, { scale: 1, x: 0, y: 0, originX: 0.5, originY: 0.5 });
+  timeline.set(skyScroll, { yPercent: 0 });
+  // Sky events read this to decide between comets (space) and meteors (sky).
+  timeline.set(flags, { skyPhase: 'space' }, 0);
+  timeline.set(percy, { x: 0, y: 0, opacity: 1 });
   timeline.set(glow, { opacity: 0 });
+  timeline.set(pan, { value: 0 });
+  timeline.set(fgV1, { opacity: 1 });
+  timeline.set(fgV2, { opacity: 0 });
 
   label('space', 0);
   alias('sky', 0);
@@ -149,7 +136,7 @@ export function createSceneTimeline({
   label('descend', 3.31);
   timeline.to(
     skyScroll,
-    { yPercent: -61.54, duration: descendDur, ease: 'power2.inOut' },
+    { yPercent: DESCENT_END_PERCENT, duration: descendDur, ease: 'power2.inOut' },
     3.31,
   );
 
@@ -162,7 +149,7 @@ export function createSceneTimeline({
   // meteors only (data-sky-phase flips to "sky").
   label('land', 7.0);
   alias('percyEnter', 7.0);
-  timeline.set(world, { attr: { 'data-sky-phase': 'sky' } }, 7.0);
+  timeline.set(flags, { skyPhase: 'sky' }, 7.0);
 
   // --- Zoom, centred on the screen ------------------------------------------
   label('zoomIn', 9.0);
@@ -182,46 +169,16 @@ export function createSceneTimeline({
   dialogueGate('percy-01', 14.0);
 
   // --- Pan to the rocks (one continuous world) ------------------------------
-  const unit = (root.clientWidth || DESIGN_WIDTH) / DESIGN_WIDTH;
+  // One progress value drives every layer; the world scales it by each layer's
+  // parallax factor (layout.panShift), so a resize never desyncs the pan.
   const panStart = 18.0;
   const panDur = reducedMotion ? 0.5 : 2.6;
   const panEnd = panStart + panDur;
   const panEase = 'power2.inOut';
-  const shift = (parallax: number) => -CAMERA_X.rocks * parallax * unit;
 
   label('panStart', panStart);
   timeline.to(world, { scale: reducedMotion ? 1 : 1.05, duration: panDur, ease: panEase }, panStart);
-  // The sky image and the streak bands (not the camera) carry the sky's
-  // horizontal parallax, so comet/meteor trails stay glued to the background.
-  timeline.to(skyImage, { x: shift(PARALLAX.sky), duration: panDur, ease: panEase }, panStart);
-  timeline.to(skyEvents, { x: shift(PARALLAX.sky), duration: panDur, ease: panEase }, panStart);
-  timeline.to(
-    clouds,
-    {
-      x: -CAMERA_X.rocks * (PARALLAX.clouds - PARALLAX.sky) * unit,
-      duration: panDur,
-      ease: panEase,
-    },
-    panStart,
-  );
-  timeline.to(far, { x: shift(PARALLAX.ridgeFar), duration: panDur, ease: panEase }, panStart);
-  timeline.to(farDup, { x: shift(PARALLAX.ridgeFar), duration: panDur, ease: panEase }, panStart);
-  timeline.to(mid, { x: shift(PARALLAX.ridgeNear), duration: panDur, ease: panEase }, panStart);
-  timeline.to(midDup, { x: shift(PARALLAX.ridgeNear), duration: panDur, ease: panEase }, panStart);
-  timeline.to(fore, { x: shift(PARALLAX.ground), duration: panDur, ease: panEase }, panStart);
-  timeline.to(foreDup, { x: shift(PARALLAX.ground), duration: panDur, ease: panEase }, panStart);
-  timeline.to(fgV1, { x: shift(PARALLAX.foreground), duration: panDur, ease: panEase }, panStart);
-  timeline.to(fgV2, { x: shift(PARALLAX.foreground), duration: panDur, ease: panEase }, panStart);
-  timeline.to(rocks, { x: shift(PARALLAX.rocks), duration: panDur, ease: panEase }, panStart);
-  timeline.to(
-    percy,
-    {
-      x: -(CAMERA_X.rocks * PARALLAX.rover - 190) * unit,
-      duration: panDur,
-      ease: panEase,
-    },
-    panStart,
-  );
+  timeline.to(pan, { value: 1, duration: panDur, ease: panEase }, panStart);
 
   // A small wheel bounce while he drives; skipped under reduced motion.
   if (!reducedMotion) {
@@ -245,14 +202,12 @@ export function createSceneTimeline({
   // The rocks are already in place (no reveal animation); the label keeps the
   // story beat and Percy reacts to reaching them.
   label('rocksReveal', round2(panEnd));
-  timeline.set(percy, { attr: { 'data-state': 'excited' } }, panEnd);
   timeline.to(
     percy,
     { y: -10, duration: reducedMotion ? 0.2 : 0.9, yoyo: true, repeat: 1, ease: 'power2.out' },
     panEnd,
   );
   timeline.to(glow, { opacity: 0.55, duration: 0.2, yoyo: true, repeat: 1, ease: 'sine.inOut' }, panEnd);
-  timeline.set(percy, { attr: { 'data-state': 'idle' } }, panEnd + (reducedMotion ? 0.4 : 1.8));
   label('prompt', round2(panEnd + 0.1));
   // percy-03's gate holds just after the pan stops, so the rocks are ready
   // when the player continues.

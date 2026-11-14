@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
+import { DevRoot } from './dev/DevRoot'; // DEV-TOOL
 import fontUrl from './assets/fonts/DK Cool Crayon.ttf?url';
 import './index.css';
 
@@ -21,6 +22,6 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    {import.meta.env.DEV ? <DevRoot /> : <App />} {/* DEV-TOOL */}
   </StrictMode>,
 );

@@ -14,9 +14,10 @@ export function EndScreen() {
       transition={{ duration: reducedMotion ? 0 : 0.4 }}
     >
       <div className="end-screen__card">
-        <h2 className="end-screen__title">P-02 not built yet</h2>
+        <h2 className="end-screen__title">To be continued...</h2>
         <p className="end-screen__subtitle">
-          This is the end of P-01 &ldquo;Pagi di Jezero&rdquo;. The next milestone is in development.
+          Percy and Ginny are on their way to Mars. The next chapter of their story is in
+          development.
         </p>
       </div>
     </motion.div>

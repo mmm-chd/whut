@@ -1,1 +1,18 @@
 /* App-level styles. Scene-specific styles live with each scene. */
+
+.story-sequence {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+/* The shell-owned blackout used between scenes. It sits above scene HUDs but
+   below the orientation gate, so rotation still covers everything. */
+.story-sequence__cover {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: #000;
+  pointer-events: none;
+}
