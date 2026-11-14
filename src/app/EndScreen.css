@@ -1,0 +1,36 @@
+.end-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: radial-gradient(circle at 50% 40%, rgba(43, 26, 22, 0.3), rgba(43, 26, 22, 0.84));
+}
+
+.end-screen__card {
+  width: min(30rem, 100%);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  color: #fff8f0;
+  text-align: center;
+  background: rgba(43, 26, 22, 0.78);
+  border: 1px solid rgba(255, 241, 230, 0.22);
+  border-radius: 1.5rem;
+  box-shadow: 0 2rem 5rem rgba(33, 16, 12, 0.45);
+  backdrop-filter: blur(10px);
+}
+
+.end-screen__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #f2c14e;
+}
+
+.end-screen__subtitle {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.6;
+  color: rgba(255, 248, 240, 0.82);
+}

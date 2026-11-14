@@ -1,0 +1,157 @@
+.sky-events {
+  position: absolute;
+  inset: 0;
+  /* Streaks are anchored to the world background, NOT to the camera: the
+     bands below live inside the tall world, so when the camera travels down
+     the trails stay put in the sky and scroll naturally past the view. */
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Two world-anchored bands with their own clipping:
+   - space: starfield region of the world (comets + meteors while in space)
+   - mars:  the camera's resting view band after landing (meteors only) */
+.sky-events__band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sky-events__band--space {
+  top: 0;
+  height: 60%;
+}
+
+.sky-events__band--mars {
+  top: 61.54%;
+  height: 38.46%;
+}
+
+/* Outer shell: rotation + travel along the streak axis (linear), plus the
+   overall fade. Inner body carries the visuals and adds the arc drop. */
+.sky-event {
+  position: absolute;
+  top: var(--ev-y);
+  left: var(--ev-x);
+  width: var(--ev-length);
+  height: var(--ev-thickness);
+  opacity: 0;
+  animation: sky-event-fly var(--ev-duration) linear forwards;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.sky-event__body {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  animation-name: sky-event-drop;
+  animation-duration: var(--ev-duration);
+  animation-timing-function: var(--ev-drop-ease, ease-in);
+  animation-fill-mode: forwards;
+}
+
+@keyframes sky-event-fly {
+  0% {
+    transform: rotate(var(--ev-angle)) translateX(-100%);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotate(var(--ev-angle)) translateX(var(--ev-travel));
+    opacity: 0;
+  }
+}
+
+@keyframes sky-event-drop {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(var(--ev-drop));
+  }
+}
+
+/* --- Meteor: thin warm-cream streak with a small bright head ------------- */
+
+.sky-event--meteor .sky-event__body {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 239, 210, 0) 0%,
+    rgba(255, 239, 210, 0.18) 40%,
+    rgba(255, 239, 210, 0.85) 92%,
+    #fff 100%
+  );
+}
+
+.sky-event--meteor .sky-event__body::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  width: var(--ev-head);
+  height: var(--ev-head);
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff 0%,
+    rgba(255, 239, 210, 0.85) 50%,
+    rgba(255, 239, 210, 0) 78%
+  );
+}
+
+/* --- Comet: large icy-cyan head with coma glow and a wide luminous tail -- */
+
+.sky-event--comet .sky-event__body {
+  background: linear-gradient(
+    90deg,
+    rgba(127, 212, 255, 0) 0%,
+    rgba(127, 212, 255, 0.14) 30%,
+    rgba(155, 232, 255, 0.6) 82%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  box-shadow: 0 0 18px rgba(127, 212, 255, 0.35);
+}
+
+.sky-event--comet .sky-event__body::after {
+  content: '';
+  position: absolute;
+  right: calc(var(--ev-head) * -0.6);
+  top: 50%;
+  width: calc(var(--ev-head) * 2.8);
+  height: calc(var(--ev-head) * 2.8);
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(155, 232, 255, 0.6) 32%,
+    rgba(127, 212, 255, 0) 68%
+  );
+}
+
+/* Reduced motion: scheduler is skipped via the prop; these rules are belt and
+   suspenders and mirror the .scene[data-reduced-motion] convention. */
+.scene[data-reduced-motion='true'] .sky-event {
+  animation: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-event {
+    animation: none;
+    opacity: 0;
+  }
+}

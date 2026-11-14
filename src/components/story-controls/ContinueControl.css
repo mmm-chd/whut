@@ -1,0 +1,57 @@
+.continue-control {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  z-index: 25;
+  transform: translateX(-50%);
+  width: min(28rem, 92vw);
+  padding: 0.9rem 1.5rem 1rem;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  letter-spacing: 0.035em;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+  border-radius: 0.25rem 0.6rem 0.35rem 0.5rem;
+  box-shadow: 0 4px 0 rgba(74, 43, 33, 0.38);
+}
+
+.continue-control:focus-visible {
+  outline: 3px solid #f2c14e;
+  outline-offset: 4px;
+}
+
+.continue-control:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.continue-control--locked {
+  color: #845f4f;
+  background: rgba(246, 231, 201, 0.72);
+  border: 2px dashed rgba(123, 70, 54, 0.58);
+}
+
+.continue-control--unlocked {
+  color: #4a2b21;
+  background: #f2c14e;
+  border: 2px solid #7b4636;
+}
+
+.continue-control--unlocked:hover:not(:disabled) {
+  background: #ffd977;
+  transform: translateX(-50%) translateY(-2px) rotate(-0.5deg);
+}
+
+@media (max-width: 720px) {
+  .continue-control {
+    bottom: 1rem;
+    width: 94vw;
+    font-size: 1rem;
+    padding: 0.9rem 1rem;
+  }
+}

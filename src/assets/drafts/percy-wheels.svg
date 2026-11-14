@@ -1,0 +1,26 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 110' width='360' height='110'>
+  <g>
+    <circle cx='70' cy='55' r='42' fill='#2b1a16'/>
+    <circle cx='70' cy='55' r='42' fill='none' stroke='#1a0f0c' stroke-width='9' stroke-dasharray='10 8'/>
+    <circle cx='70' cy='55' r='28' fill='#6b4a3a'/>
+    <circle cx='70' cy='55' r='12' fill='#d8c3a5'/>
+    <circle cx='70' cy='55' r='4' fill='#2b1a16'/>
+    <path d='M52 40 Q70 28 88 40' fill='none' stroke='#a88a6a' stroke-width='5' stroke-linecap='round' opacity='0.65'/>
+  </g>
+  <g>
+    <circle cx='180' cy='55' r='42' fill='#2b1a16'/>
+    <circle cx='180' cy='55' r='42' fill='none' stroke='#1a0f0c' stroke-width='9' stroke-dasharray='10 8'/>
+    <circle cx='180' cy='55' r='28' fill='#6b4a3a'/>
+    <circle cx='180' cy='55' r='12' fill='#d8c3a5'/>
+    <circle cx='180' cy='55' r='4' fill='#2b1a16'/>
+    <path d='M162 40 Q180 28 198 40' fill='none' stroke='#a88a6a' stroke-width='5' stroke-linecap='round' opacity='0.65'/>
+  </g>
+  <g>
+    <circle cx='290' cy='55' r='42' fill='#2b1a16'/>
+    <circle cx='290' cy='55' r='42' fill='none' stroke='#1a0f0c' stroke-width='9' stroke-dasharray='10 8'/>
+    <circle cx='290' cy='55' r='28' fill='#6b4a3a'/>
+    <circle cx='290' cy='55' r='12' fill='#d8c3a5'/>
+    <circle cx='290' cy='55' r='4' fill='#2b1a16'/>
+    <path d='M272 40 Q290 28 308 40' fill='none' stroke='#a88a6a' stroke-width='5' stroke-linecap='round' opacity='0.65'/>
+  </g>
+</svg>

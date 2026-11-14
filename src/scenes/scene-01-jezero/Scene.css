@@ -1,0 +1,435 @@
+.scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f7d9d0 0%, #c98770 45%, #7b4636 75%, #4d2a23 100%);
+  color: #2b1a16;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.stage__world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.stage__layer {
+  position: absolute;
+  will-change: transform;
+}
+
+.stage__layer-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* The tall vertical world: one 260%-tall scroll the camera travels down.
+   Children anchored to its bottom (offsets are % of the 260% height, so a
+   viewport-height strip = 100/260 = 38.46%). */
+.stage__layer--sky-scroll {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 260%;
+  z-index: 1;
+}
+
+/* The unified sky fills the whole world; the 2% over-width covers the
+   0.05-parallax shift at the rocks stop (the pan tweens this image's x). */
+.sky-scroll__image {
+  position: absolute;
+  top: 0;
+  left: -1%;
+  display: block;
+  width: 102%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  user-select: none;
+  pointer-events: none;
+}
+
+.stage__clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stage__cloud {
+  position: absolute;
+  display: block;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform;
+  animation: cloud-wave 24s ease-in-out infinite;
+}
+
+.stage__cloud--1 {
+  animation-duration: 26s;
+}
+
+.stage__cloud--2 {
+  animation-duration: 32s;
+  animation-delay: -6s;
+}
+
+.stage__cloud--3 {
+  animation-duration: 22s;
+  animation-delay: -11s;
+}
+
+/* Wave: a gentle bob and roll, looping seamlessly back to rest. */
+@keyframes cloud-wave {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate3d(0.7%, -0.9%, 0) rotate(0.6deg);
+  }
+
+  50% {
+    transform: translate3d(1.4%, 0.2%, 0) rotate(0deg);
+  }
+
+  75% {
+    transform: translate3d(0.7%, -0.4%, 0) rotate(-0.6deg);
+  }
+}
+
+.stage__layer--ridge-far {
+  left: -4%;
+  /* 38% of the viewport = 38/260 of the world height. */
+  bottom: 14.62%;
+  width: 108%;
+  aspect-ratio: 1672 / 438;
+  z-index: 2;
+}
+
+.stage__layer--ridge-near {
+  left: 0%;
+  /* 32% of the viewport = 32/260 of the world height. */
+  bottom: 11.5%;
+  width: 125%;
+  aspect-ratio: 1672 / 438;
+  z-index: 4;
+}
+
+.stage__layer--mirror .stage__layer-image {
+  transform: scaleX(-1);
+}
+
+.stage__layer--ridge-far[data-layer='far-dup'] {
+  left: 104%;
+}
+
+.stage__layer--ridge-near[data-layer='mid-dup'] {
+  left: 106%;
+}
+
+.stage__layer-image--ridge {
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.stage__layer--ground {
+  left: 0;
+  /* -38% of the viewport = -38/260 of the world height; the element itself
+     stays one viewport tall (100/260 of the world). */
+  bottom: -14.62%;
+  width: 100%;
+  position: absolute;
+  height: 38.46%;
+  z-index: 3;
+}
+
+.stage__layer--ground[data-layer='fore-dup'] {
+  left: 100%;
+}
+
+.stage__layer-image--ground {
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+/* Foreground band: v1 = frame 1, v2 = wide frame 2. Both sit above Percy. */
+.stage__layer--fg {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  aspect-ratio: 1672 / 176;
+  z-index: 8;
+  opacity: 0;
+}
+
+.stage__layer--fg[data-fg='v1'] {
+  opacity: 1;
+}
+
+.stage__layer--fg-wide {
+  /* 2520/1920 = 131.25% covers the full pan; the 2172px art has the same height. */
+  width: 131.25%;
+  aspect-ratio: 2172 / 176;
+  opacity: 0;
+}
+
+.stage__layer-image--fg {
+  object-fit: fill;
+}
+
+.scene[data-reduced-motion='true'] .stage__cloud {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage__cloud {
+    animation: none;
+  }
+}
+
+.stage__actors {
+  /* One viewport tall, anchored to the world bottom, so Percy/rock
+     percentages keep their viewport meaning. */
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38.46%;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.percy {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: clamp(300px, 40vw, 780px);
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.percy__rover {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  z-index: 2;
+  user-select: none;
+  pointer-events: none;
+}
+
+.percy__shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -4%;
+  display: block;
+  width: 86%;
+  height: auto;
+  transform: translateX(-50%);
+  z-index: 1;
+  opacity: 0.85;
+  user-select: none;
+  pointer-events: none;
+}
+
+.percy__glow {
+  position: absolute;
+  inset: -20% -15%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 160, 0.65) 0%, rgba(255, 220, 160, 0) 65%);
+  opacity: 0;
+  will-change: opacity;
+  z-index: 0;
+}
+
+.rocks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.rock {
+  position: absolute;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  outline: none;
+  pointer-events: auto;
+}
+
+.rock:focus-visible {
+  outline: 2px solid #ffefd2;
+  outline-offset: 8px;
+  z-index: 2;
+}
+
+.rock:disabled {
+  cursor: default;
+}
+
+.rock__image {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.rock:hover .rock__image,
+.rock:focus-visible .rock__image {
+  filter: drop-shadow(0 0 10px rgba(255, 239, 210, 0.5));
+}
+
+.rock--inspected .rock__image {
+  filter: saturate(0.92);
+}
+
+/* Sonar: two cream rings from the rock base (50% 100%), 0.7s apart. */
+.rock__sonar {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rock__sonar-ring {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid #ffefd2;
+  border-radius: 50%;
+  transform: translate(-50%, 50%) scale(0.35);
+  opacity: 0;
+  animation: sonar-ring 2.2s linear infinite;
+}
+
+.rock__sonar-ring--delay {
+  animation-delay: 0.7s;
+}
+
+.rock__sonar--paused .rock__sonar-ring {
+  animation-play-state: paused;
+}
+
+@keyframes sonar-ring {
+  0% {
+    transform: translate(-50%, 50%) scale(0.35);
+    opacity: 0.65;
+  }
+
+  100% {
+    transform: translate(-50%, 50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+.rock__sonar--static {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 150%;
+  height: 80%;
+  transform: translate(-50%, 18%);
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(255, 239, 210, 0.3) 0%,
+    rgba(255, 239, 210, 0) 68%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rock__sonar-ring {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+.dust {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.dust__particle {
+  position: absolute;
+  left: var(--dust-left);
+  top: var(--dust-top);
+  width: var(--dust-size);
+  height: var(--dust-size);
+  border-radius: 50%;
+  background: rgba(255, 236, 210, 0.8);
+  opacity: 0;
+  animation: dust-drift var(--dust-duration) linear infinite;
+  animation-delay: var(--dust-delay);
+  will-change: transform, opacity;
+}
+
+@keyframes dust-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: var(--dust-opacity);
+  }
+
+  85% {
+    opacity: var(--dust-opacity);
+  }
+
+  100% {
+    transform: translate3d(var(--dust-x), var(--dust-y), 0);
+    opacity: 0;
+  }
+}
+
+.stage__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(43, 26, 22, 0) 45%,
+    rgba(43, 26, 22, 0.28) 100%
+  );
+}
+
+@media (max-width: 720px) {
+  .percy {
+    bottom: 22%;
+    width: clamp(160px, 38vw, 240px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dust__particle {
+    animation: none;
+    opacity: 0.2;
+  }
+}

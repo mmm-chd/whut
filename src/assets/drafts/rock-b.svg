@@ -1,0 +1,20 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 220' width='300' height='220'>
+  <defs>
+    <linearGradient id='rockB' x1='0' y1='0' x2='0.75' y2='1'>
+      <stop offset='0' stop-color='#dda262'/>
+      <stop offset='0.5' stop-color='#b9793f'/>
+      <stop offset='1' stop-color='#7c4a29'/>
+    </linearGradient>
+    <filter id='rockBShadow' x='-30%' y='-60%' width='160%' height='220%'>
+      <feGaussianBlur stdDeviation='7'/>
+    </filter>
+  </defs>
+  <ellipse cx='150' cy='202' rx='110' ry='11' fill='#4a1f18' opacity='0.24' filter='url(#rockBShadow)'/>
+  <path d='M31 198 L39 155 Q57 100 111 78 Q168 58 214 88 Q251 113 266 158 L272 198 Z' fill='url(#rockB)'/>
+  <path d='M39 155 Q57 100 111 78 Q128 111 99 153 Z' fill='#e8b678' opacity='0.48'/>
+  <path d='M168 60 Q214 88 Q251 113 266 158 L222 158 Q198 111 168 60 Z' fill='#8f5a33' opacity='0.42'/>
+  <path d='M57 100 Q79 121 Q71 164 Q55 185 43 197' fill='none' stroke='#6a3d22' stroke-width='3' stroke-linecap='round' opacity='0.24'/>
+  <path d='M198 111 Q222 140 Q232 174 238 197' fill='none' stroke='#6a3d22' stroke-width='3' stroke-linecap='round' opacity='0.22'/>
+  <path d='M39 155 Q57 100 111 78 Q168 58 214 88' fill='none' stroke='#f3d3a6' stroke-width='3' stroke-linecap='round' opacity='0.5'/>
+  <path d='M214 88 Q251 113 266 158' fill='none' stroke='#e8bd8c' stroke-width='2' stroke-linecap='round' opacity='0.3'/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 220' width='360' height='220'>
+  <defs>
+    <linearGradient id='body' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#fbf0dd'/>
+      <stop offset='1' stop-color='#d9c3a3'/>
+    </linearGradient>
+    <linearGradient id='deck' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#e8d5b8'/>
+      <stop offset='1' stop-color='#c9ad88'/>
+    </linearGradient>
+  </defs>
+  <ellipse cx='180' cy='206' rx='150' ry='14' fill='#2b1a16' opacity='0.22'/>
+  <rect x='36' y='86' width='34' height='56' rx='12' fill='#8a7a6a' stroke='#4d342b' stroke-width='5'/>
+  <rect x='48' y='78' width='264' height='96' rx='30' fill='url(#body)' stroke='#4d342b' stroke-width='6'/>
+  <rect x='78' y='62' width='204' height='34' rx='17' fill='url(#deck)' stroke='#4d342b' stroke-width='5'/>
+  <rect x='60' y='132' width='240' height='18' rx='9' fill='#3c8c8a'/>
+  <path d='M300 120 L338 102' stroke='#4d342b' stroke-width='14' stroke-linecap='round'/>
+  <circle cx='342' cy='99' r='12' fill='#3c8c8a' stroke='#4d342b' stroke-width='5'/>
+  <circle cx='100' cy='112' r='8' fill='#c98a4b' stroke='#4d342b' stroke-width='4'/>
+  <circle cx='130' cy='112' r='8' fill='#c98a4b' stroke='#4d342b' stroke-width='4'/>
+  <circle cx='160' cy='112' r='8' fill='#c98a4b' stroke='#4d342b' stroke-width='4'/>
+  <circle cx='250' cy='112' r='15' fill='#f7d9d0' stroke='#4d342b' stroke-width='4'/>
+  <text x='250' y='118' text-anchor='middle' font-family='sans-serif' font-size='15' font-weight='700' fill='#4d342b'>P</text>
+  <path d='M78 92 Q180 74 282 92' fill='none' stroke='#fffaf2' stroke-width='5' opacity='0.55' stroke-linecap='round'/>
+  <rect x='160' y='48' width='40' height='20' rx='8' fill='#4d342b'/>
+  <path d='M180 48 L180 24' stroke='#4d342b' stroke-width='5' stroke-linecap='round'/>
+  <circle cx='180' cy='20' r='6' fill='#3c8c8a' stroke='#4d342b' stroke-width='4'/>
+</svg>

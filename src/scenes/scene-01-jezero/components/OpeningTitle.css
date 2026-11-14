@@ -1,0 +1,23 @@
+.opening-title {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  padding: 6vw;
+  pointer-events: none;
+}
+
+/* Title only — no paper panel, just the heading text on the space backdrop. */
+.opening-title__heading {
+  margin: 0;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: clamp(2.1rem, 5.4vw, 4.8rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  color: #f6e7c9;
+  text-align: center;
+  text-shadow: 0 4px 30px rgba(20, 10, 8, 0.55);
+}

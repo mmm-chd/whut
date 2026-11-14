@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#f4e3d7" />
+  <rect
+    x="8"
+    y="8"
+    width="384"
+    height="284"
+    fill="none"
+    stroke="#8a5a44"
+    stroke-width="4"
+    stroke-dasharray="12 8"
+  />
+  <text x="200" y="145" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#8a5a44">
+    PLACEHOLDER
+  </text>
+  <text x="200" y="175" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#8a5a44">
+    P-01 asset
+  </text>
+</svg>

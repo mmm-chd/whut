@@ -1,0 +1,28 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080' width='1920' height='1080'>
+  <defs>
+    <linearGradient id='ground' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#7b4636'/>
+      <stop offset='1' stop-color='#4d2a23'/>
+    </linearGradient>
+  </defs>
+  <path d='M0 960 C220 920 380 980 560 950 C740 920 900 990 1080 955 C1260 920 1440 990 1620 955 C1780 925 1860 960 1920 950 L1920 1080 L0 1080 Z' fill='url(#ground)'/>
+  <g fill='#2f1a16' opacity='0.55'>
+    <ellipse cx='180' cy='1010' rx='54' ry='18'/>
+    <ellipse cx='520' cy='1030' rx='40' ry='14'/>
+    <ellipse cx='880' cy='1005' rx='70' ry='20'/>
+    <ellipse cx='1240' cy='1032' rx='46' ry='15'/>
+    <ellipse cx='1580' cy='1008' rx='64' ry='18'/>
+    <ellipse cx='1840' cy='1030' rx='36' ry='12'/>
+  </g>
+  <g fill='#a86a52' opacity='0.5'>
+    <ellipse cx='300' cy='980' rx='90' ry='12'/>
+    <ellipse cx='700' cy='992' rx='120' ry='14'/>
+    <ellipse cx='1080' cy='982' rx='100' ry='12'/>
+    <ellipse cx='1460' cy='994' rx='110' ry='13'/>
+  </g>
+  <g stroke='#2f1a16' stroke-width='5' stroke-linecap='round' opacity='0.35'>
+    <path d='M420 1000 L470 1018 L510 1010'/>
+    <path d='M980 1020 L1030 1004 L1080 1016'/>
+    <path d='M1380 1012 L1430 1028 L1480 1016'/>
+  </g>
+</svg>

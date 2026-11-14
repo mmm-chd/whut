@@ -1,0 +1,29 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080' width='1920' height='1080'>
+  <defs>
+    <linearGradient id='sky' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#fbe8df'/>
+      <stop offset='0.42' stop-color='#f0c7b7'/>
+      <stop offset='1' stop-color='#c98770'/>
+    </linearGradient>
+    <radialGradient id='sun' cx='0.68' cy='0.22' r='0.42'>
+      <stop offset='0' stop-color='#fff7ea' stop-opacity='0.95'/>
+      <stop offset='0.35' stop-color='#ffd9b8' stop-opacity='0.5'/>
+      <stop offset='1' stop-color='#ffd9b8' stop-opacity='0'/>
+    </radialGradient>
+    <linearGradient id='haze' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#f7d9cf' stop-opacity='0'/>
+      <stop offset='1' stop-color='#f7d9cf' stop-opacity='0.55'/>
+    </linearGradient>
+  </defs>
+  <rect width='1920' height='1080' fill='url(#sky)'/>
+  <circle cx='1306' cy='238' r='430' fill='url(#sun)'/>
+  <circle cx='1306' cy='238' r='52' fill='#fffaf2' opacity='0.9'/>
+  <g fill='#f8ded4' opacity='0.45'>
+    <ellipse cx='360' cy='230' rx='220' ry='26'/>
+    <ellipse cx='520' cy='246' rx='150' ry='18'/>
+    <ellipse cx='980' cy='160' rx='180' ry='20'/>
+    <ellipse cx='1540' cy='330' rx='240' ry='24'/>
+    <ellipse cx='1700' cy='350' rx='140' ry='16'/>
+  </g>
+  <rect y='760' width='1920' height='320' fill='url(#haze)'/>
+</svg>

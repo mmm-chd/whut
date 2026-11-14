@@ -1,0 +1,20 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 220' width='300' height='220'>
+  <defs>
+    <linearGradient id='rockA' x1='0' y1='0' x2='0.7' y2='1'>
+      <stop offset='0' stop-color='#c46a52'/>
+      <stop offset='0.52' stop-color='#9c4838'/>
+      <stop offset='1' stop-color='#682b23'/>
+    </linearGradient>
+    <filter id='rockAShadow' x='-30%' y='-60%' width='160%' height='220%'>
+      <feGaussianBlur stdDeviation='7'/>
+    </filter>
+  </defs>
+  <ellipse cx='150' cy='203' rx='108' ry='11' fill='#4a1f18' opacity='0.26' filter='url(#rockAShadow)'/>
+  <path d='M34 199 L45 141 L74 105 L119 79 L167 71 L214 93 L250 133 L266 199 Z' fill='url(#rockA)'/>
+  <path d='M45 141 L74 105 L119 79 L137 113 L97 147 Z' fill='#d57b5e' opacity='0.5'/>
+  <path d='M167 71 L214 93 L250 133 L208 149 L179 109 Z' fill='#7c342a' opacity='0.48'/>
+  <path d='M74 105 L97 147 L71 197' fill='none' stroke='#5b251f' stroke-width='3' stroke-linecap='round' opacity='0.28'/>
+  <path d='M179 109 L208 149 L238 191' fill='none' stroke='#5b251f' stroke-width='3' stroke-linecap='round' opacity='0.24'/>
+  <path d='M45 141 L74 105 L119 79 L167 71' fill='none' stroke='#f0c9a4' stroke-width='3' stroke-linecap='round' opacity='0.5'/>
+  <path d='M167 71 L214 93 L250 133' fill='none' stroke='#e6b78c' stroke-width='2' stroke-linecap='round' opacity='0.3'/>
+</svg>

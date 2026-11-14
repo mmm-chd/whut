@@ -1,0 +1,25 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080' width='1920' height='1080'>
+  <defs>
+    <linearGradient id='dune1' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#c98562'/>
+      <stop offset='1' stop-color='#a65f46'/>
+    </linearGradient>
+    <linearGradient id='dune2' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#b46a4f'/>
+      <stop offset='1' stop-color='#8f4d3a'/>
+    </linearGradient>
+  </defs>
+  <path d='M0 880 C180 820 300 900 480 860 C660 820 760 900 940 870 C1120 840 1240 910 1420 870 C1600 830 1740 900 1920 860 L1920 1080 L0 1080 Z' fill='url(#dune1)'/>
+  <path d='M0 940 C160 900 300 960 460 930 C620 900 760 970 920 940 C1080 910 1240 980 1400 945 C1560 910 1740 970 1920 935 L1920 1080 L0 1080 Z' fill='url(#dune2)' opacity='0.92'/>
+  <g fill='#7b4034' opacity='0.55'>
+    <ellipse cx='260' cy='940' rx='46' ry='14'/>
+    <ellipse cx='760' cy='966' rx='60' ry='16'/>
+    <ellipse cx='1280' cy='952' rx='38' ry='12'/>
+    <ellipse cx='1680' cy='980' rx='54' ry='14'/>
+  </g>
+  <g fill='#d99a72' opacity='0.35'>
+    <ellipse cx='420' cy='900' rx='90' ry='10'/>
+    <ellipse cx='1120' cy='920' rx='110' ry='12'/>
+    <ellipse cx='1540' cy='900' rx='80' ry='9'/>
+  </g>
+</svg>

@@ -1,0 +1,37 @@
+.progress {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  background: rgba(246, 231, 201, 0.94);
+  border: 2px solid #7b4636;
+  border-radius: 0.4rem 0.65rem 0.45rem 0.6rem;
+  box-shadow: 2px 3px 0 rgba(74, 43, 33, 0.28);
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.progress__label {
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  color: #a14d37;
+}
+
+.progress__count {
+  font-size: 1rem;
+  color: #4a2b21;
+}
+
+@media (max-width: 720px) {
+  .progress {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
+
+  .progress__label {
+    display: none;
+  }
+}

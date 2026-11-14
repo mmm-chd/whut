@@ -1,0 +1,19 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080' width='1920' height='1080'>
+  <defs>
+    <linearGradient id='rim' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#c47b60'/>
+      <stop offset='1' stop-color='#9a5442'/>
+    </linearGradient>
+    <linearGradient id='rim2' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0' stop-color='#a9604b'/>
+      <stop offset='1' stop-color='#7b4034'/>
+    </linearGradient>
+  </defs>
+  <path d='M0 760 L90 720 L180 742 L290 690 L410 730 L520 700 L650 748 L760 712 L880 750 L1010 706 L1130 742 L1250 700 L1380 738 L1500 710 L1620 746 L1740 704 L1840 730 L1920 712 L1920 1080 L0 1080 Z' fill='url(#rim)' opacity='0.92'/>
+  <path d='M0 850 L120 820 L240 846 L360 806 L500 842 L640 814 L780 850 L920 818 L1060 852 L1200 820 L1340 848 L1480 812 L1620 844 L1760 818 L1920 842 L1920 1080 L0 1080 Z' fill='url(#rim2)' opacity='0.88'/>
+  <g fill='#8f4d3a' opacity='0.55'>
+    <path d='M240 842 L280 780 L330 842 Z'/>
+    <path d='M1180 846 L1220 790 L1270 846 Z'/>
+    <path d='M1660 838 L1700 792 L1745 838 Z'/>
+  </g>
+</svg>
