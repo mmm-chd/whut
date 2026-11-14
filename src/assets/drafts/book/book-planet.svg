@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 620" width="620" height="620">
+  <!-- Paper-cut Mars: flat sphere with cell-shaded crescents, light from top-left. -->
+  <defs>
+    <clipPath id="mars-disc">
+      <circle cx="310" cy="310" r="290" />
+    </clipPath>
+  </defs>
+
+  <circle cx="310" cy="310" r="290" fill="#B95E43" />
+
+  <g clip-path="url(#mars-disc)">
+    <!-- Shade away from the light: a same-size disc nudged down-right. -->
+    <circle cx="356" cy="352" r="290" fill="#8E4634" opacity="0.62" />
+    <!-- Warm rim light on the lit limb. -->
+    <circle cx="258" cy="258" r="262" fill="#D2795B" opacity="0.45" />
+
+    <g fill="#A0523D">
+      <ellipse cx="180" cy="250" rx="46" ry="26" transform="rotate(-14 180 250)" />
+      <ellipse cx="342" cy="168" rx="30" ry="16" transform="rotate(10 342 168)" />
+      <ellipse cx="420" cy="356" rx="54" ry="28" transform="rotate(-6 420 356)" />
+      <ellipse cx="238" cy="430" rx="34" ry="18" transform="rotate(12 238 430)" />
+      <ellipse cx="300" cy="300" rx="22" ry="12" transform="rotate(-20 300 300)" />
+    </g>
+    <g fill="#C4735A" opacity="0.75">
+      <ellipse cx="176" cy="245" rx="34" ry="18" transform="rotate(-14 176 245)" />
+      <ellipse cx="416" cy="351" rx="40" ry="19" transform="rotate(-6 416 351)" />
+    </g>
+    <g fill="#D9A183" opacity="0.5">
+      <ellipse cx="120" cy="330" rx="70" ry="20" transform="rotate(-18 120 330)" />
+      <ellipse cx="470" cy="200" rx="58" ry="16" transform="rotate(8 470 200)" />
+      <ellipse cx="356" cy="500" rx="60" ry="18" transform="rotate(-4 356 500)" />
+    </g>
+  </g>
+</svg>

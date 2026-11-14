@@ -1,12 +1,14 @@
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { useExperienceStore } from './experience.store';
 import { useStoryStore } from '../stores/story.store';
 import { App } from './App';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 function resetStore() {
+  useExperienceStore.setState({ stage: 'story' });
   useStoryStore.setState({
     activeSceneId: 'p01-jezero',
     status: 'playing',

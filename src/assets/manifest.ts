@@ -44,6 +44,18 @@ import p03CardSojournerUrl from './drafts/p03/card-sojourner.svg';
 import p03CardSpiritUrl from './drafts/p03/card-spirit.svg';
 import p03CardOpportunityUrl from './drafts/p03/card-opportunity.svg';
 import p03CardCuriosityUrl from './drafts/p03/card-curiosity.svg';
+import homeRocketUrl from './drafts/home/home-rocket.svg';
+import homeFlameUrl from './drafts/home/home-flame.svg';
+import homeSmokeDeepUrl from './drafts/home/home-smoke-deep.svg';
+import homeSmokeMidUrl from './drafts/home/home-smoke-mid.svg';
+import homeSmokeNearUrl from './drafts/home/home-smoke-near.svg';
+import homeCrowdAUrl from './drafts/home/home-crowd-a.svg';
+import homeCrowdBUrl from './drafts/home/home-crowd-b.svg';
+import homeMoonUrl from './drafts/home/home-moon.svg';
+import homeCloudUrl from './drafts/home/home-cloud.svg';
+import homeShipUrl from './drafts/home/home-ship.svg';
+import homeTowerUrl from './drafts/home/home-tower.svg';
+import bookPlanetUrl from './drafts/book/book-planet.svg';
 import cruiseSpaceUrl from './fixed/space-filler.png';
 import crayonFontUrl from './fonts/DK Cool Crayon.ttf';
 import kindredSpiritsUrl from '../audio/bgm/Kindred Spirits - Howard Harper-Barnes.mp3';
@@ -152,14 +164,14 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p02-sea': finalAsset('p02-sea', 'image', p02SeaUrl, 'Atlantic horizon'),
   'p02-ground': finalAsset('p02-ground', 'image', p02GroundUrl, 'Launch site ground and road'),
   'p02-tower-back': finalAsset('p02-tower-back', 'image', p02TowerBackUrl, 'Distant launch towers'),
-  'p02-tower-front': finalAsset('p02-tower-front', 'image', p02TowerFrontUrl, 'Foreground launch towers'),
-  'p02-tower': finalAsset('p02-tower', 'image', p02TowerUrl, 'Launch service tower'),
-  'p02-rocket-half': finalAsset(
-    'p02-rocket-half',
+  'p02-tower-front': finalAsset(
+    'p02-tower-front',
     'image',
-    p02RocketHalfUrl,
-    'Atlas V upper body',
+    p02TowerFrontUrl,
+    'Foreground launch towers',
   ),
+  'p02-tower': finalAsset('p02-tower', 'image', p02TowerUrl, 'Launch service tower'),
+  'p02-rocket-half': finalAsset('p02-rocket-half', 'image', p02RocketHalfUrl, 'Atlas V upper body'),
   'p02-rocket': finalAsset('p02-rocket', 'image', p02RocketFullUrl, 'Atlas V 541 rocket'),
   'p02-window-bg': finalAsset(
     'p02-window-bg',
@@ -187,6 +199,22 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p02-smoke-mid': draftImage('p02-smoke-mid', p02SmokeMidUrl, 'Middle launch smoke'),
   'p02-smoke-near': draftImage('p02-smoke-near', p02SmokeNearUrl, 'Foreground launch smoke'),
   'p02-exhaust': draftImage('p02-exhaust', p02ExhaustUrl, 'Rocket exhaust flame'),
+
+  // Homepage "The Launchpad" paper-cut layers (draft art, Dusk palette)
+  'home-rocket': draftImage('home-rocket', homeRocketUrl, 'Paper-cut rocket with boosters'),
+  'home-flame': draftImage('home-flame', homeFlameUrl, 'Rocket exhaust flame'),
+  'home-smoke-deep': draftImage('home-smoke-deep', homeSmokeDeepUrl, 'Deep violet smoke layer'),
+  'home-smoke-mid': draftImage('home-smoke-mid', homeSmokeMidUrl, 'Mid violet smoke layer'),
+  'home-smoke-near': draftImage('home-smoke-near', homeSmokeNearUrl, 'Light lavender smoke layer'),
+  'home-crowd-a': draftImage('home-crowd-a', homeCrowdAUrl, 'Waving crowd silhouette, pose A'),
+  'home-crowd-b': draftImage('home-crowd-b', homeCrowdBUrl, 'Waving crowd silhouette, pose B'),
+  'home-moon': draftImage('home-moon', homeMoonUrl, 'Crescent moon'),
+  'home-cloud': draftImage('home-cloud', homeCloudUrl, 'Small paper cloud'),
+  'home-ship': draftImage('home-ship', homeShipUrl, 'Tiny boat silhouette'),
+  'home-tower': draftImage('home-tower', homeTowerUrl, 'Lattice launch tower silhouette'),
+
+  // 2.5D book scenes (draft art, Scrapbook + Space palette)
+  'book-planet': draftImage('book-planet', bookPlanetUrl, 'Paper-cut Mars planet backdrop'),
 
   // Cruise entry (pulled space backdrop)
   'cruise-bg-space': finalAsset(

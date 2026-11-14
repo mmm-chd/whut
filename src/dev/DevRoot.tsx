@@ -2,6 +2,7 @@
 // delete the src/dev folder and the DEV-TOOL lines in src/main.tsx.
 import { useCallback, useEffect, useState } from 'react';
 import { App } from '../app/App';
+import { useExperienceStore } from '../app/experience.store';
 import { useStoryStore } from '../stores/story.store';
 import type { StorySceneId } from '../app/sceneSequence';
 
@@ -33,11 +34,25 @@ export function DevRoot() {
   const [open, setOpen] = useState(true);
   const activeSceneId = useStoryStore((s) => s.activeSceneId);
   const status = useStoryStore((s) => s.status);
+  const stage = useExperienceStore((s) => s.stage);
 
   const jump = useCallback((id: StorySceneId) => {
     applyScene(id);
     // A new key remounts the whole app, so the same scene restarts cleanly.
     setNonce((n) => n + 1);
+  }, []);
+
+  const jumpStage = useCallback((stage: 'homepage' | 'book') => {
+    useExperienceStore.setState({ stage });
+    setNonce((n) => n + 1);
+  }, []);
+
+  /* DEV-TOOL: ?devStage=book jumps straight to the journal for screenshots. */
+  useEffect(() => {
+    const stage = new URLSearchParams(window.location.search).get('devStage');
+    if (stage === 'homepage' || stage === 'book') {
+      useExperienceStore.setState({ stage });
+    }
   }, []);
 
   useEffect(() => {
@@ -112,6 +127,38 @@ export function DevRoot() {
                   {i + 1} {scene.label}
                 </button>
               ))}
+            </div>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button
+                type="button"
+                onClick={() => jumpStage('homepage')}
+                style={{
+                  cursor: 'pointer',
+                  font: 'inherit',
+                  color: 'inherit',
+                  background: stage === 'homepage' ? '#2b4a7a' : '#1a2233',
+                  border: '1px solid #3a4a66',
+                  borderRadius: 4,
+                  padding: '3px 6px',
+                }}
+              >
+                Homepage
+              </button>
+              <button
+                type="button"
+                onClick={() => jumpStage('book')}
+                style={{
+                  cursor: 'pointer',
+                  font: 'inherit',
+                  color: 'inherit',
+                  background: stage === 'book' ? '#2b4a7a' : '#1a2233',
+                  border: '1px solid #3a4a66',
+                  borderRadius: 4,
+                  padding: '3px 6px',
+                }}
+              >
+                Adventure book
+              </button>
             </div>
           </>
         )}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" width="520" height="300">
+  <!-- Front smoke layer: light lavender with blush and cream accents. -->
+  <g>
+    <circle cx="90" cy="226" r="80" fill="#B7A5E3"/><circle cx="78" cy="210" r="56" fill="#C9BAEC"/>
+    <circle cx="230" cy="198" r="94" fill="#B7A5E3"/><circle cx="216" cy="180" r="66" fill="#C9BAEC"/>
+    <circle cx="372" cy="222" r="82" fill="#B7A5E3"/><circle cx="360" cy="206" r="58" fill="#C9BAEC"/>
+    <circle cx="478" cy="252" r="56" fill="#B7A5E3"/><circle cx="470" cy="242" r="38" fill="#C9BAEC"/>
+    <circle cx="158" cy="274" r="52" fill="#A48FD6"/><circle cx="306" cy="286" r="56" fill="#A48FD6"/>
+    <circle cx="430" cy="288" r="52" fill="#A48FD6"/><circle cx="28" cy="282" r="44" fill="#A48FD6"/>
+    <circle cx="258" cy="142" r="24" fill="#E9BFE0"/><circle cx="118" cy="152" r="16" fill="#E9BFE0"/>
+    <circle cx="404" cy="150" r="20" fill="#E9BFE0"/><circle cx="330" cy="132" r="12" fill="#FFF1D6"/>
+  </g>
+</svg>

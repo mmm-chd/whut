@@ -1,6 +1,7 @@
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useExperienceStore } from './experience.store';
 import { useStoryStore } from '../stores/story.store';
 import { App } from './App';
 
@@ -9,6 +10,7 @@ import { App } from './App';
 const DEFAULT_SETTINGS = { muted: false, volume: 0.8, reducedMotion: false };
 
 function resetStore() {
+  useExperienceStore.setState({ stage: 'story' });
   useStoryStore.setState({
     activeSceneId: 'p01-jezero',
     status: 'waiting',

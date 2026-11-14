@@ -1,0 +1,273 @@
+/* Homepage "The Launchpad" — DOM overlay above the WebGL stage. */
+
+.home-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--silhouette);
+}
+
+.home-stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* --- HUD ------------------------------------------------------------------ */
+
+.home-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  color: var(--cream);
+}
+
+.home-hud button {
+  pointer-events: auto;
+}
+
+.home-tabs {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  gap: clamp(180px, 26vw, 420px);
+  transform: translateX(-50%);
+}
+
+.home-tab {
+  padding: 12px 26px 16px;
+  border: 0;
+  border-radius: 0 0 14px 14px;
+  background: var(--cream);
+  color: var(--silhouette);
+  font-weight: 700;
+  font-size: clamp(14px, 1.6vw, 18px);
+  font-family: 'DK Cool Crayon', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--silhouette) 35%, transparent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-tab:hover,
+.home-tab:focus-visible {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--silhouette) 35%, transparent);
+}
+
+.home-tab:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+/* --- Paper grain -----------------------------------------------------------
+   A fine noise overlay over the artwork only, so the stage reads as printed
+   paper (concept 4.5) while the HUD text stays crisp above it. */
+
+.home-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.24;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/* --- Title block ----------------------------------------------------------- */
+
+.home-title {
+  position: absolute;
+  left: clamp(24px, 4vw, 72px);
+  top: clamp(90px, 16vh, 180px);
+  max-width: 460px;
+}
+
+.home-sticker {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--cream);
+  color: var(--silhouette);
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  transform: rotate(-3deg);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--silhouette) 30%, transparent);
+}
+
+.home-heading {
+  margin: 18px 0 10px;
+  font-family: 'DK Cool Crayon', system-ui, sans-serif;
+  font-size: clamp(52px, 7.4vw, 104px);
+  line-height: 0.95;
+  color: var(--cream);
+  text-shadow:
+    0 4px 0 color-mix(in srgb, var(--dusk-pink) 55%, transparent),
+    0 9px 0 color-mix(in srgb, var(--dusk-violet) 45%, transparent);
+}
+
+.home-tagline {
+  margin: 0;
+  font-size: clamp(15px, 1.7vw, 20px);
+  color: var(--cream);
+  text-shadow: 0 2px 0 color-mix(in srgb, var(--silhouette) 45%, transparent);
+}
+
+/* --- Play button (rides on the rocket) ------------------------------------- */
+
+.home-play {
+  /* Position + press state are CSS variables: the rAF loop only writes
+     --play-x/-y/tilt (concept 16.6), so the pressed state can never drag the
+     button off the rocket. */
+  --play-x: 0px;
+  --play-y: 0px;
+  --play-tilt: 0deg;
+  --play-scale: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 30px;
+  border: 3px solid var(--cream);
+  border-radius: 999px;
+  background: var(--dusk-pink);
+  color: var(--cream);
+  font-family: 'DK Cool Crayon', system-ui, sans-serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  cursor: pointer;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--silhouette) 45%, transparent);
+  /* No transform transition: the position is rewritten every frame. */
+  transition: background 0.25s ease, opacity 0.4s ease;
+  transform: translate3d(var(--play-x), var(--play-y), 0) translate(-50%, -50%)
+    rotate(var(--play-tilt)) scale(var(--play-scale));
+  will-change: transform;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.home-play[data-visible='true'] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.home-play:hover,
+.home-play:focus-visible {
+  background: color-mix(in srgb, var(--dusk-pink) 78%, var(--blush));
+  --play-scale: 1.04;
+}
+
+/* Press feedback (concept 4.4): squash in place, the position stays with the
+   rocket. Kept after :hover so it wins at equal specificity. */
+.home-play:active {
+  --play-scale: 0.94;
+}
+
+.home-play:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 4px;
+}
+
+.home-play__icon {
+  font-size: 0.7em;
+}
+
+/* --- Countdown -------------------------------------------------------------- */
+
+.home-countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.home-countdown__stamp {
+  display: inline-block;
+  font-family: 'DK Cool Crayon', system-ui, sans-serif;
+  font-size: clamp(96px, 18vw, 240px);
+  color: var(--cream);
+  text-shadow:
+    0 6px 0 color-mix(in srgb, var(--dusk-pink) 60%, transparent),
+    0 14px 0 color-mix(in srgb, var(--silhouette) 50%, transparent);
+  animation: home-stamp 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes home-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.8) rotate(-7deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* --- Credit / About paper card ---------------------------------------------- */
+
+.home-modal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--silhouette) 50%, transparent);
+  pointer-events: auto;
+}
+
+.home-modal__card {
+  width: min(520px, calc(100vw - 48px));
+  padding: 28px 30px 24px;
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 10px 0 color-mix(in srgb, var(--silhouette) 35%, transparent);
+  transform: rotate(-0.6deg);
+}
+
+.home-modal__eyebrow {
+  margin: 0 0 10px;
+  font-family: 'DK Cool Crayon', system-ui, sans-serif;
+  font-size: 22px;
+  color: var(--terracotta);
+}
+
+.home-modal__text {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.home-modal__close {
+  margin-top: 6px;
+  padding: 9px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dusk-pink);
+  color: var(--cream);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home-modal__close:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-countdown__stamp {
+    animation-duration: 0.01s;
+  }
+
+  .home-tab,
+  .home-play {
+    transition: none;
+  }
+}

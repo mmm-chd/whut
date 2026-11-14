@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 340" width="110" height="340">
+  <!-- Lattice launch tower silhouette. -->
+  <g stroke="#2A1F63" stroke-width="7" stroke-linecap="round" fill="none">
+    <path d="M22 336 L38 44"/>
+    <path d="M88 336 L72 44"/>
+    <path d="M38 44 L72 44"/>
+    <path d="M25 300 L85 268"/><path d="M85 300 L25 268"/>
+    <path d="M29 252 L81 222"/><path d="M81 252 L29 222"/>
+    <path d="M33 206 L77 178"/><path d="M77 206 L33 178"/>
+    <path d="M36 162 L74 136"/><path d="M74 162 L36 136"/>
+    <path d="M39 120 L71 96"/><path d="M71 120 L39 96"/>
+    <path d="M41 82 L69 62"/><path d="M69 82 L41 62"/>
+  </g>
+  <g fill="#2A1F63">
+    <rect x="30" y="30" width="50" height="16" rx="4"/>
+    <rect x="50" y="0" width="8" height="34"/>
+    <rect x="14" y="330" width="82" height="10" rx="5"/>
+  </g>
+</svg>

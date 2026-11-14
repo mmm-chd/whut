@@ -1,6 +1,6 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { useCallback, useState, type ReactNode } from 'react';
-import { ColorManagement } from 'three';
+import { Color, ColorManagement, LinearSRGBColorSpace } from 'three';
 import { TextureCacheProvider } from './textures';
 import './WebGLStage.css';
 
@@ -8,6 +8,21 @@ import './WebGLStage.css';
 // exactly like the browser blended <img> layers. Turn colour management off
 // once, here, so `new Color('#rrggbb')` is not converted either.
 ColorManagement.enabled = false;
+
+/**
+ * The stage renders with a linear output colour space, so hex values reach the
+ * screen unchanged. `setClearColor` would still treat the string as sRGB and
+ * convert it, turning the backdrop almost black; build the raw colour instead.
+ */
+function rawClearColor(hex: string): Color {
+  const value = hex.replace('#', '');
+  return new Color().setRGB(
+    parseInt(value.slice(0, 2), 16) / 255,
+    parseInt(value.slice(2, 4), 16) / 255,
+    parseInt(value.slice(4, 6), 16) / 255,
+    LinearSRGBColorSpace,
+  );
+}
 
 let webglSupport: boolean | null = null;
 
@@ -91,11 +106,14 @@ export function WebGLStage({ label, background = '#0b0f14', preload, children }:
         flat
         linear
         dpr={[1, 2]}
+        // Layout size, not the transformed bounding box: scenes inside a CSS 3D
+        // book (tilt, page turn) must still fill their real slot.
+        resize={{ offsetSize: true }}
         frameloop="always"
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         camera={{ position: [0, 0, 100], zoom: 1, near: 0.1, far: 1000 }}
         onCreated={({ gl }) => {
-          gl.setClearColor(background);
+          gl.setClearColor(rawClearColor(background));
           const canvas = gl.domElement;
           canvas.addEventListener('webglcontextlost', (event) => {
             event.preventDefault();

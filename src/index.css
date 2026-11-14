@@ -5,6 +5,33 @@
 }
 
 :root {
+  /* --- Global palette (concept 12.2) ---------------------------------------
+     One source of truth for every stage. The homepage adds the Dusk palette
+     below (concept 4.5); it hands over to Deep Space when the rocket leaves. */
+  --deep-space: #13243c;
+  --space-blue: #274766;
+  --dusty-blue: #7898b2;
+  --starlight: #d9e4ec;
+  /* Top of the deep-space gradient: what the launchpad fades into. */
+  --space-top: #0e1b30;
+
+  --paper: #f1e4ca;
+  --paper-deep: #e4d0ab;
+  --vintage: #c7ae8d;
+  --terracotta: #b95e43;
+  --ink: #493c32;
+
+  /* --- Dusk palette (concept 4.5, homepage only) --------------------------- */
+  --dusk-violet: #6b4a9a;
+  --dusk-pink: #d5507a;
+  --horizon-orange: #f2926e;
+  --cream: #fff1d6;
+  --silhouette: #2a1f63;
+  --rocket-silver: #d5dcf0;
+  --rocket-navy: #2e3c8c;
+  --flame-yellow: #f5b82e;
+  --blush: #e9bfe0;
+
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   color-scheme: light;

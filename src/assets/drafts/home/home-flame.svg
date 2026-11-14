@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 220" width="140" height="220">
+  <!-- Paper-cut exhaust flame: three nested teardrops, light from top-left. -->
+  <path d="M70 2 Q108 44 112 108 Q114 168 70 216 Q26 168 28 108 Q32 44 70 2 Z" fill="#F5B82E"/>
+  <path d="M70 30 Q96 62 99 110 Q100 156 70 196 Q40 156 41 110 Q44 62 70 30 Z" fill="#FFD469"/>
+  <path d="M70 66 Q86 88 87 116 Q88 146 70 172 Q52 146 53 116 Q54 88 70 66 Z" fill="#FFF3D1"/>
+</svg>

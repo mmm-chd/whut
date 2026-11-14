@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" width="520" height="300">
+  <!-- Middle smoke layer: mid violet with blush paper accents. -->
+  <g>
+    <circle cx="80" cy="230" r="76" fill="#7B6BC4"/><circle cx="70" cy="216" r="54" fill="#8E7ED1"/>
+    <circle cx="210" cy="200" r="90" fill="#7B6BC4"/><circle cx="198" cy="184" r="64" fill="#8E7ED1"/>
+    <circle cx="350" cy="226" r="80" fill="#7B6BC4"/><circle cx="340" cy="212" r="56" fill="#8E7ED1"/>
+    <circle cx="462" cy="250" r="58" fill="#7B6BC4"/><circle cx="454" cy="240" r="40" fill="#8E7ED1"/>
+    <circle cx="145" cy="272" r="50" fill="#6A59B4"/><circle cx="290" cy="284" r="54" fill="#6A59B4"/>
+    <circle cx="415" cy="286" r="50" fill="#6A59B4"/><circle cx="35" cy="280" r="42" fill="#6A59B4"/>
+    <circle cx="252" cy="150" r="22" fill="#E9BFE0"/><circle cx="112" cy="160" r="15" fill="#E9BFE0"/>
+    <circle cx="392" cy="158" r="18" fill="#E9BFE0"/>
+  </g>
+</svg>
