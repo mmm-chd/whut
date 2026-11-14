@@ -6,11 +6,22 @@ import { cruiseSceneConfig } from './scene.config';
 import './Scene.css';
 
 /**
- * Entry scaffold for the cruise filler. It stays in `playing` and never
- * completes automatically; the full journey sequence is a later milestone.
+ * Entry scaffold for the cruise filler. The full journey (progress bar, "Did
+ * you know?" cards, acceleration) is a later milestone and needs no input.
+ *
+ * Until it lands, the scaffold Continue below is the only way on to P-03.
+ * Remove it, and complete the scene from the acceleration beat instead, when
+ * the full cruise is implemented.
  */
 export function CruiseEntryScene() {
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
+
+  const continueToMars = () => {
+    const { setStatus } = useStoryStore.getState();
+    // playing -> waiting -> completed: the legal route to a scene hand-off.
+    setStatus('waiting');
+    setStatus('completed');
+  };
 
   return (
     <main
@@ -31,6 +42,9 @@ export function CruiseEntryScene() {
         <p className="cruise-scene__body">
           Percy and Ginny are cruising through space. Their next adventure is being prepared.
         </p>
+        <button type="button" className="cruise-scene__continue" onClick={continueToMars}>
+          Continue to Mars
+        </button>
       </div>
     </main>
   );

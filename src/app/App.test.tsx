@@ -53,9 +53,9 @@ describe('App end screen', () => {
     await app.unmount();
   });
 
-  it('shows the end screen only after the terminal cruise scene completes', async () => {
+  it('shows the end screen only after the terminal P-03 scene completes', async () => {
     useStoryStore.setState({
-      activeSceneId: 'filler-scene-01-cruise',
+      activeSceneId: 'scene-03-arrival-jezero',
       status: 'completed',
     });
 

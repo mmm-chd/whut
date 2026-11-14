@@ -1,14 +1,19 @@
 /**
  * The ordered scene graph for this story segment. Values are intentionally
- * fixed: P-01 hands off to P-02, P-02 hands off to the cruise entry, and the
- * cruise entry has no outgoing edge.
+ * fixed: P-01 hands off to P-02, P-02 hands off to the cruise entry, the cruise
+ * hands off to P-03, and P-03 has no outgoing edge until P-04 exists.
  */
-export type StorySceneId = 'p01-jezero' | 'scene-02-launch-to-mars' | 'filler-scene-01-cruise';
+export type StorySceneId =
+  | 'p01-jezero'
+  | 'scene-02-launch-to-mars'
+  | 'filler-scene-01-cruise'
+  | 'scene-03-arrival-jezero';
 
 const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'p01-jezero': 'scene-02-launch-to-mars',
   'scene-02-launch-to-mars': 'filler-scene-01-cruise',
-  'filler-scene-01-cruise': null,
+  'filler-scene-01-cruise': 'scene-03-arrival-jezero',
+  'scene-03-arrival-jezero': null,
 };
 
 const STORY_SCENE_IDS = Object.keys(NEXT_SCENE) as StorySceneId[];

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CruiseEntryScene } from '../scenes/filler-scene-01-cruise/Scene';
 import { Scene01Jezero } from '../scenes/scene-01-jezero/Scene';
 import { Scene02LaunchToMars } from '../scenes/scene-02-launch-to-mars/Scene';
+import { Scene03ArrivalJezero } from '../scenes/scene-03-arrival-jezero/Scene';
 import { useStoryStore } from '../stores/story.store';
 import {
   getNextSceneId,
@@ -20,6 +21,8 @@ function renderScene(id: StorySceneId) {
       return <Scene02LaunchToMars />;
     case 'filler-scene-01-cruise':
       return <CruiseEntryScene />;
+    case 'scene-03-arrival-jezero':
+      return <Scene03ArrivalJezero />;
   }
 }
 
@@ -116,9 +119,16 @@ export function StorySequence() {
       startScene(next);
       setDisplayedSceneId(next);
 
-      // P-02's rewind card is already opaque black. The cruise entry needs a
-      // visible reveal, so only that swap fades the shell cover out.
-      setCover({ opacity: 0, instant: next === 'scene-02-launch-to-mars' || reducedMotion });
+      // P-02's rewind card and P-03's opening cover are already opaque black.
+      // The cruise entry needs a visible reveal, so only that swap fades the
+      // shell cover out.
+      setCover({
+        opacity: 0,
+        instant:
+          next === 'scene-02-launch-to-mars' ||
+          next === 'scene-03-arrival-jezero' ||
+          reducedMotion,
+      });
       handoffRef.current = null;
     }, instantCover ? 0 : COVER_FADE_MS);
   }, [displayedSceneId, isPaused, reducedMotion, resetScene, startScene, status]);

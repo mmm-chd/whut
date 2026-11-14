@@ -40,3 +40,22 @@
   font-size: clamp(0.95rem, 1.5vw, 1.2rem);
   line-height: 1.55;
 }
+
+/* Scaffold control (see Scene.tsx): remove with the real cruise. */
+.cruise-scene__continue {
+  min-width: 11rem;
+  min-height: 2.75rem;
+  margin-top: 1.6rem;
+  padding: 0.6rem 1.6rem;
+  color: #3b2118;
+  background: #f6e7c9;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cruise-scene__continue:focus-visible {
+  outline: 3px solid #f2c14e;
+  outline-offset: 4px;
+}

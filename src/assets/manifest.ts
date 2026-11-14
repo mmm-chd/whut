@@ -29,6 +29,21 @@ import p02SmokeFarUrl from './drafts/p02/smoke-far.svg';
 import p02SmokeMidUrl from './drafts/p02/smoke-mid.svg';
 import p02SmokeNearUrl from './drafts/p02/smoke-near.svg';
 import p02ExhaustUrl from './drafts/p02/exhaust.svg';
+import percyBodyUrl from './fixed/percy/body.png';
+import percyArmUrl from './fixed/percy/arm.png';
+import percyBackPanelUrl from './fixed/percy/back-panel.png';
+import percyCameraUrl from './fixed/percy/camera.png';
+import percyCameraNeckUrl from './fixed/percy/camera-neck.png';
+import percyGeneratorBackUrl from './fixed/percy/generator-back.png';
+import percyChassisUrl from './fixed/percy/chassis.png';
+import percyTireRearUrl from './fixed/percy/tire-rear.png';
+import percyTireFront1Url from './fixed/percy/tire-front-1.png';
+import percyTireFront2Url from './fixed/percy/tire-front-2.png';
+import percyTireFront3Url from './fixed/percy/tire-front-3.png';
+import p03CardSojournerUrl from './drafts/p03/card-sojourner.svg';
+import p03CardSpiritUrl from './drafts/p03/card-spirit.svg';
+import p03CardOpportunityUrl from './drafts/p03/card-opportunity.svg';
+import p03CardCuriosityUrl from './drafts/p03/card-curiosity.svg';
 import cruiseSpaceUrl from './fixed/space-filler.png';
 import crayonFontUrl from './fonts/DK Cool Crayon.ttf';
 import kindredSpiritsUrl from '../audio/bgm/Kindred Spirits - Howard Harper-Barnes.mp3';
@@ -40,6 +55,19 @@ import p02Narrator1Url from '../audio/voice-over/perseverance/P02 - Narrator 1.m
 import p02Narrator2Url from '../audio/voice-over/perseverance/P02 - Narrator 2.mp3';
 import p02Narrator3Url from '../audio/voice-over/perseverance/P02 - Narrator 3.mp3';
 import p02TransitionUrl from '../audio/voice-over/perseverance/P02 - Transisi Quote.mp3';
+import p03Narrator1Url from '../audio/voice-over/perseverance/P03 - Narrator 1.mp3';
+import p03Narrator2Url from '../audio/voice-over/perseverance/P03 - Narrator 2.mp3';
+import p03Narrator3Url from '../audio/voice-over/perseverance/P03 - Narrator 3.mp3';
+import p03Narrator4Url from '../audio/voice-over/perseverance/P03 - Narrator 4.mp3';
+import p03Narrator5Url from '../audio/voice-over/perseverance/P03 - Narrator 5.mp3';
+import p03Narrator6Url from '../audio/voice-over/perseverance/P03 - Narrator 6.mp3';
+import p03Narrator7Url from '../audio/voice-over/perseverance/P03 - Narrator 7.mp3';
+import p03Narrator8Url from '../audio/voice-over/perseverance/P03 - Narrator 8.mp3';
+import p03Narrator9Url from '../audio/voice-over/perseverance/P03 - Narrator 9.mp3';
+import p03TransitionUrl from '../audio/voice-over/perseverance/P03 - Transition Quote.mp3';
+import p03FinalUrl from '../audio/voice-over/perseverance/P03 - Final Quote.mp3';
+import p03Percy1Url from '../audio/voice-over/perseverance/percy/P03 - Percy 1.mp3';
+import p03Percy2Url from '../audio/voice-over/perseverance/percy/P03 - Percy 2.mp3';
 import placeholderUrl from './placeholder.svg';
 
 export type AssetStatus = 'placeholder' | 'draft' | 'final';
@@ -56,6 +84,8 @@ export interface AssetEntry {
    * Lets two dialogue lines share one recording.
    */
   sprite?: readonly [number, number];
+  /** Length of the recording (or of its slice) in milliseconds, measured by decoding it. */
+  durationMs?: number;
 }
 
 function imageAsset(id: string, alt: string): AssetEntry {
@@ -86,8 +116,9 @@ function voiceAsset(
   id: string,
   path: string,
   sprite?: readonly [number, number],
+  durationMs?: number,
 ): AssetEntry {
-  return { id, type: 'audio', path, status: 'final', sprite };
+  return { id, type: 'audio', path, status: 'final', sprite, durationMs: sprite?.[1] ?? durationMs };
 }
 
 function deferredAsset(id: string, type: AssetType): AssetEntry {
@@ -197,6 +228,24 @@ export const assetManifest: Record<string, AssetEntry> = {
   'amb-mars-wind': deferredAsset('amb-mars-wind', 'audio'),
   'music-kindred-spirits': finalAsset('music-kindred-spirits', 'audio', kindredSpiritsUrl),
 
+  // P-03 voice-over, one recording per line in story order. Lengths were measured
+  // by decoding each file. "Narrator 8" holds two lines with a pause between them
+  // (measured silence 5.06-5.66 s), so each line plays its own slice.
+  'p03-vo-narrator-01': voiceAsset('p03-vo-narrator-01', p03Narrator1Url, undefined, 3650),
+  'p03-vo-narrator-02': voiceAsset('p03-vo-narrator-02', p03Narrator2Url, undefined, 5180),
+  'p03-vo-narrator-03': voiceAsset('p03-vo-narrator-03', p03Narrator3Url, undefined, 5830),
+  'p03-vo-narrator-04': voiceAsset('p03-vo-narrator-04', p03Narrator4Url, undefined, 1250),
+  'p03-vo-percy-01': voiceAsset('p03-vo-percy-01', p03Percy1Url, undefined, 10970),
+  'p03-vo-percy-02': voiceAsset('p03-vo-percy-02', p03Percy2Url, undefined, 2450),
+  'p03-vo-narrator-05': voiceAsset('p03-vo-narrator-05', p03Narrator5Url, undefined, 1730),
+  'p03-vo-narrator-06': voiceAsset('p03-vo-narrator-06', p03Narrator6Url, undefined, 7220),
+  'p03-vo-narrator-07': voiceAsset('p03-vo-narrator-07', p03Narrator7Url, undefined, 10920),
+  'p03-vo-narrator-08': voiceAsset('p03-vo-narrator-08', p03Narrator8Url, [0, 5300]),
+  'p03-vo-narrator-09': voiceAsset('p03-vo-narrator-09', p03Narrator8Url, [5500, 6360]),
+  'p03-vo-narrator-10': voiceAsset('p03-vo-narrator-10', p03Narrator9Url, undefined, 5930),
+  'p03-vo-narrator-11': voiceAsset('p03-vo-narrator-11', p03TransitionUrl, undefined, 9460),
+  'p03-vo-narrator-12': voiceAsset('p03-vo-narrator-12', p03FinalUrl, undefined, 6460),
+
   // P-02 voice-over, one file per line, in the order of dialog-perseverance.pdf.
   'p02-vo-narrator-01': voiceAsset('p02-vo-narrator-01', p02Narrator1Url),
   'p02-vo-narrator-02': voiceAsset('p02-vo-narrator-02', p02Narrator2Url),
@@ -206,6 +255,25 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p02-sfx-countdown': deferredAsset('p02-sfx-countdown', 'audio'),
   'p02-sfx-liftoff': deferredAsset('p02-sfx-liftoff', 'audio'),
   'p02-amb-launch-site': deferredAsset('p02-amb-launch-site', 'audio'),
+
+  // Percy rig parts (read-only copies of src/assets/perseverance, same pixels)
+  'percy-body': finalAsset('percy-body', 'image', percyBodyUrl, 'Percy rig part: body'),
+  'percy-arm': finalAsset('percy-arm', 'image', percyArmUrl, 'Percy rig part: arm'),
+  'percy-back-panel': finalAsset('percy-back-panel', 'image', percyBackPanelUrl, 'Percy rig part: back-panel'),
+  'percy-camera': finalAsset('percy-camera', 'image', percyCameraUrl, 'Percy rig part: camera'),
+  'percy-camera-neck': finalAsset('percy-camera-neck', 'image', percyCameraNeckUrl, 'Percy rig part: camera-neck'),
+  'percy-generator-back': finalAsset('percy-generator-back', 'image', percyGeneratorBackUrl, 'Percy rig part: generator-back'),
+  'percy-chassis': finalAsset('percy-chassis', 'image', percyChassisUrl, 'Percy rig part: chassis'),
+  'percy-tire-rear': finalAsset('percy-tire-rear', 'image', percyTireRearUrl, 'Percy rig part: tire-rear'),
+  'percy-tire-front-1': finalAsset('percy-tire-front-1', 'image', percyTireFront1Url, 'Percy rig part: tire-front-1'),
+  'percy-tire-front-2': finalAsset('percy-tire-front-2', 'image', percyTireFront2Url, 'Percy rig part: tire-front-2'),
+  'percy-tire-front-3': finalAsset('percy-tire-front-3', 'image', percyTireFront3Url, 'Percy rig part: tire-front-3'),
+
+  // P-03 rover cards (scaffold silhouettes until the scrapbook art arrives)
+  'p03-card-sojourner': draftImage('p03-card-sojourner', p03CardSojournerUrl, 'Sojourner rover'),
+  'p03-card-spirit': draftImage('p03-card-spirit', p03CardSpiritUrl, 'Spirit rover'),
+  'p03-card-opportunity': draftImage('p03-card-opportunity', p03CardOpportunityUrl, 'Opportunity rover'),
+  'p03-card-curiosity': draftImage('p03-card-curiosity', p03CardCuriosityUrl, 'Curiosity rover'),
 
   // Font
   'font-crayon': finalAsset('font-crayon', 'font', crayonFontUrl),

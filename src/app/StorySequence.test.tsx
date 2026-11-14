@@ -132,9 +132,60 @@ describe('StorySequence', () => {
     await app.unmount();
   });
 
-  it('shows EndScreen only for terminal story completion', async () => {
+  it('takes the reader from the cruise to P-03 through the scaffold Continue', async () => {
+    vi.useFakeTimers();
+    const settings = { muted: true, volume: 0.35, reducedMotion: false };
     useStoryStore.setState({
       activeSceneId: 'filler-scene-01-cruise',
+      status: 'playing',
+      completedInteractions: [],
+      settings,
+    });
+
+    const trace: string[] = [];
+    const unsubscribe = useStoryStore.subscribe((state, previous) => {
+      if (state.status !== previous.status) {
+        trace.push(`${previous.status}>${state.status}`);
+      }
+    });
+
+    const app = renderApp();
+    await app.render();
+    expect(app.container.querySelector('[data-scene="filler-scene-01-cruise"]')).not.toBeNull();
+
+    const button = app.container.querySelector<HTMLButtonElement>('.cruise-scene__continue');
+    expect(button).not.toBeNull();
+    await act(async () => {
+      button?.click();
+    });
+    // The cover fades to black first; the cruise is still mounted under it.
+    expect(app.container.querySelector('[data-scene="filler-scene-01-cruise"]')).not.toBeNull();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+    unsubscribe();
+
+    expect(useStoryStore.getState().activeSceneId).toBe('scene-03-arrival-jezero');
+    expect(useStoryStore.getState().status).toBe('playing');
+    expect(useStoryStore.getState().settings).toEqual(settings);
+    expect(app.container.querySelector('[data-scene="scene-03-arrival-jezero"]')).not.toBeNull();
+    expect(app.container.querySelector('[data-scene="filler-scene-01-cruise"]')).toBeNull();
+    expect(app.container.querySelector('.end-screen')).toBeNull();
+    // playing > waiting > completed, then the legal reset and start.
+    expect(trace).toEqual([
+      'playing>waiting',
+      'waiting>completed',
+      'completed>idle',
+      'idle>playing',
+    ]);
+
+    await app.unmount();
+  });
+
+  it('shows EndScreen only for terminal story completion', async () => {
+    useStoryStore.setState({
+      activeSceneId: 'scene-03-arrival-jezero',
       status: 'completed',
     });
 
@@ -143,7 +194,7 @@ describe('StorySequence', () => {
 
     expect(app.container.querySelector('.end-screen')).not.toBeNull();
     expect(app.container.textContent).toContain('To be continued');
-    expect(app.container.querySelector('[data-scene="filler-scene-01-cruise"]')).toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-03-arrival-jezero"]')).toBeNull();
 
     await app.unmount();
   });

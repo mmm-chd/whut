@@ -1,0 +1,204 @@
+.p03-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: #fff6e2;
+  /* Shown until the canvas is ready: dark Mars ground, never a bright flash. */
+  background: #1a0f0c;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+/* The picture is a WebGL canvas (see World.tsx). */
+.p03-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.p03-heading:focus {
+  outline: none;
+}
+
+/* The scene opens from black: the cover fades out once the stage is up. */
+.p03-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: #000;
+  pointer-events: none;
+  animation: p03-cover-out 900ms ease 250ms forwards;
+}
+
+@keyframes p03-cover-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Exit fade: reaches full black before the sequence shell hands off. */
+.p03-exit-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 800ms ease;
+}
+
+.p03-scene[data-phase='transition'] .p03-exit-fade,
+.p03-scene[data-phase='done'] .p03-exit-fade {
+  opacity: 1;
+}
+
+/* Dialogue: narration on the right, Percy on the left, the final quote low. */
+.p03-dialogue {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+}
+
+.p03-dialogue .scrapbook-text--narrator-top-right {
+  top: 11%;
+  right: 4.5%;
+  width: min(46%, 46rem);
+  text-align: right;
+}
+
+.p03-dialogue .scrapbook-text--bottom {
+  right: 8%;
+  bottom: 20%;
+  left: 8%;
+  text-align: right;
+}
+
+.p03-dialogue .circular-gate--dialogue {
+  align-items: flex-end;
+}
+
+/* Rover cards: one row near the bottom, clear of the dialogue column. */
+.p03-cards {
+  position: absolute;
+  right: 4%;
+  bottom: 7%;
+  left: 4%;
+  z-index: 16;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.p03-cards[data-visible='true'] {
+  opacity: 1;
+}
+
+.p03-cards__list {
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vw, 1.6rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.p03-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: clamp(7rem, 17vw, 14rem);
+  padding: 0.6rem 0.6rem 0.8rem;
+  color: #3b2118;
+  background:
+    repeating-linear-gradient(0deg, rgba(104, 62, 42, 0.035) 0 1px, transparent 1px 5px),
+    #f6e7c9;
+  border: 3px solid #7b4636;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 0 rgba(74, 43, 33, 0.28);
+  opacity: 0;
+  transform: translateY(1.2rem) rotate(-2deg);
+  transition:
+    opacity 450ms ease,
+    transform 450ms ease;
+}
+
+.p03-card:nth-child(even) {
+  transform: translateY(1.2rem) rotate(2deg);
+}
+
+.p03-card[data-shown='true'] {
+  opacity: 1;
+  transform: translateY(0) rotate(-1.5deg);
+}
+
+.p03-card[data-shown='true']:nth-child(even) {
+  transform: translateY(0) rotate(1.5deg);
+}
+
+.p03-card__picture {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.p03-card__name {
+  margin-top: 0.3rem;
+  font-size: clamp(1rem, 1.6vw, 1.4rem);
+  line-height: 1.1;
+}
+
+.p03-scene[data-reduced-motion='true'] .p03-cover,
+.p03-scene[data-reduced-motion='true'] .p03-exit-fade,
+.p03-scene[data-reduced-motion='true'] .p03-cards,
+.p03-scene[data-reduced-motion='true'] .p03-card {
+  animation: none;
+  transition: none;
+}
+
+.p03-scene[data-reduced-motion='true'] .p03-cover {
+  opacity: 0;
+}
+
+@media (max-width: 720px) {
+  .p03-dialogue .scrapbook-text--narrator-top-right {
+    top: auto;
+    right: 5%;
+    bottom: 40%;
+    left: 5%;
+    width: auto;
+    text-align: center;
+  }
+
+  .p03-dialogue .scrapbook-text--bottom {
+    right: 5%;
+    bottom: 28%;
+    left: 5%;
+    text-align: center;
+  }
+
+  .p03-cards {
+    bottom: 4%;
+  }
+
+  .p03-cards__list {
+    flex-wrap: wrap;
+  }
+
+  .p03-card {
+    width: 42%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p03-cover,
+  .p03-exit-fade,
+  .p03-cards,
+  .p03-card {
+    animation: none;
+    transition: none;
+  }
+
+  .p03-cover {
+    opacity: 0;
+  }
+}

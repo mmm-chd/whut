@@ -104,7 +104,14 @@ export function FlatShapes({
   }, [polygons]);
 
   const material = useMemo(
-    () => new MeshBasicMaterial({ color, side: DoubleSide, depthTest: false, depthWrite: false }),
+    () => new MeshBasicMaterial({
+        color,
+        side: DoubleSide,
+        // Transparent puts it in the sorted pass, so renderOrder holds against sprites.
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+      }),
     [color],
   );
 
