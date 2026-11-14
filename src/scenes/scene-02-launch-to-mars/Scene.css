@@ -1,0 +1,241 @@
+.p02-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: #fff6e2;
+  background:
+    radial-gradient(circle at 50% 20%, #33506a 0%, #172433 55%, #0b1016 100%);
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+/* The picture is a WebGL canvas (see World.tsx). The host clips it; the dark
+   fill is only a last-resort backdrop. */
+.p02-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0b0f14;
+}
+
+/* Exit fade: reaches full black before the sequence shell swaps scenes. */
+.p02-exit-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 800ms ease;
+}
+
+.p02-scene[data-phase='exit'] .p02-exit-fade,
+.p02-scene[data-phase='done'] .p02-exit-fade {
+  opacity: 1;
+}
+
+/* Flashback card: P-02 owns the opaque layer, so the shell can reveal the
+   rewind text as soon as the incoming scene mounts. */
+.p02-rewind {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 8vw;
+  background: #0b0f14;
+  opacity: 1;
+  transition: opacity 700ms ease;
+}
+
+.p02-rewind[data-visible='false'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.p02-rewind__card {
+  max-width: 46rem;
+  text-align: center;
+}
+
+.p02-rewind__eyebrow {
+  margin: 0 0 1rem;
+  color: #e6b96d;
+  font-size: clamp(0.75rem, 1.2vw, 1rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.p02-rewind__title {
+  margin: 0;
+  color: #fff6e2;
+  font-size: clamp(2rem, 5.2vw, 4.6rem);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.p02-heading:focus {
+  outline: none;
+}
+
+.p02-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.p02-launch {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5%);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 14rem;
+  min-height: 4rem;
+  padding: 0.7rem 2.2rem;
+  color: #3b2118;
+  background:
+    repeating-linear-gradient(0deg, rgba(104, 62, 42, 0.035) 0 1px, transparent 1px 5px),
+    #f6e7c9;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  box-shadow:
+    0 0.6rem 0 rgba(74, 43, 33, 0.32),
+    0 1.2rem 2.4rem rgba(20, 30, 40, 0.32);
+  font-family: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translateX(-50%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.p02-launch:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.02);
+  box-shadow:
+    0 0.7rem 0 rgba(74, 43, 33, 0.32),
+    0 1.5rem 2.8rem rgba(20, 30, 40, 0.36);
+}
+
+.p02-launch:focus-visible {
+  outline: 3px solid #f2c14e;
+  outline-offset: 5px;
+}
+
+.p02-launch__eyebrow {
+  color: #a14d37;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.p02-launch__label {
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  line-height: 1.05;
+}
+
+.p02-countdown {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 1em;
+  color: #fff6e2;
+  font-size: clamp(4rem, 13vw, 11rem);
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    -3px 0 0 rgba(74, 36, 24, 0.65),
+    3px 0 0 rgba(74, 36, 24, 0.65),
+    0 -3px 0 rgba(74, 36, 24, 0.65),
+    0 3px 0 rgba(74, 36, 24, 0.65),
+    0 0 24px rgba(74, 36, 24, 0.5);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.p02-countdown:empty {
+  display: none;
+}
+
+.p02-countdown:focus {
+  outline: none;
+}
+
+/* P-02 scoped dialogue layout: narration stays on the right in landscape,
+   while the invitation sits above the Launch control. */
+.p02-dialogue {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+}
+
+.p02-dialogue .scrapbook-text--narrator-top-right {
+  top: 11%;
+  right: 4.5%;
+  width: min(46%, 46rem);
+  text-align: right;
+}
+
+.p02-dialogue .scrapbook-text--bottom {
+  right: 8%;
+  bottom: 20%;
+  left: 8%;
+  text-align: right;
+}
+
+/* The Continue gate sits under the text, on the same side as the text. */
+.p02-dialogue .circular-gate--dialogue {
+  align-items: flex-end;
+}
+
+.p02-scene[data-reduced-motion='true'] .p02-launch {
+  transition: none;
+}
+
+.p02-scene[data-reduced-motion='true'] .p02-exit-fade {
+  transition: none;
+}
+
+@media (max-width: 720px) {
+  .p02-launch {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 4.5%);
+    min-width: 12rem;
+    min-height: 3.5rem;
+  }
+
+  .p02-dialogue .scrapbook-text--narrator-top-right {
+    top: auto;
+    right: 5%;
+    bottom: 26%;
+    left: 5%;
+    width: auto;
+    text-align: center;
+  }
+
+  .p02-dialogue .scrapbook-text--bottom {
+    right: 5%;
+    bottom: 17%;
+    left: 5%;
+    text-align: center;
+  }
+
+  .p02-dialogue .scrapbook-text--bottom .circular-gate--dialogue {
+    align-items: center;
+  }
+
+  .p02-countdown {
+    font-size: clamp(3rem, 18vw, 6rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p02-rewind,
+  .p02-launch,
+  .p02-exit-fade {
+    transition: none;
+  }
+}

@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStoryStore } from '../../stores/story.store';
 import { CircularGate } from '../story-controls/CircularGate';
-import type { DialogueLine } from '../../scenes/scene-01-jezero/dialogue';
+import type { DialogueLine } from './types';
 import { Typewriter } from './Typewriter';
 import './ScrapbookText.css';
 

@@ -1,0 +1,41 @@
+.webgl-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.webgl-stage[data-ready='true'] {
+  opacity: 1;
+}
+
+.webgl-stage--unsupported {
+  opacity: 1;
+}
+
+.webgl-stage canvas {
+  display: block;
+}
+
+.webgl-stage__recover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 40;
+  min-height: 44px;
+  padding: 0.7rem 1.4rem;
+  color: #3b2118;
+  background: #f6e7c9;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .webgl-stage {
+    transition: none;
+  }
+}

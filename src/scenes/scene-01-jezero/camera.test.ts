@@ -53,9 +53,14 @@ describe('rocksConfig', () => {
     }
   });
 
-  it('keeps the rock bases at the mockup base line', () => {
+  it('keeps each rock base at its mockup base line', () => {
+    const expected: Record<string, number> = {
+      'rock-a': 0.8,
+      'rock-b': 0.649,
+      'rock-c': 0.74,
+    };
     for (const rock of rocksConfig) {
-      expect(rock.baseY).toBeCloseTo(0.63, 5);
+      expect(rock.baseY).toBeCloseTo(expected[rock.id], 5);
     }
   });
 });

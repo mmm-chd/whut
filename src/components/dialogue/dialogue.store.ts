@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { DialogueLine } from '../../scenes/scene-01-jezero/dialogue';
+import type { DialogueLine } from './types';
 
 /** The line currently on screen, with a key so re-cues remount fresh. */
 export interface ActiveDialogue {
