@@ -8,6 +8,7 @@ import { Scene05PercyInspector } from '../scenes/scene-05-percy-inspector/Scene'
 import { Scene06SampleWorkflow } from '../scenes/scene-06-sample-workflow/Scene';
 import { Scene07CheyavaFalls } from '../scenes/scene-07-cheyava-falls/Scene';
 import { Scene08TheRunner } from '../scenes/scene-08-the-runner/Scene';
+import { Scene09WaitingSample } from '../scenes/scene-09-waiting-sample/Scene';
 import { useStoryScore } from '../audio/useStoryScore';
 import { useStoryStore } from '../stores/story.store';
 import {
@@ -39,6 +40,8 @@ function renderScene(id: StorySceneId) {
       return <Scene07CheyavaFalls />;
     case 'scene-08-the-runner':
       return <Scene08TheRunner />;
+    case 'scene-09-waiting-sample':
+      return <Scene09WaitingSample />;
   }
 }
 
@@ -126,7 +129,8 @@ export function StorySequence() {
     const instantCover =
       reducedMotion ||
       outgoing === 'scene-02-launch-to-mars' ||
-      outgoing === 'scene-05-percy-inspector';
+      outgoing === 'scene-05-percy-inspector' ||
+      outgoing === 'scene-08-the-runner';
     setCover({ opacity: 1, instant: instantCover });
 
     timerRef.current = window.setTimeout(() => {

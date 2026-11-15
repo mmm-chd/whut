@@ -13,10 +13,15 @@ import { useDialogueStore } from './dialogue.store';
  * what is visible and when a line leaves. Scene transitions therefore cannot
  * wipe text that the player is still reading.
  */
-export function DialogueLayer() {
+export interface DialogueLayerProps {
+  /** Extra hold on the voice-over (hidden tab, portrait gate) on top of the story pause. */
+  presentationPaused?: boolean;
+}
+
+export function DialogueLayer({ presentationPaused = false }: DialogueLayerProps = {}) {
   const active = useDialogueStore((state) => state.active);
   const resolve = useDialogueStore((state) => state.resolve);
-  const audio = useAudioManager();
+  const audio = useAudioManager(presentationPaused);
 
   // Play the voice-over for the active line (silent fallback when no audio file).
   useEffect(() => {

@@ -1,0 +1,381 @@
+/*
+ * The ending (story P-08). The same hand-made book as the scenes before it, at
+ * dusk: the shared Mars picture under a warm violet wash, cream crayon captions
+ * on the sky, scrapbook paper for the few things that need to be read twice
+ * (the sample rack, the plan, the dated facts). Quiet on purpose: no bright
+ * accents, no reward. Scoped to `p08-`.
+ */
+.p08-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: var(--cream);
+  background: #2b1a16;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p08-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* The evening wash deepens as the news arrives, and stays through the tracks. */
+.p08-dusk {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgb(66 32 82 / 55%) 0%,
+    rgb(168 80 74 / 22%) 52%,
+    rgb(26 10 20 / 58%) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p08-dusk[data-phase='hope'],
+.p08-dusk[data-phase='hope-transition'] {
+  opacity: 0.55;
+}
+
+.p08-dusk[data-phase='message-transition'],
+.p08-dusk[data-phase='message'],
+.p08-dusk[data-phase='emotional-pause'] {
+  opacity: 0.85;
+}
+
+.p08-dusk[data-phase='departing'],
+.p08-dusk[data-phase='tracks'],
+.p08-dusk[data-phase='fade'],
+.p08-dusk[data-phase='done'] {
+  opacity: 1;
+}
+
+.p08-heading {
+  position: absolute;
+  z-index: 6;
+  left: 260px;
+  right: 24px;
+  top: 16px;
+  margin: 0;
+  font-size: clamp(1.15rem, 2.4vw, 1.75rem);
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 0 rgb(59 33 24 / 55%);
+}
+
+.p08-heading:focus {
+  outline: none;
+}
+
+/* ---------- the samples, and the plan that was proposed (right) ---------- */
+
+.p08-samples,
+.p08-plan-panel {
+  position: absolute;
+  z-index: 8;
+  top: 16%;
+  right: 4%;
+  display: grid;
+  width: min(44%, 33rem);
+  max-height: calc(100% - 16% - 76px);
+  gap: 14px;
+  overflow-y: auto;
+  padding: 18px 4px 6px;
+  scrollbar-color: #7b4636 transparent;
+  scrollbar-width: thin;
+}
+
+.p08-samples[data-visible='false'] {
+  pointer-events: none;
+}
+
+.p08-tray,
+.p08-plan,
+.p08-fact {
+  position: relative;
+  margin: 0;
+  padding: 14px 16px;
+  border: 3px solid #7b4636;
+  border-radius: 12px;
+  background: var(--paper);
+  color: #3b2118;
+  box-shadow: 0 12px 24px rgb(15 8 6 / 42%);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p08-tray::before,
+.p08-plan::before {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 70px;
+  height: 22px;
+  margin-left: -35px;
+  background: rgb(240 201 160 / 78%);
+  box-shadow: 0 1px 2px rgb(20 10 8 / 25%);
+  content: '';
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+
+.p08-tray-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.p08-tray-caption,
+.p08-plan-note {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.p08-plan-title,
+.p08-fact-title {
+  margin: 0 0 6px;
+  font-family: 'DK Cool Crayon', 'Segoe Print', cursive;
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.p08-fact-body {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.p08-fact-source {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  opacity: 0.8;
+}
+
+.p08-plan-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.p08-plan-step {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.p08-plan-picture {
+  width: 100%;
+  max-width: 68px;
+  height: auto;
+}
+
+.p08-plan-label {
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+/* ---------- the message from Earth ---------- */
+
+.p08-ding {
+  position: absolute;
+  z-index: 9;
+  top: 18%;
+  right: 6%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  background: var(--paper);
+  color: #3b2118;
+  box-shadow: 0 10px 20px rgb(15 8 6 / 40%);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.95rem;
+  animation: p08-ding-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.p08-ding-icon {
+  width: 34px;
+  height: auto;
+}
+
+@keyframes p08-ding-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.92);
+  }
+}
+
+/* ---------- captions ---------- */
+
+.p08-dialogue {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+}
+
+.p08-dialogue .scrapbook-text--narrator-top-right,
+.p08-dialogue .scrapbook-text--percy-top-left,
+.p08-dialogue .scrapbook-text--bottom {
+  top: 12%;
+  right: auto;
+  bottom: auto;
+  left: 5%;
+  width: min(52%, 40rem);
+  text-align: left;
+}
+
+/* While a panel sits on the right, the words keep to the left half. */
+.p08-stage[data-phase='samples'] ~ .p08-dialogue .scrapbook-text,
+.p08-stage[data-phase='hope-transition'] ~ .p08-dialogue .scrapbook-text,
+.p08-stage[data-phase='hope'] ~ .p08-dialogue .scrapbook-text {
+  width: min(42%, 34rem);
+}
+
+.p08-dialogue .circular-gate--dialogue {
+  pointer-events: auto;
+}
+
+.p08-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: #120a07;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- when WebGL is not available ---------- */
+
+.p08-fallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#4a2a3a, #7a3d3a 62%);
+}
+
+.p08-fallback-ground {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 36%;
+  background: linear-gradient(#8a4636, #4e2820);
+}
+
+.p08-fallback-rover {
+  position: absolute;
+  bottom: 14%;
+  left: 24%;
+  width: min(34%, 420px);
+  transition: transform 3s ease-in;
+}
+
+.p08-fallback-rover[data-rolling='true'] {
+  transform: translateX(160%);
+}
+
+.p08-fallback-tracks {
+  position: absolute;
+  right: 6%;
+  bottom: 12%;
+  left: 18%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.p08-fallback-tracks span {
+  width: 3%;
+  height: 14px;
+  border-top: 3px dashed rgb(244 196 156 / 55%);
+  border-bottom: 3px dashed rgb(244 196 156 / 55%);
+}
+
+/* ---------- compact landscape ---------- */
+
+@media (max-width: 900px), (max-height: 480px) {
+  .p08-heading {
+    left: 250px;
+    font-size: 1rem;
+  }
+
+  .p08-samples,
+  .p08-plan-panel {
+    top: 70px;
+    width: 48%;
+    max-height: calc(100% - 70px - 12px);
+    gap: 8px;
+  }
+
+  .p08-tray,
+  .p08-plan,
+  .p08-fact {
+    padding: 8px 10px;
+  }
+
+  .p08-tray-image {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  .p08-tray-caption {
+    font-size: 0.78rem;
+  }
+
+  .p08-fact-body {
+    font-size: 0.82rem;
+  }
+
+  .p08-fact-source,
+  .p08-plan-note {
+    font-size: 0.7rem;
+  }
+
+  .p08-plan-label {
+    font-size: 0.66rem;
+  }
+
+  .p08-dialogue .scrapbook-text--narrator-top-right,
+  .p08-dialogue .scrapbook-text--percy-top-left,
+  .p08-dialogue .scrapbook-text--bottom {
+    top: 70px;
+    width: 46%;
+  }
+
+  .p08-stage[data-phase='samples'] ~ .p08-dialogue .scrapbook-text,
+  .p08-stage[data-phase='hope-transition'] ~ .p08-dialogue .scrapbook-text,
+  .p08-stage[data-phase='hope'] ~ .p08-dialogue .scrapbook-text {
+    width: 46%;
+  }
+
+  .p08-dialogue .circular-gate--dialogue {
+    margin-top: 0.2rem;
+  }
+
+  .p08-dialogue .circular-gate--dialogue .circular-gate__button {
+    width: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p08-dusk {
+    transition: none;
+  }
+
+  .p08-ding {
+    animation: none;
+  }
+
+  .p08-fallback-rover {
+    transition: none;
+  }
+}

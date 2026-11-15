@@ -96,7 +96,31 @@ export function ScrapbookText({ line, onContinue }: ScrapbookTextProps) {
     return () => window.clearTimeout(timer);
   }, [advance, delay, isPaused, line, onContinue, typed]);
 
-  const showGate = advance === 'manual' && typed && !done;
+  // A manual gate may wait out the recording: active time only, so a pause
+  // keeps what is left instead of restarting it.
+  const gateDelayMs = (line.gateDelay ?? 0) * 1000;
+  const [gateReady, setGateReady] = useState(gateDelayMs <= 0);
+  const gateRemaining = useRef(gateDelayMs);
+  useEffect(() => {
+    if (!typed || advance !== 'manual' || gateReady) {
+      return;
+    }
+    if (gateRemaining.current <= 0) {
+      setGateReady(true);
+      return;
+    }
+    if (isPaused) {
+      return;
+    }
+    const startedAt = performance.now();
+    const timer = window.setTimeout(() => setGateReady(true), gateRemaining.current);
+    return () => {
+      window.clearTimeout(timer);
+      gateRemaining.current = Math.max(0, gateRemaining.current - (performance.now() - startedAt));
+    };
+  }, [advance, gateReady, isPaused, typed]);
+
+  const showGate = advance === 'manual' && typed && gateReady && !done;
 
   return (
     <motion.div

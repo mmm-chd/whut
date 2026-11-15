@@ -3,7 +3,16 @@ import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
 import './PlaybackControls.css';
 
-export function PlaybackControls() {
+export interface PlaybackControlsProps {
+  /**
+   * Allow Pause while the scene is globally `waiting`. Scenes that animate and
+   * narrate through `waiting` (the ending, the Runner) opt in; the default keeps
+   * Pause for `playing` only.
+   */
+  allowPauseWhileWaiting?: boolean;
+}
+
+export function PlaybackControls({ allowPauseWhileWaiting = false }: PlaybackControlsProps = {}) {
   const { pause, resume, replay } = useNarrativeController();
   const status = useStoryStore((state) => state.status);
   const isPaused = useStoryStore((state) => state.isPaused);
@@ -12,7 +21,7 @@ export function PlaybackControls() {
   const setMuted = useStoryStore((state) => state.setMuted);
   const setVolume = useStoryStore((state) => state.setVolume);
 
-  const canPause = status === 'playing';
+  const canPause = status === 'playing' || (allowPauseWhileWaiting && status === 'waiting');
   const canReplay = status === 'playing' || status === 'waiting';
 
   return (

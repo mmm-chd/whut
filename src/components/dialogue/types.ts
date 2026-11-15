@@ -56,6 +56,12 @@ export interface DialogueLine {
    * screen until Continue without holding the story (percy-02 mid-pan).
    */
   holdsStory?: boolean;
+  /**
+   * Seconds, counted in active time after typing ends, before a `manual` line's
+   * Continue gate appears. Omitted or zero shows it at once (the default). A
+   * scene sets it from the recording's length so Continue cannot cut off a voice.
+   */
+  gateDelay?: number;
   emphasis: boolean;
   emphasisText?: string;
   trigger?: DialogueTrigger;

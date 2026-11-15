@@ -13,6 +13,11 @@ interface StoryState {
   setPaused: (isPaused: boolean) => void;
   markInteractionComplete: (interactionId: string) => void;
   resetScene: () => void;
+  /**
+   * Forget the whole story run: no active scene, nothing completed. Settings stay.
+   * `resetScene` keeps the active scene id, so it cannot restart or leave a story.
+   */
+  resetStory: () => void;
   setMuted: (muted: boolean) => void;
   setVolume: (volume: number) => void;
   setReducedMotion: (reducedMotion: boolean) => void;
@@ -55,6 +60,13 @@ export const useStoryStore = create<StoryState>((set) => ({
     }),
   resetScene: () =>
     set({
+      status: 'idle',
+      isPaused: false,
+      completedInteractions: [],
+    }),
+  resetStory: () =>
+    set({
+      activeSceneId: null,
       status: 'idle',
       isPaused: false,
       completedInteractions: [],

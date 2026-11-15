@@ -6,10 +6,11 @@ import { getAudioManager } from './audioManagerInstance';
 /**
  * The shared audio manager plus the story settings it follows.
  *
+ * `presentationPausedOverride` adds a scene-owned hold on top of the store's pause.
  * It never unloads on unmount: the manager is page-lifetime so the score can
  * survive a scene swap (see `audioManagerInstance`).
  */
-export function useAudioManager(): AudioManager {
+export function useAudioManager(presentationPausedOverride = false): AudioManager {
   const manager = getAudioManager();
   const muted = useStoryStore((state) => state.settings.muted);
   const volume = useStoryStore((state) => state.settings.volume);
@@ -23,13 +24,17 @@ export function useAudioManager(): AudioManager {
     manager.setVolume(volume);
   }, [manager, volume]);
 
+  // A hidden tab or a rotated phone holds the audio too, without touching the
+  // store's own pause flag, so a store resume cannot restart sound the host is
+  // still holding back.
+  const held = isPaused || presentationPausedOverride;
   useEffect(() => {
-    if (isPaused) {
+    if (held) {
       manager.pause();
     } else {
       manager.resume();
     }
-  }, [manager, isPaused]);
+  }, [manager, held]);
 
   return manager;
 }

@@ -106,6 +106,28 @@ import p07Narrator5Url from '../audio/voice-over/perseverance/P07 - Narrator 5.m
 import p07Percy1Url from '../audio/voice-over/perseverance/percy/P07 - Percy 1.mp3';
 import p07Percy2Url from '../audio/voice-over/perseverance/percy/P07 - Percy 2.mp3';
 import p07Percy3Url from '../audio/voice-over/perseverance/percy/P07 - Percy 3.mp3';
+import p08Narrator1Url from '../audio/voice-over/perseverance/P08 - Narrator 1.mp3';
+import p08Narrator2Url from '../audio/voice-over/perseverance/P08 - Narrator 2.mp3';
+import p08Narrator3Url from '../audio/voice-over/perseverance/P08 - Narrator 3.mp3';
+import p08Narrator4Url from '../audio/voice-over/perseverance/P08 - Narrator 4.mp3';
+import p08Narrator5Url from '../audio/voice-over/perseverance/P08 - Narrator 5.mp3';
+import p08Narrator6Url from '../audio/voice-over/perseverance/P08 - Narrator 6.mp3';
+import p08Narrator7Url from '../audio/voice-over/perseverance/P08 - Narrator 7.mp3';
+import p08Narrator8Url from '../audio/voice-over/perseverance/P08 - Narrator 8.mp3';
+import p08Narrator9Url from '../audio/voice-over/perseverance/P08 - Narrator 9.mp3';
+import p08Narrator10Url from '../audio/voice-over/perseverance/P08 - Narrator 10.mp3';
+import p08Narrator11Url from '../audio/voice-over/perseverance/P08 - Narrator 11.mp3';
+import p08Narrator12Url from '../audio/voice-over/perseverance/P08 - Narrator 12.mp3';
+import p08Narrator13Url from '../audio/voice-over/perseverance/P08 - Narrator 13.mp3';
+import p08Narrator14Url from '../audio/voice-over/perseverance/P08 - Narrator 14.mp3';
+import p08Narrator15Url from '../audio/voice-over/perseverance/P08 - Narrator 15.mp3';
+import p08Narrator16Url from '../audio/voice-over/perseverance/P08 - Narrator 16.mp3';
+import p08Percy1Url from '../audio/voice-over/perseverance/percy/P08 - Percy 1.mp3';
+import p08Percy2Url from '../audio/voice-over/perseverance/percy/P08 - Percy 2.mp3';
+import p08Percy3Url from '../audio/voice-over/perseverance/percy/P08 - Percy 3.mp3';
+import p08Percy4Url from '../audio/voice-over/perseverance/percy/P08 - Percy 4.mp3';
+import p08Percy5Url from '../audio/voice-over/perseverance/percy/P08 - Percy 5.mp3';
+import p08Percy6Url from '../audio/voice-over/perseverance/percy/P08 - Percy 6.mp3';
 import p07InfographicUrl from './fixed/p07/infographic.webp';
 import p07InfographicTopUrl from './fixed/p07/infographic-top.webp';
 import placeholderUrl from './placeholder.svg';
@@ -330,6 +352,29 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p07-vo-percy-02': voiceAsset('p07-vo-percy-02', p07Percy2Url, undefined, 13704),
   'p07-vo-percy-03': voiceAsset('p07-vo-percy-03', p07Narrator5Url, undefined, 2352),
   'p07-vo-percy-04': voiceAsset('p07-vo-percy-04', p07Percy3Url, undefined, 10128),
+  // P-08 voice-over: 16 narrator and 6 Percy files, mapped to the script by length and order (not yet checked by ear).
+  'p08-vo-narrator-01': voiceAsset('p08-vo-narrator-01', p08Narrator1Url, undefined, 10152),
+  'p08-vo-narrator-02': voiceAsset('p08-vo-narrator-02', p08Narrator2Url, undefined, 7416),
+  'p08-vo-narrator-03': voiceAsset('p08-vo-narrator-03', p08Narrator3Url, undefined, 6720),
+  'p08-vo-narrator-04': voiceAsset('p08-vo-narrator-04', p08Narrator4Url, undefined, 21600),
+  'p08-vo-narrator-05': voiceAsset('p08-vo-narrator-05', p08Narrator5Url, undefined, 6648),
+  'p08-vo-narrator-06': voiceAsset('p08-vo-narrator-06', p08Narrator6Url, undefined, 13296),
+  'p08-vo-narrator-07': voiceAsset('p08-vo-narrator-07', p08Narrator7Url, undefined, 3048),
+  'p08-vo-narrator-08': voiceAsset('p08-vo-narrator-08', p08Narrator8Url, undefined, 2136),
+  'p08-vo-narrator-09': voiceAsset('p08-vo-narrator-09', p08Narrator9Url, undefined, 1200),
+  'p08-vo-narrator-10': voiceAsset('p08-vo-narrator-10', p08Narrator10Url, undefined, 3864),
+  'p08-vo-narrator-11': voiceAsset('p08-vo-narrator-11', p08Narrator11Url, undefined, 864),
+  'p08-vo-narrator-12': voiceAsset('p08-vo-narrator-12', p08Narrator12Url, undefined, 816),
+  'p08-vo-narrator-13': voiceAsset('p08-vo-narrator-13', p08Narrator13Url, undefined, 1800),
+  'p08-vo-narrator-14': voiceAsset('p08-vo-narrator-14', p08Narrator14Url, undefined, 5016),
+  'p08-vo-narrator-15': voiceAsset('p08-vo-narrator-15', p08Narrator15Url, undefined, 13056),
+  'p08-vo-narrator-16': voiceAsset('p08-vo-narrator-16', p08Narrator16Url, undefined, 2256),
+  'p08-vo-percy-01': voiceAsset('p08-vo-percy-01', p08Percy1Url, undefined, 4104),
+  'p08-vo-percy-02': voiceAsset('p08-vo-percy-02', p08Percy2Url, undefined, 10896),
+  'p08-vo-percy-03': voiceAsset('p08-vo-percy-03', p08Percy3Url, undefined, 5592),
+  'p08-vo-percy-04': voiceAsset('p08-vo-percy-04', p08Percy4Url, undefined, 1416),
+  'p08-vo-percy-05': voiceAsset('p08-vo-percy-05', p08Percy5Url, undefined, 9216),
+  'p08-vo-percy-06': voiceAsset('p08-vo-percy-06', p08Percy6Url, undefined, 888),
   // P-07 infographic: web copies of `src/assets/Infografis.png`, which stays untouched.
   'p07-infographic': finalAsset(
     'p07-infographic',

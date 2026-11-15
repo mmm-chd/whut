@@ -2,6 +2,9 @@ import { cellIndex, COLUMNS, type Cell } from './grid';
 import { positionOf, startMotion, stepDiscrete, stepMotion, DISCRETE_STEP_MS, MAX_DELTA_MS, type MotionEvent, type MotionState } from './movement';
 import type { RunnerNodes } from './nodes';
 import type { NavigationMap } from './map';
+import { browserFrameEnv, type FrameEnv } from '../shared/frameEnv';
+
+export type { FrameEnv };
 
 /**
  * The Runner's one active-time driver.
@@ -33,18 +36,6 @@ export interface DriverCallbacks {
   onFrame?: () => void;
 }
 
-export interface FrameEnv {
-  now: () => number;
-  request: (callback: () => void) => number;
-  cancel: (id: number) => void;
-}
-
-const browserEnv: FrameEnv = {
-  now: () => performance.now(),
-  request: (callback) => window.requestAnimationFrame(callback),
-  cancel: (id) => window.cancelAnimationFrame(id),
-};
-
 type Job =
   | { readonly type: 'idle' }
   | { readonly type: 'opening'; motion: MotionState; cellsPerSecond: number; stepEvery: number; sinceStep: number }
@@ -74,7 +65,7 @@ export interface DriverOptions {
 
 export function createRunnerDriver(options: DriverOptions): RunnerDriver {
   const { nodes, map, callbacks } = options;
-  const env = options.env ?? browserEnv;
+  const env = options.env ?? browserFrameEnv;
   let reduced = options.reducedMotion;
   let paused = false;
   let disposed = false;

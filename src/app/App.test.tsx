@@ -55,9 +55,9 @@ describe('App end screen', () => {
     await app.unmount();
   });
 
-  it('shows the end screen only after the terminal runner scene completes', async () => {
+  it('shows the end screen only after the ending scene completes', async () => {
     useStoryStore.setState({
-      activeSceneId: 'scene-08-the-runner',
+      activeSceneId: 'scene-09-waiting-sample',
       status: 'completed',
     });
 
@@ -65,7 +65,7 @@ describe('App end screen', () => {
     await app.render();
 
     expect(app.container.querySelector('[data-scene="p01-jezero"]')).toBeNull();
-    expect(app.container.textContent).toContain('To be continued');
+    expect(app.container.textContent).toContain('The journey continues');
 
     await app.unmount();
   });

@@ -16,6 +16,7 @@ const SCENES: { id: StorySceneId; label: string }[] = [
   { id: 'scene-06-sample-workflow', label: 'P-05 Sampling' },
   { id: 'scene-07-cheyava-falls', label: 'P-06 Cheyava Falls' },
   { id: 'scene-08-the-runner', label: 'P-07 Runner' },
+  { id: 'scene-09-waiting-sample', label: 'P-08 Ending' },
 ];
 
 function applyScene(id: StorySceneId) {

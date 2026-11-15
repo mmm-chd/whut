@@ -14,7 +14,8 @@ export type StorySceneId =
   | 'scene-05-percy-inspector'
   | 'scene-06-sample-workflow'
   | 'scene-07-cheyava-falls'
-  | 'scene-08-the-runner';
+  | 'scene-08-the-runner'
+  | 'scene-09-waiting-sample';
 
 const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'p01-jezero': 'scene-02-launch-to-mars',
@@ -25,7 +26,9 @@ const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'scene-05-percy-inspector': 'scene-06-sample-workflow',
   'scene-06-sample-workflow': 'scene-07-cheyava-falls',
   'scene-07-cheyava-falls': 'scene-08-the-runner',
-  'scene-08-the-runner': null,
+  'scene-08-the-runner': 'scene-09-waiting-sample',
+  // The ending is the story's last scene: nothing follows it.
+  'scene-09-waiting-sample': null,
 };
 
 const STORY_SCENE_IDS = Object.keys(NEXT_SCENE) as StorySceneId[];

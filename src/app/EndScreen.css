@@ -34,3 +34,81 @@
   line-height: 1.6;
   color: rgba(255, 248, 240, 0.82);
 }
+
+/* ---------- the story's last card ---------- */
+
+/* Out of the ending's black, with no heavy blur behind it on a phone. */
+.end-screen--ending {
+  background: #120a07;
+}
+
+.end-screen--ending .end-screen__card {
+  background: rgba(43, 26, 22, 0.92);
+  backdrop-filter: none;
+}
+
+.end-screen--ending .end-screen__title {
+  color: #fff1d6;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.end-screen--ending .end-screen__subtitle,
+.end-screen--ending .end-screen__button {
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.end-screen--ending .end-screen__title:focus {
+  outline: none;
+}
+
+.end-screen__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.end-screen__button {
+  min-height: 48px;
+  padding: 0.5rem 1.5rem;
+  color: #3b2118;
+  background: #fff6e2;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.end-screen__button[data-primary] {
+  background: #ffd9a8;
+  border-width: 3px;
+}
+
+.end-screen__button:hover:not(:disabled),
+.end-screen__button:focus-visible {
+  background: #ffc98a;
+}
+
+.end-screen__button:focus-visible {
+  outline: 3px solid #45b5ff;
+  outline-offset: 3px;
+}
+
+.end-screen__button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 480px) {
+  .end-screen__actions {
+    flex-direction: column;
+  }
+
+  .end-screen__button {
+    width: 100%;
+  }
+}

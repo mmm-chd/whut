@@ -260,24 +260,50 @@ describe('StorySequence', () => {
     await app.unmount();
   });
 
-  it('ends on the Runner copy when the Runner completes and nothing follows it yet', async () => {
+  it('hands the Runner to the ending, and ends there', async () => {
+    vi.useFakeTimers();
     useStoryStore.setState({
       activeSceneId: 'scene-08-the-runner',
+      status: 'completed',
+      isPaused: false,
+      completedInteractions: [],
+      settings: { muted: true, volume: 0.35, reducedMotion: false },
+    });
+
+    const app = renderApp();
+    await app.render();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+
+    expect(useStoryStore.getState().activeSceneId).toBe('scene-09-waiting-sample');
+    // The ending marks itself waiting once its first picture is up.
+    expect(['playing', 'waiting']).toContain(useStoryStore.getState().status);
+    expect(app.container.querySelector('[data-scene="scene-09-waiting-sample"]')).not.toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-08-the-runner"]')).toBeNull();
+    expect(app.container.querySelector('.end-screen')).toBeNull();
+
+    await app.unmount();
+  });
+
+  it('shows the ending card once the ending itself has completed', async () => {
+    useStoryStore.setState({
+      activeSceneId: 'scene-09-waiting-sample',
       status: 'completed',
     });
 
     const app = renderApp();
     await app.render();
 
-    expect(app.container.querySelector('.end-screen')).not.toBeNull();
-    expect(app.container.textContent).toContain('Percy reached the destination you chose');
+    expect(app.container.querySelector('[data-end-variant="perseverance-ending"]')).not.toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-09-waiting-sample"]')).toBeNull();
 
     await app.unmount();
   });
 
   it('shows EndScreen only for terminal story completion', async () => {
     useStoryStore.setState({
-      activeSceneId: 'scene-08-the-runner',
+      activeSceneId: 'scene-09-waiting-sample',
       status: 'completed',
     });
 
@@ -285,8 +311,8 @@ describe('StorySequence', () => {
     await app.render();
 
     expect(app.container.querySelector('.end-screen')).not.toBeNull();
-    expect(app.container.textContent).toContain('To be continued');
-    expect(app.container.querySelector('[data-scene="scene-08-the-runner"]')).toBeNull();
+    expect(app.container.textContent).toContain('The journey continues');
+    expect(app.container.querySelector('[data-scene="scene-09-waiting-sample"]')).toBeNull();
 
     await app.unmount();
   });

@@ -18,10 +18,11 @@ describe('sceneSequence', () => {
 
   it('has no outgoing edge from the last scene', () => {
     expect(getNextSceneId('scene-05-percy-inspector')).toBe('scene-06-sample-workflow');
-    // The sampling game hands off to Cheyava Falls, which hands off to the runner.
+    // Sampling hands off to Cheyava Falls, then the runner, then the ending.
     expect(getNextSceneId('scene-06-sample-workflow')).toBe('scene-07-cheyava-falls');
     expect(getNextSceneId('scene-07-cheyava-falls')).toBe('scene-08-the-runner');
-    expect(getNextSceneId('scene-08-the-runner')).toBeNull();
+    expect(getNextSceneId('scene-08-the-runner')).toBe('scene-09-waiting-sample');
+    expect(getNextSceneId('scene-09-waiting-sample')).toBeNull();
   });
 
   it('rejects unknown store IDs before render-map lookup', () => {
