@@ -59,7 +59,7 @@ export function FactCard({ card, onClose, returnFocusTo }: FactCardProps) {
         <div className="fact-card__backdrop" onClick={handleClose} />
         <div className="fact-card__panel" onClick={(event) => event.stopPropagation()}>
           <div className="fact-card__header">
-            <span className="fact-card__fact-id">{card.factId}</span>
+            {/* <span className="fact-card__fact-id">{card.factId}</span> */}
             <h2 className="fact-card__title">{card.title}</h2>
             <button
               type="button"

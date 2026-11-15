@@ -1,6 +1,7 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { useCallback, useState, type ReactNode } from 'react';
-import { Color, ColorManagement, LinearSRGBColorSpace } from 'three';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { ColorManagement } from 'three';
+import { rawClearColor } from './colors';
 import { TextureCacheProvider } from './textures';
 import './WebGLStage.css';
 
@@ -8,21 +9,6 @@ import './WebGLStage.css';
 // exactly like the browser blended <img> layers. Turn colour management off
 // once, here, so `new Color('#rrggbb')` is not converted either.
 ColorManagement.enabled = false;
-
-/**
- * The stage renders with a linear output colour space, so hex values reach the
- * screen unchanged. `setClearColor` would still treat the string as sRGB and
- * convert it, turning the backdrop almost black; build the raw colour instead.
- */
-function rawClearColor(hex: string): Color {
-  const value = hex.replace('#', '');
-  return new Color().setRGB(
-    parseInt(value.slice(0, 2), 16) / 255,
-    parseInt(value.slice(2, 4), 16) / 255,
-    parseInt(value.slice(4, 6), 16) / 255,
-    LinearSRGBColorSpace,
-  );
-}
 
 let webglSupport: boolean | null = null;
 
@@ -54,6 +40,17 @@ export interface WebGLStageProps {
   children: ReactNode;
 }
 
+/**
+ * The picture may only appear once it is both drawn and measured.
+ *
+ * A stage with no measured size would reveal an empty frame; the canvas
+ * element's own 300 x 150 default is handled in CSS, because a small host may
+ * legitimately measure exactly that.
+ */
+export function stageReady(texturesReady: boolean, width: number, height: number): boolean {
+  return texturesReady && width > 1 && height > 1;
+}
+
 function StageContents({
   preload,
   onReady,
@@ -64,11 +61,26 @@ function StageContents({
   children: ReactNode;
 }) {
   const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
+  const width = useThree((state) => state.size.width);
+  const height = useThree((state) => state.size.height);
+  const [texturesReady, setTexturesReady] = useState(false);
+  const reportedRef = useRef(false);
+
+  // Both conditions are latched here, so the parent is told once and only when
+  // the first frame it would reveal is already the right size.
+  useEffect(() => {
+    if (reportedRef.current || !stageReady(texturesReady, width, height)) {
+      return;
+    }
+    reportedRef.current = true;
+    onReady();
+  }, [height, onReady, texturesReady, width]);
+
   return (
     <TextureCacheProvider
       maxAnisotropy={Math.min(8, maxAnisotropy)}
       preload={preload}
-      onReady={onReady}
+      onReady={() => setTexturesReady(true)}
     >
       {children}
     </TextureCacheProvider>

@@ -211,7 +211,8 @@ describe('Scene02LaunchToMars', () => {
     expect(phase()).toBe('countdown');
     expect(launchButton()).toBeNull();
     expect(useStoryStore.getState().completedInteractions).toEqual(['launch-button']);
-    expect(AudioManager.prototype.playMusic).toHaveBeenCalledTimes(1);
+    // The score belongs to the story shell now, so the launch does not restart it.
+    expect(AudioManager.prototype.playMusic).not.toHaveBeenCalled();
 
     await seek(15.1);
     expect(countdownText()).toBe('2');
@@ -360,7 +361,8 @@ describe('Scene02LaunchToMars', () => {
     expect(driver.dispose).toHaveBeenCalled();
     expect(controller?.isTimelineRunning()).toBe(false);
     expect(useDialogueStore.getState().active).toBeNull();
-    expect(AudioManager.prototype.stop).toHaveBeenCalledWith('music-kindred-spirits');
+    // The score outlives the scene; only the cue channel is torn down here.
+    expect(AudioManager.prototype.stop).not.toHaveBeenCalledWith('music-perseverance');
     expect(AudioManager.prototype.stop).toHaveBeenCalledWith('p02-sfx-liftoff');
     expect(AudioManager.prototype.stop).toHaveBeenCalledWith('p02-sfx-countdown');
 

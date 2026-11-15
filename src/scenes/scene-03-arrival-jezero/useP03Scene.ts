@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAudioManager } from '../../audio/useAudioManager';
 import { useDialogueStore } from '../../components/dialogue/dialogue.store';
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
@@ -43,9 +42,7 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
   const controllerRef = useRef(controller);
   controllerRef.current = controller;
 
-  const scoreAudio = useAudioManager();
-  const audioRef = useRef({ scoreAudio });
-  audioRef.current = { scoreAudio };
+
 
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
 
@@ -198,9 +195,6 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
       isRunning: () => driver.isRunning(),
     });
     driver.play(0);
-    // The reader's last click (the cruise Continue) is the gesture; a blocked
-    // start only means silence.
-    audioRef.current.scoreAudio.playMusic('music-kindred-spirits');
   }, [nodes, snapshot]);
 
   startRunRef.current = startRun;
@@ -225,7 +219,6 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
       driverRef.current = null;
       controllerRef.current.attachTimeline(null);
       useDialogueStore.getState().clear();
-      audioRef.current.scoreAudio.stop('music-kindred-spirits');
     };
   }, [startRun]);
 

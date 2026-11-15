@@ -14,8 +14,15 @@
   opacity: 1;
 }
 
+/*
+ * The canvas keeps its drawing buffer, but never its own layout size: an
+ * unmeasured canvas is 300 x 150 and would otherwise sit as a small square in
+ * the corner of the stage.
+ */
 .webgl-stage canvas {
   display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .webgl-stage__recover {

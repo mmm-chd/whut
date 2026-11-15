@@ -54,10 +54,9 @@ export function useP02Scene(nodes: P02Nodes): P02SceneApi {
   const controllerRef = useRef(controller);
   controllerRef.current = controller;
 
-  const scoreAudio = useAudioManager();
   const cueAudio = useAudioManager();
-  const audioRef = useRef({ scoreAudio, cueAudio });
-  audioRef.current = { scoreAudio, cueAudio };
+  const audioRef = useRef({ cueAudio });
+  audioRef.current = { cueAudio };
 
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
 
@@ -203,7 +202,6 @@ export function useP02Scene(nodes: P02Nodes): P02SceneApi {
       driverRef.current = null;
       controllerRef.current.attachTimeline(null);
       useDialogueStore.getState().clear();
-      audioRef.current.scoreAudio.stop('music-kindred-spirits');
       audioRef.current.cueAudio.stop('p02-sfx-liftoff');
       audioRef.current.cueAudio.stop('p02-sfx-countdown');
     };
@@ -243,7 +241,6 @@ export function useP02Scene(nodes: P02Nodes): P02SceneApi {
     phaseRef.current = 'countdown';
     setPhase('countdown');
     state.markInteractionComplete('launch-button');
-    audioRef.current.scoreAudio.playMusic('music-kindred-spirits');
   }, []);
 
   return { phase, countdown, launch };

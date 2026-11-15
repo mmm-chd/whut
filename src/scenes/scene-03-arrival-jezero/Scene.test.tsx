@@ -265,7 +265,8 @@ describe('Scene03ArrivalJezero', () => {
     expect(current.dispose).toHaveBeenCalled();
     expect(controller?.isTimelineRunning()).toBe(false);
     expect(useDialogueStore.getState().active).toBeNull();
-    expect(AudioManager.prototype.stop).toHaveBeenCalledWith('music-kindred-spirits');
+    // The score outlives the scene; the shell stops it when the story ends.
+    expect(AudioManager.prototype.stop).not.toHaveBeenCalledWith('music-perseverance');
 
     // A disposed driver no longer cues lines.
     current.seek(labelTime('p03-percy-01') + 0.02, false);

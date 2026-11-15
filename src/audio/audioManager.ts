@@ -20,6 +20,8 @@ export const VOICE_GAIN = 1.25;
 export class AudioManager {
   private sounds = new Map<string, Howl>();
   private currentId: string | null = null;
+  /** The looping bed; kept apart from `currentId` so a narration line cannot cut it. */
+  private musicId: string | null = null;
   private pausedIds = new Set<string>();
   private muted = false;
   private volume = 0.8;
@@ -46,9 +48,25 @@ export class AudioManager {
     return this.playSound(id, { stopCurrent: true, loop: false });
   }
 
-  /** Plays persistent scene music without interrupting dialogue voice-over. */
+  /**
+   * Plays the persistent score. Calling it again with the track that is already
+   * running is a no-op: scene handoffs must not restart the loop from zero.
+   */
   playMusic(id: string): boolean {
+    if (this.musicId === id && this.sounds.get(id)?.playing()) {
+      return true;
+    }
+    if (this.musicId && this.musicId !== id) {
+      // A different bed replaces the old one; two scores never layer.
+      this.sounds.get(this.musicId)?.stop();
+      this.musicId = null;
+    }
     return this.playSound(id, { stopCurrent: false, loop: true });
+  }
+
+  /** True while `id` owns the looping bed. */
+  isMusicPlaying(id: string): boolean {
+    return this.musicId === id;
   }
 
   private playSound(id: string, options: { stopCurrent: boolean; loop: boolean }): boolean {
@@ -99,7 +117,13 @@ export class AudioManager {
     } else {
       sound.play();
     }
-    this.currentId = id;
+    // Only one-shot lines arm `stopCurrent`; the score owns `musicId` instead,
+    // so a voice-over never stops the music underneath it.
+    if (options.loop) {
+      this.musicId = id;
+    } else {
+      this.currentId = id;
+    }
     this.pausedIds.delete(id);
     return true;
   }
@@ -111,6 +135,9 @@ export class AudioManager {
     }
     if (this.currentId === id) {
       this.currentId = null;
+    }
+    if (this.musicId === id) {
+      this.musicId = null;
     }
     this.pausedIds.delete(id);
   }
@@ -133,6 +160,7 @@ export class AudioManager {
     this.sounds.forEach((sound) => sound.unload());
     this.sounds.clear();
     this.currentId = null;
+    this.musicId = null;
     this.pausedIds.clear();
   }
 

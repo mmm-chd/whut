@@ -3,6 +3,9 @@ import { CruiseEntryScene } from '../scenes/filler-scene-01-cruise/Scene';
 import { Scene01Jezero } from '../scenes/scene-01-jezero/Scene';
 import { Scene02LaunchToMars } from '../scenes/scene-02-launch-to-mars/Scene';
 import { Scene03ArrivalJezero } from '../scenes/scene-03-arrival-jezero/Scene';
+import { Scene04PercyInspection } from '../scenes/scene-04-percy-inspection/Scene';
+import { Scene05PercyInspector } from '../scenes/scene-05-percy-inspector/Scene';
+import { useStoryScore } from '../audio/useStoryScore';
 import { useStoryStore } from '../stores/story.store';
 import {
   getNextSceneId,
@@ -23,6 +26,10 @@ function renderScene(id: StorySceneId) {
       return <CruiseEntryScene />;
     case 'scene-03-arrival-jezero':
       return <Scene03ArrivalJezero />;
+    case 'scene-04-percy-inspection':
+      return <Scene04PercyInspection />;
+    case 'scene-05-percy-inspector':
+      return <Scene05PercyInspector />;
   }
 }
 
@@ -41,6 +48,9 @@ interface CoverState {
  * disappear immediately there; the cruise entry is revealed by the shell.
  */
 export function StorySequence() {
+  // One looping score for the whole run: it outlives every scene swap.
+  useStoryScore();
+
   const activeSceneId = useStoryStore((state) => state.activeSceneId);
   const status = useStoryStore((state) => state.status);
   const isPaused = useStoryStore((state) => state.isPaused);
@@ -127,6 +137,8 @@ export function StorySequence() {
         instant:
           next === 'scene-02-launch-to-mars' ||
           next === 'scene-03-arrival-jezero' ||
+          next === 'scene-04-percy-inspection' ||
+          next === 'scene-05-percy-inspector' ||
           reducedMotion,
       });
       handoffRef.current = null;

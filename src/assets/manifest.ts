@@ -59,6 +59,8 @@ import bookPlanetUrl from './drafts/book/book-planet.svg';
 import cruiseSpaceUrl from './fixed/space-filler.png';
 import crayonFontUrl from './fonts/DK Cool Crayon.ttf';
 import kindredSpiritsUrl from '../audio/bgm/Kindred Spirits - Howard Harper-Barnes.mp3';
+import perseveranceBgmUrl from '../audio/bgm/bgm-percy.mp3';
+import menuBgmUrl from '../audio/bgm/bgm-main.mp3';
 import p01NarratorUrl from '../audio/voice-over/perseverance/[P01 - Narrator 1 - 2].mp3';
 import p01Percy1Url from '../audio/voice-over/perseverance/percy/P01 - Percy 1.mp3';
 import p01Percy2Url from '../audio/voice-over/perseverance/percy/P01 - Percy 2.mp3';
@@ -80,6 +82,11 @@ import p03TransitionUrl from '../audio/voice-over/perseverance/P03 - Transition 
 import p03FinalUrl from '../audio/voice-over/perseverance/P03 - Final Quote.mp3';
 import p03Percy1Url from '../audio/voice-over/perseverance/percy/P03 - Percy 1.mp3';
 import p03Percy2Url from '../audio/voice-over/perseverance/percy/P03 - Percy 2.mp3';
+import p04Narrator1Url from '../audio/voice-over/perseverance/P04 - Narrator 1.mp3';
+import p04Narrator2Url from '../audio/voice-over/perseverance/P04 - Narrator 2.mp3';
+import p04Narrator3Url from '../audio/voice-over/perseverance/P04 - Narrator 3.mp3';
+import p04Narrator4Url from '../audio/voice-over/perseverance/P04 - Narrator 4.mp3';
+import p04FinalQuoteUrl from '../audio/voice-over/perseverance/P04 - Final Quote.mp3';
 import placeholderUrl from './placeholder.svg';
 
 export type AssetStatus = 'placeholder' | 'draft' | 'final';
@@ -255,6 +262,11 @@ export const assetManifest: Record<string, AssetEntry> = {
   'sfx-unlock': deferredAsset('sfx-unlock', 'audio'),
   'amb-mars-wind': deferredAsset('amb-mars-wind', 'audio'),
   'music-kindred-spirits': finalAsset('music-kindred-spirits', 'audio', kindredSpiritsUrl),
+  // The music that runs under the Perseverance story (P-01 take-off, P-02 launch
+  // to Mars, P-03 arrival). Swap the imported file to change the whole score.
+  'music-perseverance': finalAsset('music-perseverance', 'audio', perseveranceBgmUrl),
+  // The bed for the pages outside the story: splash, launchpad, characters.
+  'music-main': finalAsset('music-main', 'audio', menuBgmUrl),
 
   // P-03 voice-over, one recording per line in story order. Lengths were measured
   // by decoding each file. "Narrator 8" holds two lines with a pause between them
@@ -273,6 +285,14 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p03-vo-narrator-10': voiceAsset('p03-vo-narrator-10', p03Narrator9Url, undefined, 5930),
   'p03-vo-narrator-11': voiceAsset('p03-vo-narrator-11', p03TransitionUrl, undefined, 9460),
   'p03-vo-narrator-12': voiceAsset('p03-vo-narrator-12', p03FinalUrl, undefined, 6460),
+
+  // P-04 voice-over, one file per line, in the order of dialog-perseverance.pdf.
+  'p04-vo-narrator-01': voiceAsset('p04-vo-narrator-01', p04Narrator1Url, undefined, 6960),
+  'p04-vo-narrator-02': voiceAsset('p04-vo-narrator-02', p04Narrator2Url, undefined, 14090),
+  'p04-vo-narrator-03': voiceAsset('p04-vo-narrator-03', p04Narrator3Url, undefined, 24430),
+  'p04-vo-narrator-04': voiceAsset('p04-vo-narrator-04', p04Narrator4Url, undefined, 3790),
+  // The script's final quote is spoken in the close-up, not on the ground.
+  'p05-vo-rotation-hint': voiceAsset('p05-vo-rotation-hint', p04FinalQuoteUrl, undefined, 3790),
 
   // P-02 voice-over, one file per line, in the order of dialog-perseverance.pdf.
   'p02-vo-narrator-01': voiceAsset('p02-vo-narrator-01', p02Narrator1Url),

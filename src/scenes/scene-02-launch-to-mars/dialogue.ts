@@ -10,12 +10,12 @@ import type { DialogueLine } from '../../components/dialogue/types';
  * player's Continue gate, as in P-01, so no line leaves on a timer.
  */
 const COPY_01 =
-  'It all started on July 30, 2020 (July thirtieth, twenty twenty), when Percy was carried aboard an Atlas V 541 rocket, launching from Cape Canaveral Air Force Station, Florida.';
+  'It all started on July 30, 2020. Percy being carried by Atlas V 541 zooming out to sky from Cape Canaveral Air Force Station, Florida';
 const COPY_02 =
-  "A journey that excited Percy! He was heading to Jezero Crater, a place on Mars that holds clues about a very ancient past. Waaaaa! That's faaaaar older than Percy!";
+  "A journey that excites Percy,  he's been told to land on Jazero, a crater in Mars that has been standing since its planet's old age. Waaaaa, faaaaar older than Percy";
 const COPY_03 =
-  "Oh! Look! Percy isn't alone on this journey. He's going with his little buddy, Ginny! Well, we'll hear more about The Dynamic Duo, Perseverance and Ingenuity, and their adventures up there!";
-const COPY_04 = "Let's join Percy and Ginny on this NASA mission!";
+  "Oh! look! Percy isn't alone in this journey. He’s going with his brother, Ginny! well, we’ll hear more about The Dynamic Duo and their journey up there";
+const COPY_04 = "Lets join Percy and Ginny in this Nasa Mission!";
 
 export const p02DialogueLines: readonly DialogueLine[] = [
   {
@@ -47,7 +47,7 @@ export const p02DialogueLines: readonly DialogueLine[] = [
     advance: 'manual',
     holdsStory: true,
     emphasis: true,
-    emphasisText: 'Jezero Crater',
+    emphasisText: 'Jazero',
     trigger: 'timeline',
   },
   {
@@ -72,7 +72,7 @@ export const p02DialogueLines: readonly DialogueLine[] = [
     text: COPY_04,
     audioId: 'p02-vo-narrator-04',
     timelineLabel: 'launch-invitation',
-    placement: 'bottom',
+    placement: 'narrator-top-right',
     panel: false,
     textSize: 'normal',
     textAlign: 'right',

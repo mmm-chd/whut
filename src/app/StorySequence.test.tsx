@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useExperienceStore } from './experience.store';
 import { useStoryStore } from '../stores/story.store';
+import { AudioManager } from '../audio/audioManager';
+import { resetAudioManager } from '../audio/audioManagerInstance';
+import { STORY_SCORE_ID } from '../audio/useStoryScore';
 import { App } from './App';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -79,6 +82,36 @@ describe('StorySequence', () => {
     expect(app.container.querySelector('.end-screen')).toBeNull();
 
     await app.unmount();
+  });
+
+  it('keeps one looping score across the P-01 to P-02 handoff', async () => {
+    // The score belongs to the story shell, not to a scene: the swap must not
+    // restart the loop or stop the bed.
+    vi.useFakeTimers();
+    resetAudioManager();
+    const playMusic = vi.spyOn(AudioManager.prototype, 'playMusic').mockReturnValue(true);
+    const stop = vi.spyOn(AudioManager.prototype, 'stop');
+
+    const app = renderApp();
+    await app.render();
+
+    expect(playMusic).toHaveBeenCalledTimes(1);
+    expect(playMusic).toHaveBeenCalledWith(STORY_SCORE_ID);
+
+    await act(async () => {
+      useStoryStore.getState().setStatus('completed');
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+
+    expect(useStoryStore.getState().activeSceneId).toBe('scene-02-launch-to-mars');
+    expect(playMusic).toHaveBeenCalledTimes(1);
+    expect(stop).not.toHaveBeenCalledWith(STORY_SCORE_ID);
+
+    await app.unmount();
+    expect(stop).toHaveBeenCalledWith(STORY_SCORE_ID);
+    vi.restoreAllMocks();
   });
 
   it('does not hand off while paused and rechecks on resume', async () => {
@@ -187,7 +220,7 @@ describe('StorySequence', () => {
 
   it('shows EndScreen only for terminal story completion', async () => {
     useStoryStore.setState({
-      activeSceneId: 'scene-03-arrival-jezero',
+      activeSceneId: 'scene-05-percy-inspector',
       status: 'completed',
     });
 
@@ -196,7 +229,7 @@ describe('StorySequence', () => {
 
     expect(app.container.querySelector('.end-screen')).not.toBeNull();
     expect(app.container.textContent).toContain('To be continued');
-    expect(app.container.querySelector('[data-scene="scene-03-arrival-jezero"]')).toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-05-percy-inspector"]')).toBeNull();
 
     await app.unmount();
   });

@@ -11,6 +11,8 @@ const SCENES: { id: StorySceneId; label: string }[] = [
   { id: 'scene-02-launch-to-mars', label: 'P-02 Launch' },
   { id: 'filler-scene-01-cruise', label: 'Cruise' },
   { id: 'scene-03-arrival-jezero', label: 'P-03 Arrival' },
+  { id: 'scene-04-percy-inspection', label: 'P-04 Inspection' },
+  { id: 'scene-05-percy-inspector', label: 'P-05 Close-up' },
 ];
 
 function applyScene(id: StorySceneId) {
@@ -38,6 +40,8 @@ export function DevRoot() {
 
   const jump = useCallback((id: StorySceneId) => {
     applyScene(id);
+    // A scene only mounts inside the story stage, so jump there too.
+    useExperienceStore.setState({ stage: 'story' });
     // A new key remounts the whole app, so the same scene restarts cleanly.
     setNonce((n) => n + 1);
   }, []);
@@ -49,9 +53,16 @@ export function DevRoot() {
 
   /* DEV-TOOL: ?devStage=book jumps straight to the journal for screenshots. */
   useEffect(() => {
-    const stage = new URLSearchParams(window.location.search).get('devStage');
+    const params = new URLSearchParams(window.location.search);
+    const stage = params.get('devStage');
     if (stage === 'homepage' || stage === 'book') {
       useExperienceStore.setState({ stage });
+    }
+    /* DEV-TOOL: ?devScene=scene-04-percy-inspection opens a later scene directly. */
+    const scene = SCENES.find((entry) => entry.id === params.get('devScene'));
+    if (scene) {
+      applyScene(scene.id);
+      useExperienceStore.setState({ stage: 'story' });
     }
   }, []);
 

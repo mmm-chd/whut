@@ -1,19 +1,25 @@
 /**
  * The ordered scene graph for this story segment. Values are intentionally
  * fixed: P-01 hands off to P-02, P-02 hands off to the cruise entry, the cruise
- * hands off to P-03, and P-03 has no outgoing edge until P-04 exists.
+ * hands off to P-03, P-03 hands off to the P-04 story, and P-04 hands Percy to
+ * the P-05 close-up, which owns the only inspector canvas. Nothing follows P-05
+ * yet.
  */
 export type StorySceneId =
   | 'p01-jezero'
   | 'scene-02-launch-to-mars'
   | 'filler-scene-01-cruise'
-  | 'scene-03-arrival-jezero';
+  | 'scene-03-arrival-jezero'
+  | 'scene-04-percy-inspection'
+  | 'scene-05-percy-inspector';
 
 const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'p01-jezero': 'scene-02-launch-to-mars',
   'scene-02-launch-to-mars': 'filler-scene-01-cruise',
   'filler-scene-01-cruise': 'scene-03-arrival-jezero',
-  'scene-03-arrival-jezero': null,
+  'scene-03-arrival-jezero': 'scene-04-percy-inspection',
+  'scene-04-percy-inspection': 'scene-05-percy-inspector',
+  'scene-05-percy-inspector': null,
 };
 
 const STORY_SCENE_IDS = Object.keys(NEXT_SCENE) as StorySceneId[];

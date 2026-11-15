@@ -5,11 +5,15 @@ import {
   p02StoryHoldingLineIds,
 } from './dialogue';
 
+/**
+ * Mirrors `dialogue.ts` exactly. The spoken script is the source of truth, so a
+ * copy change updates both files together and this test keeps them locked.
+ */
 const exactCopy = [
-  'It all started on July 30, 2020 (July thirtieth, twenty twenty), when Percy was carried aboard an Atlas V 541 rocket, launching from Cape Canaveral Air Force Station, Florida.',
-  "A journey that excited Percy! He was heading to Jezero Crater, a place on Mars that holds clues about a very ancient past. Waaaaa! That's faaaaar older than Percy!",
-  "Oh! Look! Percy isn't alone on this journey. He's going with his little buddy, Ginny! Well, we'll hear more about The Dynamic Duo, Perseverance and Ingenuity, and their adventures up there!",
-  "Let's join Percy and Ginny on this NASA mission!",
+  'It all started on July 30, 2020. Percy being carried by Atlas V 541 zooming out to sky from Cape Canaveral Air Force Station, Florida',
+  "A journey that excites Percy,  he's been told to land on Jazero, a crater in Mars that has been standing since its planet's old age. Waaaaa, faaaaar older than Percy",
+  "Oh! look! Percy isn't alone in this journey. He’s going with his brother, Ginny! well, we’ll hear more about The Dynamic Duo and their journey up there",
+  'Lets join Percy and Ginny in this Nasa Mission!',
 ];
 
 describe('p02DialogueLines', () => {
@@ -46,7 +50,7 @@ describe('p02DialogueLines', () => {
     });
     expect(p02DialogueLines[1]).toMatchObject({
       emphasis: true,
-      emphasisText: 'Jezero Crater',
+      emphasisText: 'Jazero',
     });
     expect(p02DialogueLines[2]).toMatchObject({
       emphasis: true,

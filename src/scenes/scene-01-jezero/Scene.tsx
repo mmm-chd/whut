@@ -3,7 +3,6 @@ import gsap from 'gsap';
 import { useCallback, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
-import { useAudioManager } from '../../audio/useAudioManager';
 import { RockProxy } from './components/RockProxy';
 import { OpeningTitle } from './components/OpeningTitle';
 import { WebGLStage } from '../../three/WebGLStage';
@@ -83,7 +82,6 @@ export function Scene01Jezero() {
   const isPaused = useStoryStore((state) => state.isPaused);
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
   const [gate, setGate] = useState<Gate>(null);
-  const audio = useAudioManager();
 
   // Card state — only one card open at a time
   const [openCardId, setOpenCardId] = useState<string | null>(null);
@@ -161,11 +159,9 @@ export function Scene01Jezero() {
       return;
     }
     startScene(scene01Config.id);
-    // Start on this user gesture so browsers do not reject the score as autoplay.
-    audio.playMusic('music-kindred-spirits');
     setGate(null);
     resume();
-  }, [audio, gate, resume, startScene]);
+  }, [gate, resume, startScene]);
 
   useGSAP(
     () => {

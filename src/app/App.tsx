@@ -1,3 +1,4 @@
+import { useMenuScore } from '../audio/useMenuScore';
 import { useStoryStore } from '../stores/story.store';
 import { NarrativeController } from '../engine/NarrativeController';
 import { ensureScenesRegistered } from '../engine/ensureScenesRegistered';
@@ -9,6 +10,7 @@ import { EndScreen } from './EndScreen';
 import { StorySequence } from './StorySequence';
 import { useExperienceStore } from './experience.store';
 import { getNextSceneId, narrowStorySceneId } from './sceneSequence';
+import { useStageUrl } from './useStageUrl';
 import './App.css';
 
 ensureScenesRegistered();
@@ -17,6 +19,13 @@ export function App() {
   const stage = useExperienceStore((state) => state.stage);
   const status = useStoryStore((state) => state.status);
   const activeSceneId = useStoryStore((state) => state.activeSceneId);
+
+  // The address bar follows the stage: `/`, `/characters`, `/story`.
+  useStageUrl();
+
+  // Everything outside the story shares one looping track (splash, launchpad,
+  // characters); the story shell mounts its own score instead.
+  useMenuScore(stage !== 'story');
 
   // Stage 00: the launchpad mounts behind the splash overlay so its textures
   // preload during the frames; the overlay crossfades straight into it.

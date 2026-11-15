@@ -55,9 +55,9 @@ describe('App end screen', () => {
     await app.unmount();
   });
 
-  it('shows the end screen only after the terminal P-03 scene completes', async () => {
+  it('shows the end screen only after the terminal P-05 scene completes', async () => {
     useStoryStore.setState({
-      activeSceneId: 'scene-03-arrival-jezero',
+      activeSceneId: 'scene-05-percy-inspector',
       status: 'completed',
     });
 

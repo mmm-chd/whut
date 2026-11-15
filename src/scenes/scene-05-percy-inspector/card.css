@@ -1,0 +1,165 @@
+/*
+ * Close-up card chrome.
+ *
+ * `InspectionCard`, `MoxieActivity` and `EarthTeamActivity` keep their P-04
+ * class names because the close-up was extracted from P-04: one component, one
+ * set of styles. P-04 no longer renders them, so they live with the scene that
+ * does.
+ */
+
+
+/* ---------- card column ---------- */
+
+.p04-card-column {
+  position: absolute;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px;
+  border-radius: 14px;
+  /* A reserved panel, so an empty column reads as reserved rather than spilled. */
+  background: rgb(12 33 40 / 55%);
+  box-shadow: inset 0 0 0 2px rgb(255 241 214 / 14%);
+}
+
+.p04-card-empty {
+  margin: 0 auto;
+  max-width: 30ch;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--cream);
+  opacity: 0.75;
+}
+
+.p04-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 16px 16px 14px;
+  border: 3px solid #7b4636;
+  border-radius: 14px;
+  background: var(--paper);
+  color: #3b2118;
+  box-shadow: 0 12px 24px rgb(20 10 8 / 40%);
+}
+
+.p04-card-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.p04-card-title:focus {
+  outline: 2px solid #45b5ff;
+  outline-offset: 3px;
+}
+
+.p04-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.p04-card-summary,
+.p04-card-source {
+  margin: 0;
+}
+
+.p04-card-source {
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.p04-card-close {
+  align-self: flex-start;
+  padding: 6px 14px;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  background: #fff6e2;
+  color: #3b2118;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.p04-card-close:hover,
+.p04-card-close:focus-visible {
+  background: #ffd9a8;
+  outline: 2px solid #45b5ff;
+  outline-offset: 2px;
+}
+
+  .p04-card-column {
+    padding: 10px;
+  }
+
+/* ---------- activities ---------- */
+
+.p04-activity {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.p04-moxie-steps {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.p04-moxie-step[data-reached='false'] {
+  opacity: 0.45;
+}
+
+.p04-moxie-step[aria-current='step'] {
+  font-weight: 700;
+}
+
+.p04-message {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid #7b4636;
+  border-radius: 8px;
+  background: rgb(123 70 54 / 12%);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.p04-activity-button {
+  align-self: flex-start;
+  padding: 6px 14px;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  background: #fff6e2;
+  color: #3b2118;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.p04-activity-button:hover,
+.p04-activity-button:focus-visible {
+  background: #ffd9a8;
+  outline: 2px solid #45b8ff;
+  outline-offset: 2px;
+}
+
+.p04-activity-status,
+.p04-activity-done {
+  margin: 0;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #3b2118;
+}

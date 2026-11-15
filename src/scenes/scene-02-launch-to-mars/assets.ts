@@ -63,7 +63,7 @@ export const p02DeferredAssetIds: readonly string[] = [
   'p02-smoke-mid',
   'p02-smoke-near',
   'p02-exhaust',
-  'music-kindred-spirits',
+  'music-perseverance',
   'p02-vo-narrator-01',
   'p02-vo-narrator-02',
   'p02-vo-narrator-03',

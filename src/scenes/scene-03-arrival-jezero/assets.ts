@@ -34,5 +34,5 @@ export const p03DeferredAssetIds: readonly string[] = [
   'p03-card-spirit',
   'p03-card-opportunity',
   'p03-card-curiosity',
-  'music-kindred-spirits',
+  'music-perseverance',
 ];

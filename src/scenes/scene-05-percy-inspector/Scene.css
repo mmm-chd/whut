@@ -1,0 +1,436 @@
+@import './card.css';
+
+/*
+ * P-05: the close-up.
+ *
+ * One picture, a reserved card column, and a single exit control in the frame.
+ * The chips sit on the picture itself, so every rule here is scoped to the
+ * frame and never to the host.
+ */
+.p05-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: var(--cream);
+  background: #0a1c22;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p05-heading {
+  position: absolute;
+  left: 260px;
+  right: 24px;
+  top: 16px;
+  margin: 0;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 0 rgb(3 12 16 / 60%);
+}
+
+.p05-heading:focus {
+  outline: none;
+}
+
+.p05-progress {
+  position: absolute;
+  left: 260px;
+  right: 24px;
+  top: 50px;
+  margin: 0;
+  font-size: 0.86rem;
+  opacity: 0.85;
+}
+
+/* ---------- the framed picture ---------- */
+
+.p05-frame {
+  position: absolute;
+  z-index: 4;
+  overflow: visible;
+  border-radius: 18px;
+  background: #102b32;
+  box-shadow:
+    0 0 0 3px #7b4636,
+    0 0 0 8px #3b2118,
+    0 18px 36px rgb(4 12 16 / 45%);
+}
+
+.p05-screen {
+  position: absolute;
+  inset: 6px;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 50% 40%, rgb(69 181 255 / 16%), transparent 62%),
+    #0c2128;
+  cursor: grab;
+  touch-action: none;
+}
+
+.p05-screen:focus-visible {
+  outline: 2px solid #45b5ff;
+  outline-offset: -2px;
+}
+
+/*
+ * The picture fills the screen exactly. `InspectorCanvas` keeps its P-04 class
+ * names (it is the shared canvas), so its frame rules are restated here rather
+ * than importing the whole P-04 stylesheet.
+ */
+.p05-screen .p04-canvas,
+.p05-screen .p04-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.p05-screen .p04-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/*
+ * The closing quote speaks from the bottom of the picture. The layer ignores
+ * pointers so it can never steal a drag, but its own gate stays clickable.
+ */
+/* The line lives inside the picture, so it can never run into the card column. */
+.p05-dialogue {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/*
+ * Symmetric insets rather than a transform: motion owns the line's transform.
+ * It sits above the frame bar, in the strip between the lowest chip and the
+ * toolbar, so it never covers a part or a button.
+ */
+.p05-dialogue .scrapbook-text--bottom {
+  left: 8%;
+  right: 8%;
+  bottom: 62px;
+  max-width: none;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/*
+ * On a short host the chips fill the picture, so the line steps outside it,
+ * into the strip under the frame. It is still on screen, and still clear of
+ * every part.
+ */
+.p05-dialogue[data-compact='true'] .scrapbook-text--bottom {
+  left: 4%;
+  right: 4%;
+  bottom: -70px;
+  font-size: 0.78rem;
+}
+
+.p05-dialogue .circular-gate--dialogue {
+  pointer-events: auto;
+}
+
+/* The picture is turned with a drag, so it shows the hand that carries. */
+.p05-screen[data-rotate-surface='true'] {
+  cursor: var(--cursor-grab, grab);
+}
+
+.p05-screen[data-rotate-surface='true'][data-dragging='true'] {
+  cursor: var(--cursor-grabbing, grabbing);
+}
+
+.p05-fallback a,
+.p05-exit:not(:disabled) {
+  cursor: var(--cursor-active, pointer);
+}
+
+/* The chips and their lines live inside the same rectangle as the canvas. */
+.p05-chips {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.p05-leaders {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.p05-leaders line {
+  stroke: rgb(214 235 255 / 62%);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 5 4;
+  transition: stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.p05-leaders circle {
+  fill: rgb(214 235 255 / 72%);
+  stroke: rgb(12 33 40 / 90%);
+  stroke-width: 1.4;
+}
+
+.p05-leaders g[data-state='hover'] line {
+  stroke: #eaf6ff;
+  stroke-width: 2;
+}
+
+.p05-leaders g[data-state='active'] line {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-dasharray: none;
+}
+
+.p05-leaders g[data-state='active'] circle,
+.p05-leaders g[data-state='hover'] circle {
+  fill: #ffffff;
+}
+
+.p05-leaders g[data-state='done'] circle {
+  fill: #9fe3b0;
+}
+
+/* ---------- the part chips ---------- */
+
+.p05-chip {
+  position: absolute;
+  z-index: 4;
+  cursor: var(--cursor-active, pointer);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 44px;
+  padding: 7px 12px;
+  border: 2px solid rgb(150 205 235 / 72%);
+  border-radius: 12px;
+  background: rgb(10 30 38 / 88%);
+  color: rgb(226 240 250 / 92%);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease,
+    opacity 160ms ease;
+}
+
+.p05-chip-label {
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+}
+
+.p05-chip-hint {
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  opacity: 0.72;
+}
+
+.p05-chip[data-state='hover'] {
+  border-color: #eaf6ff;
+  background: rgb(20 48 60 / 94%);
+  color: #ffffff;
+}
+
+/* Active is the brightest state: near-white fill, dark text. */
+.p05-chip[data-state='active'] {
+  border-color: #ffffff;
+  background: rgb(246 251 255 / 96%);
+  color: #0a2630;
+}
+
+.p05-chip[data-state='active'] .p05-chip-hint {
+  color: #26444f;
+  opacity: 0.9;
+}
+
+.p05-chip[data-state='done'] {
+  border-color: rgb(159 227 176 / 85%);
+  color: #dff6e5;
+}
+
+.p05-chip:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/*
+ * A part turned away from the camera leaves the picture, but the button stays
+ * in the tab order; focus brings it back so keyboard access never depends on
+ * the model's rotation.
+ */
+.p05-chip[data-state='hidden'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.p05-chip[data-state='hidden']:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- loading ---------- */
+
+.p05-loading {
+  position: absolute;
+  inset: 6px;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 50% 42%, rgb(69 181 255 / 20%), transparent 66%),
+    rgb(9 27 34 / 96%);
+  text-align: center;
+}
+
+.p05-loading-title {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: #eaf6ff;
+}
+
+.p05-loading-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  opacity: 0.78;
+}
+
+/* ---------- the frame bar: turn controls and the one exit ---------- */
+
+.p05-frame-bar {
+  position: absolute;
+  z-index: 7;
+  right: 0;
+  bottom: -54px;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.p05-exit {
+  margin-left: auto;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 2px solid rgb(255 255 255 / 80%);
+  border-radius: 999px;
+  background: rgb(246 251 255 / 92%);
+  color: #0a2630;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: var(--cursor-active, pointer);
+}
+
+.p05-exit:disabled {
+  border-color: rgb(150 205 235 / 45%);
+  background: rgb(12 33 40 / 70%);
+  color: rgb(226 240 250 / 55%);
+  cursor: not-allowed;
+}
+
+.p05-exit:not(:disabled):hover,
+.p05-exit:focus-visible {
+  background: #ffffff;
+  outline: 2px solid #45b5ff;
+  outline-offset: 2px;
+}
+
+.p05-exit-hint {
+  margin: 0;
+  font-size: 0.68rem;
+  color: rgb(226 240 250 / 70%);
+}
+
+/* ---------- the card column ---------- */
+
+.p05-card-column {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.p05-card-empty {
+  margin: 0;
+  padding: 14px;
+  border: 2px dashed rgb(150 205 235 / 34%);
+  border-radius: 14px;
+  color: rgb(226 240 250 / 70%);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+/* The card keeps P-04's markup; only its frame belongs to P-05. */
+.p05-card-column .p04-card {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: auto;
+  border: 2px solid rgb(150 205 235 / 45%);
+  border-radius: 14px;
+  background: rgb(10 30 38 / 92%);
+}
+
+/* ---------- exit fade ---------- */
+
+.p05-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: #04121a;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms ease;
+}
+
+.p05-fade[data-visible='true'] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p05-chip,
+  .p05-exit,
+  .p05-leaders line {
+    transition: none;
+  }
+
+  .p05-fade {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .p05-heading,
+  .p05-progress {
+    left: 16px;
+    right: 16px;
+  }
+
+  .p05-frame-bar {
+    gap: 6px;
+  }
+
+  .p05-chip {
+    padding: 6px 9px;
+  }
+
+  .p05-chip-hint {
+    display: none;
+  }
+}
