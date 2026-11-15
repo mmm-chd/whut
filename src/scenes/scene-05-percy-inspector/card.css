@@ -45,13 +45,71 @@
   box-shadow: 0 12px 24px rgb(20 10 8 / 40%);
 }
 
+/* The small category line above the title, per the panel hierarchy. */
+.p04-card-category {
+  margin: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7b5b48;
+}
+
 .p04-card-title {
   margin: 0;
   font-size: 1.15rem;
 }
 
+/*
+ * The primary content slot. It is empty on purpose until authentic NASA media
+ * exists: a labelled reservation is honest, an invented picture is not.
+ */
+.p04-card-media {
+  display: grid;
+  gap: 4px;
+  place-content: center;
+  min-height: 88px;
+  padding: 12px;
+  border: 2px dashed rgb(123 91 72 / 42%);
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgb(123 91 72 / 6%) 0 8px,
+      transparent 8px 16px
+    ),
+    #fffdf7;
+  text-align: center;
+}
+
+.p04-card-media-label {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #3b2118;
+}
+
+.p04-card-media-note {
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: #6b5343;
+}
+
+/* Completion stays a small line, never a scoreboard. */
+.p04-card-badge {
+  align-self: flex-start;
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #2f7a48;
+  color: #f4fbf5;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .p04-card-title:focus {
-  outline: 2px solid #45b5ff;
+  outline: 2px solid #2f7fa8;
   outline-offset: 3px;
 }
 

@@ -36,7 +36,30 @@ export interface InspectorRendererApi {
   reportContextLost: () => void;
 }
 
+/**
+ * Whether this browser can give us WebGL2.
+ *
+ * Asked once and remembered: a probe is a real WebGL context, and browsers keep
+ * a small number of them alive per page (Chromium about sixteen). Asking again
+ * on every render — which is exactly what a default parameter does — created a
+ * context per pointer move while the reader turned the model, and the browser
+ * began dropping the oldest, which was the canvas itself. The rover blinked
+ * out, the context came back, and the cycle repeated.
+ *
+ * The probe releases its own context immediately, so a cached answer costs
+ * nothing either.
+ */
+let webgl2Support: boolean | null = null;
+
+/** Test seam: forget the remembered answer. */
+export function resetWebGLSupportProbe(): void {
+  webgl2Support = null;
+}
+
 export function hasWebGL2(): boolean {
+  if (webgl2Support !== null) {
+    return webgl2Support;
+  }
   if (typeof document === 'undefined') {
     return false;
   }
@@ -44,8 +67,17 @@ export function hasWebGL2(): boolean {
     return false;
   }
   try {
-    return Boolean(document.createElement('canvas').getContext('webgl2'));
+    const probe = document.createElement('canvas');
+    const context = probe.getContext('webgl2');
+    const supported = Boolean(context);
+    // Hand the probe's context back before forgetting the canvas: a probe is
+    // worth a question, not a slot out of the page's small allowance.
+    const gl = context as WebGL2RenderingContext | null;
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+    webgl2Support = supported;
+    return supported;
   } catch {
+    webgl2Support = false;
     return false;
   }
 }

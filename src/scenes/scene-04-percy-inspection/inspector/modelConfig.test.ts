@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { copyAllowsNumbers } from '../content';
 import { P04_POINT_IDS } from '../inspectionState';
+import {
+  INSPECTOR_ZOOM_MAX,
+  INSPECTOR_ZOOM_MIN,
+  clampInspectorZoom,
+} from './modelConfig';
 import { P04_POINT_LABELS } from '../components/pointCopy';
 import {
   anchorForPoint,
@@ -71,5 +76,19 @@ describe('inspector anchors', () => {
     expect(INSPECTOR_LOAD_DEADLINE_MS).toBe(10_000);
     expect(INSPECTOR_VERTICAL_FOV).toBeGreaterThan(20);
     expect(INSPECTOR_VERTICAL_FOV).toBeLessThan(60);
+  });
+});
+
+describe('clampInspectorZoom', () => {
+  it('holds the view between the fitted frame and the modest limit', () => {
+    expect(clampInspectorZoom(1)).toBe(1);
+    expect(clampInspectorZoom(1.24)).toBe(1.24);
+    expect(clampInspectorZoom(0.5)).toBe(INSPECTOR_ZOOM_MIN);
+    expect(clampInspectorZoom(3)).toBe(INSPECTOR_ZOOM_MAX);
+    expect(clampInspectorZoom(Number.NaN)).toBe(INSPECTOR_ZOOM_MIN);
+  });
+
+  it('keeps the limit close enough to still read the rover as a whole', () => {
+    expect(INSPECTOR_ZOOM_MAX).toBeLessThanOrEqual(1.6);
   });
 });

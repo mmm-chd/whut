@@ -6,6 +6,7 @@ import { Scene03ArrivalJezero } from '../scenes/scene-03-arrival-jezero/Scene';
 import { Scene04PercyInspection } from '../scenes/scene-04-percy-inspection/Scene';
 import { Scene05PercyInspector } from '../scenes/scene-05-percy-inspector/Scene';
 import { Scene06SampleWorkflow } from '../scenes/scene-06-sample-workflow/Scene';
+import { Scene07CheyavaFalls } from '../scenes/scene-07-cheyava-falls/Scene';
 import { Scene08TheRunner } from '../scenes/scene-08-the-runner/Scene';
 import { useStoryScore } from '../audio/useStoryScore';
 import { useStoryStore } from '../stores/story.store';
@@ -34,6 +35,8 @@ function renderScene(id: StorySceneId) {
       return <Scene05PercyInspector />;
     case 'scene-06-sample-workflow':
       return <Scene06SampleWorkflow />;
+    case 'scene-07-cheyava-falls':
+      return <Scene07CheyavaFalls />;
     case 'scene-08-the-runner':
       return <Scene08TheRunner />;
   }

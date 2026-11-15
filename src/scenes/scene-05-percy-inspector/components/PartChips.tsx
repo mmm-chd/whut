@@ -27,6 +27,14 @@ export interface PartChipsProps {
   readonly activePoint: InspectionPointId | null;
   readonly hoveredPoint: InspectionPointId | null;
   readonly completed: readonly InspectionPointId[];
+  /** Usable picture width when the floating panel covers part of it. */
+  readonly rightLimit?: number;
+  /**
+   * On a narrow host the drawer covers most of the picture, so the chips step
+   * out of the way while it is open. They stay mounted and focusable: reaching
+   * them with Tab brings them back.
+   */
+  readonly hidden?: boolean;
   readonly onHover: (point: InspectionPointId | null) => void;
   readonly onSelect: (point: InspectionPointId, control: HTMLElement | null) => void;
 }
@@ -41,9 +49,11 @@ export function PartChips(props: PartChipsProps) {
         activePoint: props.activePoint,
         hoveredPoint: props.hoveredPoint,
         completed: props.completed,
+        rightLimit: props.rightLimit,
       }),
     [
       props.completed,
+      props.rightLimit,
       props.occluded,
       props.activePoint,
       props.hoveredPoint,
@@ -53,7 +63,11 @@ export function PartChips(props: PartChipsProps) {
   );
 
   return (
-    <div className="p05-chips" data-part-chips>
+    <div
+      className="p05-chips"
+      data-part-chips
+      data-hidden={props.hidden ? 'true' : undefined}
+    >
       <svg
         className="p05-leaders"
         viewBox={`0 0 ${props.viewport.width} ${props.viewport.height}`}

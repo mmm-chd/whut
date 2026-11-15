@@ -4,7 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Group } from 'three';
 import { InspectorModelError } from './loadDeadline';
 import type { InspectorModelResource } from './modelResource';
-import { useInspectorRenderer, type InspectorRendererApi } from './useInspectorRenderer';
+import {
+  hasWebGL2,
+  resetWebGLSupportProbe,
+  useInspectorRenderer,
+  type InspectorRendererApi,
+} from './useInspectorRenderer';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -145,5 +150,21 @@ describe('useInspectorRenderer', () => {
     });
     root = null;
     expect(resource.disposed).toBe(true);
+  });
+});
+
+describe('the WebGL support probe', () => {
+  it('asks the browser once and remembers the answer', async () => {
+    // A probe is a real context. Asking per render — which a default parameter
+    // does — exhausted the page's context allowance while the reader turned the
+    // model, and the browser dropped the canvas itself.
+    resetWebGLSupportProbe();
+    const create = vi.spyOn(document, 'createElement');
+    const answers = [hasWebGL2(), hasWebGL2(), hasWebGL2(), hasWebGL2()];
+    expect(new Set(answers).size).toBe(1);
+    const probes = create.mock.calls.filter(([tag]) => String(tag) === 'canvas').length;
+    expect(probes).toBeLessThanOrEqual(1);
+    create.mockRestore();
+    resetWebGLSupportProbe();
   });
 });

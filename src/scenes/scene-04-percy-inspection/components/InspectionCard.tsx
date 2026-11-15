@@ -10,17 +10,35 @@ import type { InspectionPointId } from '../inspectionState';
 export interface InspectionCardProps {
   readonly point: InspectionPointId;
   readonly title: string;
+  /** Small line above the title, e.g. `IMAGING SYSTEM`. */
+  readonly category?: string;
   readonly children: ReactNode;
   readonly onClose: () => void;
   /** The control that opened this card; focus returns here on close. */
   readonly returnFocusTo?: HTMLElement | null;
+  /**
+   * The primary content slot. It is deliberately empty until an authentic
+   * asset exists: a placeholder that says so is honest, a fabricated picture
+   * is not.
+   */
+  readonly media?: { readonly label: string; readonly note: string } | null;
+  readonly discovered?: boolean;
 }
 
 /**
  * A nonmodal card. It is not a dialog, has no backdrop, and closing it returns
  * focus to the control that opened it so the reader keeps their place.
  */
-export function InspectionCard({ point, title, children, onClose, returnFocusTo }: InspectionCardProps) {
+export function InspectionCard({
+  point,
+  title,
+  category,
+  children,
+  onClose,
+  returnFocusTo,
+  media,
+  discovered = false,
+}: InspectionCardProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const titleId = `p04-card-title-${point}`;
 
@@ -50,10 +68,22 @@ export function InspectionCard({ point, title, children, onClose, returnFocusTo 
         }
       }}
     >
+      {category ? <p className="p04-card-category">{category}</p> : null}
       <h2 className="p04-card-title" id={titleId} tabIndex={-1} ref={headingRef}>
         {title}
       </h2>
+      {media ? (
+        <div className="p04-card-media" data-media-slot={point}>
+          <p className="p04-card-media-label">{media.label}</p>
+          <p className="p04-card-media-note">{media.note}</p>
+        </div>
+      ) : null}
       <div className="p04-card-body">{children}</div>
+      {discovered ? (
+        <p className="p04-card-badge" data-discovered={point}>
+          Discovered
+        </p>
+      ) : null}
       <button type="button" className="p04-card-close" onClick={onClose}>
         Close
       </button>

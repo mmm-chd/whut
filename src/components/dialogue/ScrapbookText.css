@@ -162,3 +162,12 @@
     bottom: 12%;
   }
 }
+
+/*
+ * A press that came before the voice-over ended: the gate stays, acknowledged
+ * and dimmed, until the recording finishes and the line can leave.
+ */
+.scrapbook-text[data-armed='true'] .circular-gate {
+  opacity: 0.55;
+  transition: opacity 160ms ease;
+}

@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import type { PausableTimeline } from '../../engine/narrativeControllerContext';
 import { P04_INVITATION_X } from './annotations';
-import { findP04Line, P04_INVITATION_LINE_ID, p04VoiceSeconds } from './dialogue';
+import { findP04Line, P04_INVITATION_LINE_ID } from './dialogue';
 import type { P04Nodes } from './nodes';
 import type { P04Phase } from './state';
 import { followPose, travelledDistance, travelDuration, P04_TRAVEL } from './travel';
@@ -56,22 +56,28 @@ export interface P04Driver extends PausableTimeline {
 const DIALOGUE_GATE_DELAY = 0.01;
 /** First narration beat, after the picture settles. */
 const FIRST_CUE_AT = 0.9;
-/** Breath between one recording and the next, on top of its own length. */
-const BEAT_PAD = 0.6;
+/** Breath between the release of one gate and the cue of the next line. */
+const BEAT_PAD = 0.35;
 
 /**
- * The four beats, spaced by how long each recording runs.
+ * The four beats, spaced by the gate — never by the recording length.
  *
- * A fixed gap would cue the next line — and stop the current voice-over — while
- * the previous one is still speaking; the third line alone is 24 s long. A
- * dialogue gate pauses the whole narrative, so reading time is added on top of
- * these by the gate itself.
+ * A gate freezes this timeline at its cue, so the recording is "spent" in
+ * frozen time. Adding its length to the *next* cue position counted it twice:
+ * the story sat silent for another whole recording (14.7 s after the distance
+ * line, 25 s after the dimensions line) before the next line was allowed to
+ * speak. The gate already holds for as long as the voice runs; all the next
+ * beat needs is a breath.
+ *
+ * The recordings are protected from the other side: each narrated line sets
+ * `gateAfter` to its own length, so Continue cannot be pressed before the voice
+ * has finished and the next cue cannot cut it off.
  */
 const BEAT_1_AT = FIRST_CUE_AT;
-const BEAT_2_AT = BEAT_1_AT + p04VoiceSeconds('p04-narrator-01') + BEAT_PAD;
-const BEAT_3_AT = BEAT_2_AT + p04VoiceSeconds('p04-narrator-02') + BEAT_PAD;
-const INVITATION_AT = BEAT_3_AT + p04VoiceSeconds('p04-narrator-03') + BEAT_PAD;
-const AWAITING_AT = INVITATION_AT + p04VoiceSeconds(P04_INVITATION_LINE_ID) + 0.4;
+const BEAT_2_AT = BEAT_1_AT + DIALOGUE_GATE_DELAY + BEAT_PAD;
+const BEAT_3_AT = BEAT_2_AT + DIALOGUE_GATE_DELAY + BEAT_PAD;
+const INVITATION_AT = BEAT_3_AT + DIALOGUE_GATE_DELAY + BEAT_PAD;
+const AWAITING_AT = INVITATION_AT + DIALOGUE_GATE_DELAY + BEAT_PAD + 0.4;
 const NARRATIVE_END = AWAITING_AT + 0.2;
 
 /** The authored beats in seconds, exported so a test can hold the spacing. */

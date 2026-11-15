@@ -221,24 +221,32 @@ describe('teardown', () => {
     }
   });
 
-  it('spaces the beats by the recordings, never by a fixed gap', async () => {
-    // Once the voice-over was mapped, a fixed 3.2 s beat stopped the 14 s and
-    // 24 s lines after three seconds. Each beat now starts only after the
-    // previous recording has finished, so this holds the spacing down.
+  it('puts only a breath between beats, because the gate already holds for the voice', async () => {
+    // The gate freezes the timeline at its cue, so counting the recording in
+    // the next cue position as well left the story silent for a whole extra
+    // recording (14.7 s after the distance line, 25 s after the dimensions
+    // line). The sleeps are guarded from the other side instead: no line can
+    // be advanced before its own recording ends.
     const { P04_BEAT_TIMES: beats } = await import('./timeline');
-    const { p04VoiceSeconds } = await import('./dialogue');
+    const { p04VoiceSeconds, p04DialogueLines } = await import('./dialogue');
     const gaps = [
-      [beats.first, beats.second, 'p04-narrator-01'],
-      [beats.second, beats.third, 'p04-narrator-02'],
-      [beats.third, beats.invitation, 'p04-narrator-03'],
+      [beats.first, beats.second],
+      [beats.second, beats.third],
+      [beats.third, beats.invitation],
     ] as const;
 
-    for (const [from, to, lineId] of gaps) {
-      expect(to - from).toBeGreaterThanOrEqual(p04VoiceSeconds(lineId));
+    for (const [from, to] of gaps) {
+      expect(to - from).toBeLessThan(0.5);
+      expect(to - from).toBeGreaterThan(0.25);
     }
     expect(beats.invitation).toBeGreaterThan(beats.third);
     expect(beats.awaiting).toBeGreaterThan(beats.invitation);
-    // The last two lines really are long, which is why this matters.
+
+    // No dead air, no cut voice: every narrated line keeps Continue closed for
+    // its own recording length.
+    for (const line of p04DialogueLines) {
+      expect(line.gateAfter).toBeCloseTo(p04VoiceSeconds(line.id), 5);
+    }
     expect(p04VoiceSeconds('p04-narrator-02')).toBeGreaterThan(10);
     expect(p04VoiceSeconds('p04-narrator-03')).toBeGreaterThan(20);
   });

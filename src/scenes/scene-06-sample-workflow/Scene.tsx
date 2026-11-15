@@ -516,9 +516,9 @@ function SampleRun({ runId }: { readonly runId: number }) {
         </div>
       ) : null}
 
-      <h1 className="p05s-heading" tabIndex={-1}>
+      {/* <h1 className="p05s-heading" tabIndex={-1}>
         Percy, the Sample Collector
-      </h1>
+      </h1> */}
 
       {state.setupError ? (
         <div className="p05s-setup" role="alert">

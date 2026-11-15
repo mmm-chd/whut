@@ -71,6 +71,20 @@ export function inspectorInteractive(state: InspectorSceneState): boolean {
   return state.phase === 'ready' || state.phase === 'exiting';
 }
 
+/**
+ * Whether a press on `target` may start turning the model.
+ *
+ * A press that lands on a control must not: the screen takes pointer capture,
+ * and a captured pointer re-targets the `click` to the screen, so the chip's
+ * own press would be swallowed and no part could ever be opened.
+ */
+export function startsTurn(target: EventTarget | null): boolean {
+  if (!target || typeof (target as Element).closest !== 'function') {
+    return true;
+  }
+  return (target as Element).closest('button, a[href], input, select, textarea, [role="button"]') === null;
+}
+
 /** One exit control, disabled until every part is read. */
 export function canExitInspection(input: {
   readonly status: SceneStatus;

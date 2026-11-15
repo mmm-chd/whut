@@ -45,15 +45,14 @@ const SPECS: readonly LineSpec[] = [
   {
     id: 'p04-narrator-03',
     label: 'dimensions',
-    text: "All that traveling hasn't made Percy any lighter, though! Percy is about 3 meters long, 2.7 meters wide, and 2.2 meters tall. Carrying him would be like pushing 4 to 7 grown-up male lions, non-stop! Luckily, Percy has strong wheels! They have curved titanium spokes that give them a springy, bouncy support.",
+    text: "All that traveling hasn't made Percy any lighter, though! Percy is about 3 meters long, 2.7 meters wide, and 2.2 meters tall. Carrying him would be like pushing 4 to 7 grown-up male lions, non-stop!\nLuckily, Percy has strong wheels! They have curved titanium spokes that give them a springy, bouncy support.",
     emphasisText: 'curved titanium spokes',
   },
   {
     id: P04_INVITATION_LINE_ID,
     label: 'invitation',
     text: 'Oh, how about we take a closer look at Percy?',
-    textAlign: 'left',
-    placement: 'bottom',
+    textAlign: 'right',
     emphasisText: 'closer look',
   },
 ];
@@ -68,6 +67,9 @@ export const p04DialogueLines: readonly DialogueLine[] = SPECS.map((spec): Dialo
   speaker: 'narrator',
   text: spec.text,
   audioId: voiceIdFor(spec.id),
+  // Continue waits for the recording, so a reader cannot advance early and
+  // cut the narration; the next line then follows a breath later.
+  gateAfter: p04VoiceSeconds(spec.id),
   timelineLabel: `p04:${spec.label}`,
   placement: spec.placement ?? 'narrator-top-right',
   panel: false,

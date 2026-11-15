@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { modelAnchors } from './modelConfig';
+import { INSPECTOR_ZOOM_MAX, modelAnchors } from './modelConfig';
 import { monitorViewport, MONITOR_FRAME_PX, projectAnchor, visibleAnchors, type MonitorViewport } from './projection';
 import { INITIAL_ROTATION, MAX_PITCH } from './rotation';
 
@@ -63,6 +63,29 @@ describe('monitorViewport', () => {
     const wide = monitorViewport({ width: 900, height: 340 });
     const tall = monitorViewport({ width: 340, height: 900 });
     expect(tall.distance).toBeGreaterThan(wide.distance);
+  });
+
+  it('walks the camera in for zoom, and stops at the range it was designed for', () => {
+    const fitted = monitorViewport({ width: 912, height: 528 });
+    const near = monitorViewport({ width: 912, height: 528 }, INSPECTOR_ZOOM_MAX);
+    expect(near.distance).toBeCloseTo(fitted.distance / INSPECTOR_ZOOM_MAX, 5);
+    // Past the designed range the extra zoom is dropped rather than obeyed.
+    expect(monitorViewport({ width: 912, height: 528 }, 4).distance).toBeCloseTo(
+      monitorViewport({ width: 912, height: 528 }, INSPECTOR_ZOOM_MAX).distance,
+      5,
+    );
+    expect(monitorViewport({ width: 912, height: 528 }, 0.2).distance).toBeCloseTo(fitted.distance, 5);
+  });
+
+  it('moves a marker further out when the view zooms in', () => {
+    const anchor = modelAnchors().moxie;
+    const fitted = monitorViewport({ width: 912, height: 528 });
+    const near = monitorViewport({ width: 912, height: 528 }, INSPECTOR_ZOOM_MAX);
+    const atFit = projectAnchor(anchor, INITIAL_ROTATION, fitted);
+    const atNear = projectAnchor(anchor, INITIAL_ROTATION, near);
+    const spread = (p: { x: number; y: number }) =>
+      Math.hypot(p.x - fitted.width / 2, p.y - fitted.height / 2);
+    expect(spread(atNear)).toBeGreaterThan(spread(atFit));
   });
 });
 

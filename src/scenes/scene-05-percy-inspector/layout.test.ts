@@ -28,10 +28,14 @@ describe('layoutP05', () => {
   });
 
   it('docks the card under the picture on a narrow host', () => {
-    const layout = layoutP05(720, 640);
+    const layout = layoutP05(640, 640);
+    expect(layout.mode).toBe('sheet');
     expect(layout.stacked).toBe(true);
-    expect(layout.card.top).toBeGreaterThan(layout.picture.top + layout.picture.height);
-    expect(overlaps(layout.picture, layout.card)).toBe(false);
+    // The drawer sits at the bottom edge of the picture, not below it.
+    expect(layout.card.top + layout.card.height).toBeLessThanOrEqual(
+      layout.picture.top + layout.picture.height + 1,
+    );
+    expect(layout.card.top).toBeGreaterThan(layout.picture.top + layout.picture.height / 2);
   });
 
   it('keeps the picture inside the host with room for the chrome', () => {
@@ -60,14 +64,40 @@ describe('layoutP05', () => {
 
 describe('narrow host with no card open', () => {
   it('gives the picture the whole height instead of an empty sheet', () => {
-    const closed = layoutP05(800, 600);
-    const open = layoutP05(800, 600, { cardOpen: true });
+    const closed = layoutP05(640, 600);
+    const open = layoutP05(640, 600, { cardOpen: true });
     expect(closed.stacked).toBe(true);
     expect(closed.card.height).toBe(0);
-    expect(closed.picture.height).toBeGreaterThan(open.picture.height);
+    // Opening the drawer does not re-fit the model.
+    expect(closed.picture.height).toBe(open.picture.height);
     expect(closed.picture.top + closed.picture.height).toBeLessThanOrEqual(600);
     // The open sheet is still readable and the picture still has a picture.
     expect(open.card.height).toBeGreaterThanOrEqual(120);
     expect(open.picture.height).toBeGreaterThanOrEqual(120);
+  });
+
+  it('floats the panel over a full-width picture on a tablet', () => {
+    const layout = layoutP05(1024, 768);
+    expect(layout.mode).toBe('overlay');
+    expect(layout.stacked).toBe(false);
+    // The picture keeps the whole content width: the model is not shrunk.
+    expect(layout.picture.width).toBeGreaterThan(layoutP05(1024, 768).width - 60);
+    // The panel sits over the picture's right edge, inside the host.
+    expect(layout.card.top).toBeGreaterThanOrEqual(layout.picture.top);
+    expect(layout.card.left).toBeGreaterThan(layout.picture.left);
+    expect(layout.card.left + layout.card.width).toBeLessThanOrEqual(1024);
+    expect(layout.picture.left + layout.picture.width).toBeLessThanOrEqual(1024);
+    // It covers part of the picture, which is the point of an overlay...
+    expect(overlaps(layout.picture, layout.card)).toBe(true);
+    // ...but never all of it: the rover stays visible beside it.
+    const uncovered = layout.card.left - layout.picture.left;
+    expect(uncovered).toBeGreaterThan(200);
+  });
+
+  it('gives the card its own column on a desktop', () => {
+    const layout = layoutP05(1280, 720);
+    expect(layout.mode).toBe('side');
+    expect(layout.stacked).toBe(false);
+    expect(overlaps(layout.picture, layout.card)).toBe(false);
   });
 });

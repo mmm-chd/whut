@@ -27,6 +27,12 @@ export class AudioManager {
   private volume = 0.8;
   private warned = new Set<string>();
   private musicIds = new Set<string>();
+  /**
+   * Everyone who asked the score to stand down — a video with its own sound, for
+   * instance. Holds are counted, not boolean: two owners overlapping must not
+   * resume the bed when the first of them lets go.
+   */
+  private musicHolders = new Set<symbol>();
 
   private levelFor(id: string): number {
     return this.musicIds.has(id)
@@ -67,6 +73,40 @@ export class AudioManager {
   /** True while `id` owns the looping bed. */
   isMusicPlaying(id: string): boolean {
     return this.musicId === id;
+  }
+
+  /** True while somebody holds the score down, so the game can tell why it is quiet. */
+  isMusicHeld(): boolean {
+    return this.musicHolders.size > 0;
+  }
+
+  /**
+   * Silences the looping bed until the returned release is called. It only ever
+   * touches the score: voice-over, one-shot effects and the shell's mute and
+   * volume are left exactly as they are. Releasing is idempotent, and the bed is
+   * only resumed if this manager still owns it and nothing else has paused it.
+   */
+  holdMusic(owner: symbol): () => void {
+    this.musicHolders.add(owner);
+    if (this.musicId) {
+      this.sounds.get(this.musicId)?.pause();
+    }
+    let released = false;
+    return () => {
+      if (released) {
+        return;
+      }
+      released = true;
+      this.musicHolders.delete(owner);
+      if (this.musicHolders.size > 0) {
+        return;
+      }
+      const id = this.musicId;
+      if (!id || this.pausedIds.has(id)) {
+        return;
+      }
+      this.sounds.get(id)?.play();
+    };
   }
 
   private playSound(id: string, options: { stopCurrent: boolean; loop: boolean }): boolean {
@@ -117,6 +157,10 @@ export class AudioManager {
     } else {
       sound.play();
     }
+    if (options.loop && this.musicHolders.size > 0) {
+      // A score asked for during a hold is remembered but stays silent.
+      sound.pause();
+    }
     // Only one-shot lines arm `stopCurrent`; the score owns `musicId` instead,
     // so a voice-over never stops the music underneath it.
     if (options.loop) {
@@ -144,6 +188,11 @@ export class AudioManager {
 
   pause(): void {
     this.sounds.forEach((sound, id) => {
+      // A held bed is already silent, but the pause still has to be remembered:
+      // otherwise releasing the hold would start it against the shell's wishes.
+      if (id === this.musicId && this.musicHolders.size > 0) {
+        this.pausedIds.add(id);
+      }
       if (sound.playing()) {
         this.pausedIds.add(id);
         sound.pause();
@@ -152,11 +201,18 @@ export class AudioManager {
   }
 
   resume(): void {
-    this.pausedIds.forEach((id) => this.sounds.get(id)?.play());
+    this.pausedIds.forEach((id) => {
+      // A held score stays down even when the rest of the shell resumes.
+      if (id === this.musicId && this.musicHolders.size > 0) {
+        return;
+      }
+      this.sounds.get(id)?.play();
+    });
     this.pausedIds.clear();
   }
 
   unload(): void {
+    this.musicHolders.clear();
     this.sounds.forEach((sound) => sound.unload());
     this.sounds.clear();
     this.currentId = null;

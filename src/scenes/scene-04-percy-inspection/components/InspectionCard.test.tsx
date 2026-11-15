@@ -29,6 +29,9 @@ function createHarness(): Harness {
         <InspectionCard
           point="cameras"
           title="Cameras"
+          category={props?.category}
+          media={props?.media}
+          discovered={props?.discovered}
           onClose={props?.onClose ?? (() => {})}
           returnFocusTo={props?.returnFocusTo ?? null}
         >
@@ -136,5 +139,47 @@ describe('focus return', () => {
     opener.remove();
     await expect(harness.unmount()).resolves.toBeUndefined();
     harness = createHarness();
+  });
+
+});
+
+describe('the panel hierarchy', () => {
+  beforeEach(() => {
+    harness = createHarness();
+  });
+
+  afterEach(async () => {
+    await harness.unmount();
+  });
+
+  it('shows category, title, the reserved media slot and a discovery badge', async () => {
+    await harness.render({
+      category: 'Imaging system',
+      media: {
+        label: 'Recorded from Mars',
+        note: 'Mastcam-Z footage is not loaded yet.',
+      },
+      discovered: true,
+    });
+
+    expect(harness.container.querySelector('.p04-card-category')?.textContent).toBe(
+      'Imaging system',
+    );
+    expect(harness.container.querySelector('.p04-card-title')?.textContent).toBe('Cameras');
+    const slot = harness.container.querySelector('[data-media-slot]');
+    expect(slot?.getAttribute('data-media-slot')).toBe('cameras');
+    expect(slot?.textContent).toContain('Recorded from Mars');
+    // The slot says the media is missing instead of showing something invented.
+    expect(slot?.textContent).toContain('not loaded yet');
+    expect(harness.container.querySelector('[data-discovered]')?.textContent).toBe(
+      'Discovered',
+    );
+  });
+
+  it('omits the optional parts when the panel does not have them', async () => {
+    await harness.render();
+    expect(harness.container.querySelector('.p04-card-category')).toBeNull();
+    expect(harness.container.querySelector('[data-media-slot]')).toBeNull();
+    expect(harness.container.querySelector('[data-discovered]')).toBeNull();
   });
 });

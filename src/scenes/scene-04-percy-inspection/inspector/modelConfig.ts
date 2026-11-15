@@ -45,6 +45,45 @@ export const INSPECTOR_LOAD_DEADLINE_MS = 10_000;
 /** Clear colour of the monitor screen, matching the frame around it. */
 export const INSPECTOR_BACKGROUND = '#102b32';
 
+/**
+ * The close-up shows the same model on a light stage. The 3D pass is light
+ * only (no theme switch), so the colour lives beside the dark one and the
+ * shared canvas takes it as a prop.
+ *
+ * Sampled from `docs-base/pics/3d-inspect/perseverance.png`, the reference
+ * render: its backdrop is exactly #ebebeb, a very light grey rather than white.
+ * White made the pale panels vanish; this keeps their edges.
+ */
+export const INSPECTOR_BACKGROUND_LIGHT = '#ebebeb';
+
+/**
+ * Zoom on the close-up.
+ *
+ * `1` is the fitted view — the whole rover inside the frame with room around it.
+ * The upper bound is deliberately modest: this is a picture of a rover for
+ * reading, not a microscope, and letting the reader push the camera into a
+ * panel turns four labelled parts into an abstract surface. A little under
+ * half again feels like leaning in; more feels like losing the machine.
+ */
+export const INSPECTOR_ZOOM_MIN = 1;
+export const INSPECTOR_ZOOM_MAX = 1.3;
+/**
+ * Measured, not guessed: at 1.5 the rover's wheels come within a few pixels of
+ * the bottom edge, which is "too close" in the words of the request. At 1.3 it
+ * still fills the frame better than the fitted view and keeps a margin on all
+ * four sides.
+ */
+/** One wheel notch. Three notches cover the whole range. */
+export const INSPECTOR_ZOOM_STEP = 0.1;
+
+/** Zoom, held inside the range the view is designed for. */
+export function clampInspectorZoom(zoom: number): number {
+  if (!Number.isFinite(zoom)) {
+    return INSPECTOR_ZOOM_MIN;
+  }
+  return Math.min(INSPECTOR_ZOOM_MAX, Math.max(INSPECTOR_ZOOM_MIN, zoom));
+}
+
 export const P04_MODEL_ANCHORS: Record<InspectionPointId, PointAnchor> = {
   cameras: {
     point: 'cameras',

@@ -55,9 +55,9 @@ describe('App end screen', () => {
     await app.unmount();
   });
 
-  it('shows the end screen only after the terminal sampling scene completes', async () => {
+  it('shows the end screen only after the terminal runner scene completes', async () => {
     useStoryStore.setState({
-      activeSceneId: 'scene-06-sample-workflow',
+      activeSceneId: 'scene-08-the-runner',
       status: 'completed',
     });
 

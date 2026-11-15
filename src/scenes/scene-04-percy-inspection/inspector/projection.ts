@@ -1,5 +1,5 @@
 import type { ModelAnchor } from './modelConfig';
-import { INSPECTOR_VERTICAL_FOV } from './modelConfig';
+import { INSPECTOR_VERTICAL_FOV, clampInspectorZoom } from './modelConfig';
 import { fitInspectorSphere } from './modelMath';
 import type { InspectorRotation } from './rotation';
 
@@ -10,11 +10,22 @@ export const MONITOR_FRAME_PX = 6;
  * The rectangle the canvas draws into, plus the camera that fits it. Both the
  * canvas and the DOM markers use this, so they cannot disagree.
  */
-export function monitorViewport(monitor: { width: number; height: number }): MonitorViewport {
+export function monitorViewport(
+  monitor: { width: number; height: number },
+  zoom: number = 1,
+): MonitorViewport {
   const width = Math.max(1, monitor.width - MONITOR_FRAME_PX * 2);
   const height = Math.max(1, monitor.height - MONITOR_FRAME_PX * 2);
   const fit = fitInspectorSphere(1, width / height, INSPECTOR_VERTICAL_FOV);
-  return { width, height, fovDegrees: INSPECTOR_VERTICAL_FOV, distance: fit.distance };
+  // Zoom is the camera walking in, not the model growing: every projected
+  // marker divides by this same distance, so the chips cannot drift off the
+  // parts they label.
+  return {
+    width,
+    height,
+    fovDegrees: INSPECTOR_VERTICAL_FOV,
+    distance: fit.distance / clampInspectorZoom(zoom),
+  };
 }
 
 /**

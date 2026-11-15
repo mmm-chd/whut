@@ -3,8 +3,7 @@
  * fixed: P-01 hands off to P-02, P-02 hands off to the cruise entry, the cruise
  * hands off to P-03, P-03 hands off to the P-04 story, and P-04 hands Percy to
  * the close-up, which owns the only inspector canvas. The close-up hands off to
- * the sampling game (story P-05), which sits behind a fresh load. Nothing follows
- * the sampling game yet.
+ * the sampling game (story P-05), which hands off to the Cheyava Falls chapter.
  */
 export type StorySceneId =
   | 'p01-jezero'
@@ -14,6 +13,7 @@ export type StorySceneId =
   | 'scene-04-percy-inspection'
   | 'scene-05-percy-inspector'
   | 'scene-06-sample-workflow'
+  | 'scene-07-cheyava-falls'
   | 'scene-08-the-runner';
 
 const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
@@ -23,9 +23,8 @@ const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'scene-03-arrival-jezero': 'scene-04-percy-inspection',
   'scene-04-percy-inspection': 'scene-05-percy-inspector',
   'scene-05-percy-inspector': 'scene-06-sample-workflow',
-  'scene-06-sample-workflow': null,
-  // The Runner (story P-07) has no inbound edge yet: P-06 sits between the sampling
-  // game and it and is built separately. Whoever lands P-06 adds `scene-07 -> scene-08`.
+  'scene-06-sample-workflow': 'scene-07-cheyava-falls',
+  'scene-07-cheyava-falls': 'scene-08-the-runner',
   'scene-08-the-runner': null,
 };
 

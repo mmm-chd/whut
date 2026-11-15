@@ -12,18 +12,40 @@
   inset: 0;
   overflow: hidden;
   color: var(--cream);
+  /* Light stays inside the monitor: the page around it is the story's own dark
+     paper, as it was before the inspection pass. */
   background: #0a1c22;
   font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
 }
 
-.p05-heading {
+/*
+ * The bar owns the top strip the layout already reserves: title and progress on
+ * the left, the single exit on the right.
+ */
+.p05-bar {
   position: absolute;
-  left: 260px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   right: 24px;
+  left: 24px;
   top: 16px;
+}
+
+.p05-bar-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.p05-heading {
   margin: 0;
-  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(1rem, 1.9vw, 1.35rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cream);
   text-shadow: 0 2px 0 rgb(3 12 16 / 60%);
 }
 
@@ -32,13 +54,9 @@
 }
 
 .p05-progress {
-  position: absolute;
-  left: 260px;
-  right: 24px;
-  top: 50px;
   margin: 0;
-  font-size: 0.86rem;
-  opacity: 0.85;
+  font-size: 0.78rem;
+  color: rgb(226 240 250 / 75%);
 }
 
 /* ---------- the framed picture ---------- */
@@ -48,11 +66,11 @@
   z-index: 4;
   overflow: visible;
   border-radius: 18px;
-  background: #102b32;
+  background: #fbf8f1;
   box-shadow:
-    0 0 0 3px #7b4636,
-    0 0 0 8px #3b2118,
-    0 18px 36px rgb(4 12 16 / 45%);
+    0 0 0 3px #b98b6f,
+    0 0 0 8px #7b5b48,
+    0 16px 30px rgb(52 38 26 / 22%);
 }
 
 .p05-screen {
@@ -61,15 +79,15 @@
   z-index: 1;
   overflow: hidden;
   border-radius: 13px;
-  background:
-    radial-gradient(circle at 50% 40%, rgb(69 181 255 / 16%), transparent 62%),
-    #0c2128;
+  /* The same light grey the canvas clears to, so the frame does not flash white
+     before the first frame lands. Matches the reference render (#ebebeb). */
+  background: #ebebeb;
   cursor: grab;
   touch-action: none;
 }
 
 .p05-screen:focus-visible {
-  outline: 2px solid #45b5ff;
+  outline: 2px solid #2f7fa8;
   outline-offset: -2px;
 }
 
@@ -84,6 +102,9 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  /* The same pan as the chips, so the model and its markers always agree. */
+  transform: translateX(var(--p05-pan, 0px));
+  transition: transform 260ms ease;
 }
 
 .p05-screen .p04-canvas canvas {
@@ -108,6 +129,15 @@
  * It sits above the frame bar, in the strip between the lowest chip and the
  * toolbar, so it never covers a part or a button.
  */
+/*
+ * The stage is light, so the quote is written in ink. The cream crayon and its
+ * dark halo belong to the dark scenes.
+ */
+.p05-dialogue .scrapbook-text--bare {
+  color: #16292e;
+  text-shadow: none;
+}
+
 .p05-dialogue .scrapbook-text--bottom {
   left: 8%;
   right: 8%;
@@ -148,11 +178,25 @@
 }
 
 /* The chips and their lines live inside the same rectangle as the canvas. */
+/* The drawer owns the picture on a narrow host; Tab still reaches the chips. */
+.p05-chips[data-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.p05-chips[data-hidden='true']:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .p05-chips {
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
+  transform: translateX(var(--p05-pan, 0px));
+  transition: transform 260ms ease;
 }
 
 .p05-leaders {
@@ -165,8 +209,8 @@
 }
 
 .p05-leaders line {
-  stroke: rgb(214 235 255 / 62%);
-  stroke-width: 1.6;
+  stroke: rgb(30 62 72 / 88%);
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-dasharray: 5 4;
   transition: stroke 120ms ease, stroke-width 120ms ease;
@@ -174,24 +218,24 @@
 
 .p05-leaders circle {
   fill: rgb(214 235 255 / 72%);
-  stroke: rgb(12 33 40 / 90%);
+  stroke: rgb(247 244 236 / 95%);
   stroke-width: 1.4;
 }
 
 .p05-leaders g[data-state='hover'] line {
-  stroke: #eaf6ff;
+  stroke: #16292e;
   stroke-width: 2;
 }
 
 .p05-leaders g[data-state='active'] line {
-  stroke: #ffffff;
+  stroke: #0f2027;
   stroke-width: 2.4;
   stroke-dasharray: none;
 }
 
 .p05-leaders g[data-state='active'] circle,
 .p05-leaders g[data-state='hover'] circle {
-  fill: #ffffff;
+  fill: #16292e;
 }
 
 .p05-leaders g[data-state='done'] circle {
@@ -209,10 +253,12 @@
   gap: 2px;
   min-height: 44px;
   padding: 7px 12px;
-  border: 2px solid rgb(150 205 235 / 72%);
+  /* Slightly stronger than before: on a pure white stage the chip needs its own
+     edge, or it fades into the picture. */
+  border: 2px solid rgb(64 104 116 / 78%);
   border-radius: 12px;
-  background: rgb(10 30 38 / 88%);
-  color: rgb(226 240 250 / 92%);
+  background: #fffdf7;
+  color: #16292e;
   font: inherit;
   text-align: left;
   white-space: nowrap;
@@ -237,30 +283,34 @@
 }
 
 .p05-chip[data-state='hover'] {
-  border-color: #eaf6ff;
-  background: rgb(20 48 60 / 94%);
-  color: #ffffff;
+  border-color: #16292e;
+  background: #ffffff;
+  color: #0f2027;
 }
 
-/* Active is the brightest state: near-white fill, dark text. */
+/* Active is the filled state on paper: dark plate, cream text. */
 .p05-chip[data-state='active'] {
-  border-color: #ffffff;
-  background: rgb(246 251 255 / 96%);
-  color: #0a2630;
+  border-color: #16292e;
+  background: #16292e;
+  color: #f7f4ec;
 }
 
 .p05-chip[data-state='active'] .p05-chip-hint {
-  color: #26444f;
+  color: #dfe9ec;
   opacity: 0.9;
 }
 
 .p05-chip[data-state='done'] {
-  border-color: rgb(159 227 176 / 85%);
-  color: #dff6e5;
+  border-color: #2f7a48;
+  color: #1c5133;
+}
+
+.p05-chip[data-state='done'][data-state='active'] {
+  color: #f7f4ec;
 }
 
 .p05-chip:focus-visible {
-  outline: 3px solid #ffffff;
+  outline: 3px solid #2f7fa8;
   outline-offset: 3px;
 }
 
@@ -291,24 +341,24 @@
   gap: 8px;
   border-radius: 13px;
   background:
-    radial-gradient(circle at 50% 42%, rgb(69 181 255 / 20%), transparent 66%),
-    rgb(9 27 34 / 96%);
+    radial-gradient(circle at 50% 42%, #ffffff 0%, transparent 66%),
+    rgb(242 240 232 / 96%);
   text-align: center;
 }
 
 .p05-loading-title {
   margin: 0;
   font-size: clamp(1rem, 2vw, 1.3rem);
-  color: #eaf6ff;
+  color: #16292e;
 }
 
 .p05-loading-hint {
   margin: 0;
   font-size: 0.78rem;
-  opacity: 0.78;
+  color: rgb(226 240 250 / 75%);
 }
 
-/* ---------- the frame bar: turn controls and the one exit ---------- */
+/* ---------- the frame bar: the turn controls ---------- */
 
 .p05-frame-bar {
   position: absolute;
@@ -325,37 +375,48 @@
 .p05-exit {
   margin-left: auto;
   min-height: 40px;
-  padding: 8px 16px;
-  border: 2px solid rgb(255 255 255 / 80%);
+  padding: 9px 18px;
+  border: 2px solid #16292e;
   border-radius: 999px;
-  background: rgb(246 251 255 / 92%);
-  color: #0a2630;
+  background: #16292e;
+  color: #f7f4ec;
   font: inherit;
   font-size: 0.8rem;
+  letter-spacing: 0.04em;
   cursor: var(--cursor-active, pointer);
 }
 
 .p05-exit:disabled {
-  border-color: rgb(150 205 235 / 45%);
-  background: rgb(12 33 40 / 70%);
-  color: rgb(226 240 250 / 55%);
+  border-color: rgb(96 140 152 / 40%);
+  background: rgb(226 224 214 / 80%);
+  color: rgb(22 41 46 / 45%);
   cursor: not-allowed;
 }
 
 .p05-exit:not(:disabled):hover,
 .p05-exit:focus-visible {
-  background: #ffffff;
-  outline: 2px solid #45b5ff;
-  outline-offset: 2px;
+  background: #0f2027;
+  outline: 2px solid #2f7fa8;
+  outline-offset: 3px;
 }
 
+/* The hint sits under the exit, inside the bar's own strip. */
 .p05-exit-hint {
+  position: absolute;
+  right: 0;
+  top: 46px;
   margin: 0;
   font-size: 0.68rem;
   color: rgb(226 240 250 / 70%);
 }
 
 /* ---------- the card column ---------- */
+
+/* On a tablet the panel floats over the picture, so it needs its own edge. */
+.p05-card-column[data-mode='overlay'] {
+  border-radius: 16px;
+  box-shadow: -10px 14px 30px rgb(4 12 16 / 45%);
+}
 
 .p05-card-column {
   position: absolute;
@@ -382,9 +443,11 @@
   flex: 1 1 auto;
   flex-direction: column;
   overflow: auto;
-  border: 2px solid rgb(150 205 235 / 45%);
+  /* The card itself stays paper: it is a page of the storybook lying on the
+     dark stage, and its copy is written in ink. */
+  border: 2px solid #c3bcab;
   border-radius: 14px;
-  background: rgb(10 30 38 / 92%);
+  background: #fbf8f1;
 }
 
 /* ---------- exit fade ---------- */
@@ -406,7 +469,10 @@
 @media (prefers-reduced-motion: reduce) {
   .p05-chip,
   .p05-exit,
-  .p05-leaders line {
+  .p05-leaders line,
+  .p05-chips,
+  .p05-screen .p04-canvas,
+  .p05-screen .p04-fallback {
     transition: none;
   }
 
@@ -416,10 +482,10 @@
 }
 
 @media (max-width: 900px) {
-  .p05-heading,
-  .p05-progress {
-    left: 16px;
-    right: 16px;
+  .p05-bar {
+    right: 14px;
+    left: 14px;
+    gap: 10px;
   }
 
   .p05-frame-bar {

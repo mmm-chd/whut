@@ -176,3 +176,103 @@ describe('narration over the score', () => {
     expect(bed.playing()).toBe(true);
   });
 });
+
+describe('holding the score down', () => {
+  it('pauses the bed and resumes it when the only owner lets go', () => {
+    const audio = new AudioManager();
+    audio.playMusic(SCORE);
+    const bed = howler.instances[0];
+    const playsBefore = bed.playCalls;
+
+    const release = audio.holdMusic(Symbol('video'));
+    expect(audio.isMusicHeld()).toBe(true);
+    expect(bed.playing()).toBe(false);
+
+    release();
+    expect(audio.isMusicHeld()).toBe(false);
+    expect(bed.playing()).toBe(true);
+    expect(bed.playCalls).toBe(playsBefore + 1);
+  });
+
+  it('counts overlapping owners instead of using one flag', () => {
+    const audio = new AudioManager();
+    audio.playMusic(SCORE);
+    const bed = howler.instances[0];
+
+    const first = audio.holdMusic(Symbol('video'));
+    const second = audio.holdMusic(Symbol('narration'));
+    first();
+
+    // One owner is still holding: the bed must stay quiet.
+    expect(audio.isMusicHeld()).toBe(true);
+    expect(bed.playing()).toBe(false);
+
+    second();
+    expect(bed.playing()).toBe(true);
+  });
+
+  it('releases once, no matter how often the release is called', () => {
+    const audio = new AudioManager();
+    audio.playMusic(SCORE);
+    const bed = howler.instances[0];
+
+    const release = audio.holdMusic(Symbol('video'));
+    release();
+    const plays = bed.playCalls;
+    release();
+    release();
+
+    expect(bed.playCalls).toBe(plays);
+  });
+
+  it('keeps a score that is asked for during a hold silent, and still owned', () => {
+    const audio = new AudioManager();
+    audio.holdMusic(Symbol('video'));
+    audio.playMusic(SCORE);
+
+    const bed = howler.instances[0];
+    expect(audio.isMusicPlaying(SCORE)).toBe(true);
+    expect(bed.playing()).toBe(false);
+  });
+
+  it('never resumes a bed the shell has paused itself', () => {
+    const audio = new AudioManager();
+    audio.playMusic(SCORE);
+    const bed = howler.instances[0];
+
+    const release = audio.holdMusic(Symbol('video'));
+    audio.pause();
+    release();
+    expect(bed.playing()).toBe(false);
+
+    audio.resume();
+    expect(bed.playing()).toBe(true);
+  });
+
+  it('leaves the bed down while a hold is active, even after a resume', () => {
+    const audio = new AudioManager();
+    audio.playMusic(SCORE);
+    const bed = howler.instances[0];
+
+    audio.pause();
+    const release = audio.holdMusic(Symbol('video'));
+    audio.resume();
+
+    expect(bed.playing()).toBe(false);
+    release();
+    expect(bed.playing()).toBe(true);
+  });
+
+  it('does not touch narration, mute or volume', () => {
+    const audio = new AudioManager();
+    audio.setMuted(true);
+    audio.playMusic(SCORE);
+    const bed = howler.instances[0];
+
+    const release = audio.holdMusic(Symbol('video'));
+    expect(bed.playing()).toBe(false);
+    release();
+    // Mute is the shell's business, not the hold's: the bed is playing and muted.
+    expect(bed.playing()).toBe(true);
+  });
+});

@@ -1,10 +1,10 @@
 /**
  * Where the two end-of-game choices lead.
  *
- * A destination is a real, registered scene id or `null`. Both are `null`
- * today: Percy's next chapter and Ingenuity's story are separate work, so the
- * buttons say so instead of routing to a scene that does not exist. When a
- * chapter ships, set its id here and teach the shell to follow it.
+ * A destination is a real, registered scene id or `null`. Percy's next chapter
+ * is now `scene-07-cheyava-falls`, so that button routes there; Ingenuity's
+ * story is still separate work, so its button says so instead of routing
+ * nowhere.
  */
 export interface NextExperience {
   readonly id: 'percy-story' | 'ingenuity';
@@ -17,14 +17,14 @@ export const NEXT_EXPERIENCES: readonly NextExperience[] = [
   {
     id: 'percy-story',
     label: "Continue Percy's Story",
-    destination: null,
+    destination: 'scene-07-cheyava-falls',
     unavailableNote: "Percy's next chapter is still in development.",
   },
   {
     id: 'ingenuity',
     label: 'Meet Ingenuity',
     destination: null,
-    unavailableNote: 'Her story is coming soon.',
+    unavailableNote: 'His story is coming soon.',
   },
 ];
 

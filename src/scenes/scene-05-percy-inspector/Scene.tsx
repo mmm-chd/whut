@@ -15,6 +15,12 @@ import { InspectionCard } from '../scene-04-percy-inspection/components/Inspecti
 import { MoxieActivity } from '../scene-04-percy-inspection/components/MoxieActivity';
 import { EarthTeamActivity } from '../scene-04-percy-inspection/components/EarthTeamActivity';
 import { InspectorCanvas } from '../scene-04-percy-inspection/inspector/InspectorCanvas';
+import {
+  INSPECTOR_BACKGROUND_LIGHT,
+  INSPECTOR_ZOOM_MIN,
+  INSPECTOR_ZOOM_STEP,
+  clampInspectorZoom,
+} from '../scene-04-percy-inspection/inspector/modelConfig';
 import { InspectorFallback } from '../scene-04-percy-inspection/inspector/InspectorFallback';
 import { InspectorToolbar } from '../scene-04-percy-inspection/inspector/InspectorToolbar';
 import { monitorViewport } from '../scene-04-percy-inspection/inspector/projection';
@@ -27,8 +33,15 @@ import { useInspectorRenderer } from '../scene-04-percy-inspection/inspector/use
 import { cursorCss } from '../../components/cursor/cursors';
 import { PartChips } from './components/PartChips';
 import { p05RotationHintLine } from './dialogue';
+import { P05_PANEL_CATEGORY, P05_PANEL_MEDIA } from './panelCopy';
 import { layoutP05 } from './layout';
-import { canExitInspection, inspectorInteractive, reduceInspectorScene, createInspectorSceneState } from './state';
+import {
+  canExitInspection,
+  createInspectorSceneState,
+  inspectorInteractive,
+  reduceInspectorScene,
+  startsTurn,
+} from './state';
 import './Scene.css';
 
 const EARTH_REPLY_MS = 900;
@@ -72,6 +85,7 @@ export function Scene05PercyInspector() {
   });
 
   const completed = allPointsComplete(inspection);
+  const completedIds = completedPointIds(inspection);
 
   // Host size, measured on the scene's own element; jsdom has no observer, so
   // the window is the fallback instead of leaving the scene unmeasured.
@@ -215,10 +229,36 @@ export function Scene05PercyInspector() {
   const dragRef = useRef<ReturnType<typeof beginDrag> | null>(null);
   const interactive = inspectorInteractive(scene);
 
+  // Zoom walks the camera in; the model and the chips share the projection, so
+  // they cannot separate. Zoom is only offered on the 3D picture: the fallback
+  // is a still, and its markers do not move.
+  const [zoom, setZoom] = useState(INSPECTOR_ZOOM_MIN);
+  const zoomed = inspector.renderer === '3d' ? clampInspectorZoom(zoom) : 1;
+  const screenRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const element = screenRef.current;
+    if (!element) {
+      return;
+    }
+    // A native listener, because React's `onWheel` is passive and cannot keep
+    // the page from scrolling under the pointer while the reader zooms.
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const step = event.deltaY < 0 ? INSPECTOR_ZOOM_STEP : -INSPECTOR_ZOOM_STEP;
+      setZoom((current) => clampInspectorZoom(current + step));
+    };
+    element.addEventListener('wheel', onWheel, { passive: false });
+    return () => element.removeEventListener('wheel', onWheel);
+  }, [interactive]);
+
   const screen = {
-    label: 'Turn the rover with a drag, or with the arrow keys.',
+    label:
+      'Turn the rover with a drag or the arrow keys. Scroll, or press plus and minus, to zoom.',
     onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
-      if (event.button !== 0) {
+      // A press on a chip or a button belongs to that control: turning the
+      // model here would capture the pointer and swallow the control's click.
+      if (event.button !== 0 || !startsTurn(event.target)) {
         return;
       }
       dragRef.current = beginDrag(event.pointerId, event.clientX, event.clientY);
@@ -253,6 +293,11 @@ export function Scene05PercyInspector() {
         ArrowRight: () => rotation.rotateBy(step, 0),
         ArrowUp: () => rotation.rotateBy(0, -step),
         ArrowDown: () => rotation.rotateBy(0, step),
+        // Zoom by keyboard too, or the picture has a feature only a mouse can reach.
+        '+': () => setZoom((current) => clampInspectorZoom(current + INSPECTOR_ZOOM_STEP)),
+        '=': () => setZoom((current) => clampInspectorZoom(current + INSPECTOR_ZOOM_STEP)),
+        '-': () => setZoom((current) => clampInspectorZoom(current - INSPECTOR_ZOOM_STEP)),
+        '0': () => setZoom(INSPECTOR_ZOOM_MIN),
       };
       const handler = handlers[event.key];
       if (!handler) {
@@ -263,7 +308,10 @@ export function Scene05PercyInspector() {
     },
   };
 
-  const viewport = monitorViewport({ width: layout.picture.width, height: layout.picture.height });
+  const viewport = monitorViewport(
+    { width: layout.picture.width, height: layout.picture.height },
+    zoomed,
+  );
   // One place decides the pointing devices, so the chips, the picture and the
   // drag share the same four cursor drawings.
   const cursorStyle: CSSProperties = {
@@ -273,6 +321,21 @@ export function Scene05PercyInspector() {
     '--cursor-grabbing': cursorCss('grabbing', 'grabbing'),
   } as CSSProperties;
 
+  // Choosing a part slides the picture aside so the panel has room; the pan is
+  // one CSS value shared by the canvas and the chips, so they never separate.
+  const panning = inspection.activePoint !== null && !layout.stacked;
+  // An overlay panel covers the picture's right side, so the picture steps
+  // further aside there; a side column only needs a nudge.
+  const panAmount = layout.mode === 'overlay' ? '-14%' : '-7%';
+  // The floating panel covers the picture's right side, so the chips keep to
+  // the clear part of it. A side column or a sheet covers nothing.
+  const chipRightLimit =
+    layout.mode === 'overlay' && inspection.activePoint
+      ? layout.card.left - layout.picture.left
+      : undefined;
+  // The drawer takes most of a small picture, so the chips step aside while it
+  // is open rather than sit under it and catch presses meant for the panel.
+  const chipsStandAside = layout.mode === 'sheet' && inspection.activePoint !== null;
   const frameStyle: CSSProperties = {
     left: `${layout.picture.left}px`,
     top: `${layout.picture.top}px`,
@@ -300,6 +363,10 @@ export function Scene05PercyInspector() {
           resource={inspector.resource}
           rotation={rotation.rotation}
           label="A model of Percy, the rover. Four labelled parts point at his cameras, microphone, MOXIE unit and antenna."
+          background={INSPECTOR_BACKGROUND_LIGHT}
+          frameloop="always"
+          zoom={zoomed}
+          toneMapped
           onContextLost={inspector.reportContextLost}
           onOccluded={setOccluded}
           onPainted={() => dispatchScene({ type: 'FIRST_FRAME' })}
@@ -311,7 +378,9 @@ export function Scene05PercyInspector() {
             occluded={occluded}
             activePoint={inspection.activePoint}
             hoveredPoint={hovered}
-            completed={completedPointIds(inspection)}
+            completed={completedIds}
+            rightLimit={chipRightLimit}
+            hidden={chipsStandAside}
             onHover={setHovered}
             onSelect={openPoint}
           />
@@ -327,7 +396,9 @@ export function Scene05PercyInspector() {
             occluded={[]}
             activePoint={inspection.activePoint}
             hoveredPoint={hovered}
-            completed={completedPointIds(inspection)}
+            completed={completedIds}
+            rightLimit={chipRightLimit}
+            hidden={chipsStandAside}
             onHover={setHovered}
             onSelect={openPoint}
           />
@@ -348,19 +419,45 @@ export function Scene05PercyInspector() {
       data-fade={scene.phase === 'exiting' ? 'true' : 'false'}
       style={cursorStyle}
     >
-      <h1 className="p05-heading" tabIndex={-1}>
-        A Closer Look at Percy
-      </h1>
-      <p className="p05-progress" aria-live="polite">
-        {`${completedPointIds(inspection).length} of 4 parts read`}
-      </p>
+      <header className="p05-bar">
+        <div className="p05-bar-text">
+          <h1 className="p05-heading" tabIndex={-1}>
+            Perseverance Inspection
+          </h1>
+          <p className="p05-progress" aria-live="polite">
+            {`${completedIds.length} of 4 parts read`}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="p05-exit"
+          data-exit-inspection
+          onClick={requestExit}
+          disabled={!exitEnabled}
+          aria-describedby={!completed ? 'p05-exit-hint' : undefined}
+        >
+          Exit inspection
+        </button>
+        {!completed ? (
+          <p className="p05-exit-hint" id="p05-exit-hint">
+            Read all four parts to leave.
+          </p>
+        ) : null}
+      </header>
 
       {layout.valid ? (
         <>
-          <div className="p05-frame" data-picture-frame style={frameStyle}>
+          <div
+            className="p05-frame"
+            data-picture-frame
+            data-panning={panning ? 'true' : 'false'}
+            style={{ ...frameStyle, '--p05-pan': panning ? panAmount : '0px' } as CSSProperties}
+          >
             <div
               className="p05-screen"
+              ref={screenRef}
               data-rotate-surface="true"
+              data-zoom={zoomed.toFixed(2)}
               data-dragging={turning ? 'true' : 'false'}
               tabIndex={0}
               role="group"
@@ -384,29 +481,29 @@ export function Scene05PercyInspector() {
 
             <div className="p05-frame-bar">
               <InspectorToolbar rotation={rotation} />
-              <button
-                type="button"
-                className="p05-exit"
-                data-exit-inspection
-                onClick={requestExit}
-                disabled={!exitEnabled}
-                aria-describedby={!completed ? 'p05-exit-hint' : undefined}
-              >
-                Exit inspection
-              </button>
-              {!completed ? (
-                <p className="p05-exit-hint" id="p05-exit-hint">
-                  Read all four parts to leave.
-                </p>
-              ) : null}
             </div>
           </div>
 
-          <div className="p05-card-column" style={cardStyle}>
+          {/*
+            In `side` mode the column is reserved, so its empty state holds the
+            place from the first frame. In `overlay` mode it floats over the
+            picture, so it only exists while a part is open: an empty floating
+            panel would both cover the rover and swallow its chip.
+          */}
+          {inspection.activePoint || layout.mode === 'side' ? (
+          <div
+            className="p05-card-column"
+            data-mode={layout.mode}
+            data-open={inspection.activePoint !== null ? 'true' : 'false'}
+            style={cardStyle}
+          >
             {inspection.activePoint ? (
               <InspectionCard
                 point={inspection.activePoint}
                 title={cardTitle(inspection.activePoint)}
+                category={P05_PANEL_CATEGORY[inspection.activePoint]}
+                media={P05_PANEL_MEDIA[inspection.activePoint]}
+                discovered={completedIds.includes(inspection.activePoint)}
                 onClose={closePoint}
                 returnFocusTo={origin}
               >
@@ -418,6 +515,7 @@ export function Scene05PercyInspector() {
               </p>
             )}
           </div>
+          ) : null}
 
           <div
             className="p05-dialogue"

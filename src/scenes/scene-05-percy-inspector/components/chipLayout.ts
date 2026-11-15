@@ -20,8 +20,20 @@ import { chipAnchor, chipState, leaderFor, type ChipState, type Point2 } from '.
 export const CHIP_MARGIN_X = 104;
 export const CHIP_MARGIN_Y = 30;
 
-/** Keeps a chip centre inside the picture, whatever the standoff asked for. */
-export function clampChipAnchor(anchor: Point2, width: number, height: number): Point2 {
+/**
+ * Keeps a chip centre inside the picture, whatever the standoff asked for.
+ *
+ * `rightLimit` narrows the usable width when part of the picture is covered by
+ * the floating panel on a tablet, so a chip is never pushed under the panel
+ * where it could not be pressed.
+ */
+export function clampChipAnchor(
+  anchor: Point2,
+  width: number,
+  height: number,
+  rightLimit: number = width,
+  bottomLimit: number = height,
+): Point2 {
   const clamp = (value: number, size: number, margin: number): number => {
     if (!Number.isFinite(value) || !Number.isFinite(size)) {
       return Math.max(margin, size / 2);
@@ -29,9 +41,27 @@ export function clampChipAnchor(anchor: Point2, width: number, height: number): 
     const max = Math.max(margin, size - margin);
     return Math.min(Math.max(value, margin), max);
   };
+  const clampX = (value: number): number => {
+    if (!Number.isFinite(value) || !Number.isFinite(width)) {
+      return Math.max(CHIP_MARGIN_X, width / 2);
+    }
+    const limit = Math.min(width, Number.isFinite(rightLimit) ? rightLimit : width);
+    const max = Math.max(CHIP_MARGIN_X, limit - CHIP_MARGIN_X);
+    return Math.min(Math.max(value, CHIP_MARGIN_X), max);
+  };
+  const clampY = (value: number): number => {
+    if (!Number.isFinite(value) || !Number.isFinite(height)) {
+      return Math.max(CHIP_MARGIN_Y, height / 2);
+    }
+    // Same idea as `rightLimit`, for the drawer on a narrow host: a chip under
+    // the sheet could not be pressed, so it stays above it.
+    const limit = Math.min(height, Number.isFinite(bottomLimit) ? bottomLimit : height);
+    const max = Math.max(CHIP_MARGIN_Y, limit - CHIP_MARGIN_Y);
+    return Math.min(Math.max(value, CHIP_MARGIN_Y), max);
+  };
   return {
-    x: clamp(anchor.x, width, CHIP_MARGIN_X),
-    y: clamp(anchor.y, height, CHIP_MARGIN_Y),
+    x: clampX(anchor.x),
+    y: clampY(clamp(anchor.y, height, CHIP_MARGIN_Y)),
   };
 }
 
@@ -125,6 +155,10 @@ export function chipLayout(input: {
   readonly activePoint: InspectionPointId | null;
   readonly hoveredPoint: InspectionPointId | null;
   readonly completed: readonly InspectionPointId[];
+  /** Usable picture width: less than `viewport.width` when a panel covers it. */
+  readonly rightLimit?: number;
+  /** Usable picture height: less than `viewport.height` under the drawer. */
+  readonly bottomLimit?: number;
 }): readonly ChipLayout[] {
   const anchors = modelAnchors();
   const centre = { x: input.viewport.width / 2, y: input.viewport.height / 2 };
@@ -132,7 +166,13 @@ export function chipLayout(input: {
     const projection = projectAnchor(anchors[point], input.rotation, input.viewport);
     const part = { x: projection.x, y: projection.y };
     const placed = chipAnchor(part, centre);
-    const anchor = clampChipAnchor(placed, input.viewport.width, input.viewport.height);
+    const anchor = clampChipAnchor(
+      placed,
+      input.viewport.width,
+      input.viewport.height,
+      input.rightLimit ?? input.viewport.width,
+      input.bottomLimit ?? input.viewport.height,
+    );
     return {
       point,
       state: chipState({
@@ -150,7 +190,13 @@ export function chipLayout(input: {
   });
   const compact = input.viewport.width < CHIP_COMPACT_BELOW_PX;
   // Separation moves a chip, so its line is drawn again from the final spot.
-  return separateChips(chips, compact, input.viewport.height).map((chip) => ({
+  // Separation may only use the part of the picture the reader can actually
+  // reach, or it would slide a chip back under the drawer.
+  const separateHeight = Math.min(
+    input.viewport.height,
+    input.bottomLimit ?? input.viewport.height,
+  );
+  return separateChips(chips, compact, separateHeight).map((chip) => ({
     ...chip,
     leader: leaderFor(chip.anchor, chip.part),
   }));

@@ -34,14 +34,10 @@ describe('P-04 lines', () => {
       expect(line.holdsStory).toBe(true);
       expect(line.trigger).toBe('timeline');
       expect(line.panel).toBe(false);
-      // The invitation speaks from the bottom band, where the hand-over asks
-      // for it, so it never competes with the annotation card.
-      expect(line.placement).toBe(
-        line.id === P04_INVITATION_LINE_ID ? 'bottom' : 'narrator-top-right',
-      );
-      // The invitation speaks left-aligned from the bottom band; the rest keep
-      // the narrator's right alignment.
-      expect(line.textAlign).toBe(line.id === P04_INVITATION_LINE_ID ? 'left' : 'right');
+      // Every line speaks from the same narrator spot in the top-right band;
+      // the invitation no longer moves to the bottom band.
+      expect(line.placement).toBe('narrator-top-right');
+      expect(line.textAlign).toBe('right');
     }
   });
 

@@ -277,7 +277,7 @@ describe('StorySequence', () => {
 
   it('shows EndScreen only for terminal story completion', async () => {
     useStoryStore.setState({
-      activeSceneId: 'scene-06-sample-workflow',
+      activeSceneId: 'scene-08-the-runner',
       status: 'completed',
     });
 
@@ -286,7 +286,7 @@ describe('StorySequence', () => {
 
     expect(app.container.querySelector('.end-screen')).not.toBeNull();
     expect(app.container.textContent).toContain('To be continued');
-    expect(app.container.querySelector('[data-scene="scene-06-sample-workflow"]')).toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-08-the-runner"]')).toBeNull();
 
     await app.unmount();
   });

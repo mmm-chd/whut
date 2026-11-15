@@ -93,6 +93,11 @@ import p05Sample3Url from '../audio/voice-over/perseverance/P05 - Narrator 3.mp3
 import p05Sample4Url from '../audio/voice-over/perseverance/P05 - Narrator 4.mp3';
 import p05Sample5Url from '../audio/voice-over/perseverance/P05 - Narrator 5.mp3';
 import p05SampleFinalUrl from '../audio/voice-over/perseverance/P05 - Final Quote.mp3';
+import p06Narrator1Url from '../audio/voice-over/perseverance/P06 - Narrator 1.mp3';
+import p06Narrator2Url from '../audio/voice-over/perseverance/P06 - Narrator 2.mp3';
+import p06Narrator3Url from '../audio/voice-over/perseverance/P06 - Narrator 3.mp3';
+import p06Narrator4Url from '../audio/voice-over/perseverance/P06 - Narrator 4.mp3';
+import p06Percy1Url from '../audio/voice-over/perseverance/percy/P06 - Percy 1.mp3';
 import p07Narrator1Url from '../audio/voice-over/perseverance/P07 - Narrator 1.mp3';
 import p07Narrator2Url from '../audio/voice-over/perseverance/P07 - Narrator 2.mp3';
 import p07Narrator3Url from '../audio/voice-over/perseverance/P07 - Narrator 3.mp3';
@@ -338,6 +343,14 @@ export const assetManifest: Record<string, AssetEntry> = {
     p07InfographicTopUrl,
     'The top of the infographic: Perseverance at 45.2 km and Opportunity at 45.16 km.',
   ),
+
+  // P-06 Cheyava Falls. Durations were read out of the MP3 frames, not guessed.
+  // The file-to-line mapping is a candidate until it is checked by ear.
+  'p06-vo-narrator-01': voiceAsset('p06-vo-narrator-01', p06Narrator1Url, undefined, 6340),
+  'p06-vo-narrator-02': voiceAsset('p06-vo-narrator-02', p06Narrator2Url, undefined, 5450),
+  'p06-vo-narrator-03': voiceAsset('p06-vo-narrator-03', p06Narrator3Url, undefined, 12380),
+  'p06-vo-narrator-04': voiceAsset('p06-vo-narrator-04', p06Narrator4Url, undefined, 2690),
+  'p06-vo-percy-01': voiceAsset('p06-vo-percy-01', p06Percy1Url, undefined, 8620),
 
   // P-02 voice-over, one file per line, in the order of dialog-perseverance.pdf.
   'p02-vo-narrator-01': voiceAsset('p02-vo-narrator-01', p02Narrator1Url),

@@ -9,6 +9,8 @@ import { ScrapbookText } from './ScrapbookText';
 
 const narrator = dialogueLines.find((line) => line.id === 'narrator-01')!;
 const manualNarrator = { ...narrator, advance: 'manual' as const };
+/** A narrated line: Continue stays closed until its own recording ends. */
+const recordedNarrator = { ...manualNarrator, gateAfter: 4 };
 
 function setReducedMotion(reducedMotion: boolean) {
   useStoryStore.setState({
@@ -211,5 +213,78 @@ describe('ScrapbookText', () => {
     });
     container.remove();
     vi.useRealTimers();
+  });
+
+  it('takes an early Continue and carries it out when the voice ends', async () => {
+    vi.useFakeTimers();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    const onContinue = vi.fn();
+
+    await act(async () => {
+      root.render(<ScrapbookText line={recordedNarrator} onContinue={onContinue} />);
+    });
+
+    // The gate is offered as soon as the text is typed: nobody is left
+    // staring at a finished line while the voice keeps talking.
+    const gate = container.querySelector('.circular-gate__button') as HTMLButtonElement | null;
+    expect(gate).not.toBeNull();
+
+    await act(async () => {
+      gate?.click();
+    });
+    // Pressed early: remembered, not carried out, so the recording is safe.
+    expect(onContinue).not.toHaveBeenCalled();
+    expect(container.querySelector('.scrapbook-text')?.getAttribute('data-armed')).toBe('true');
+
+    await act(async () => {
+      vi.advanceTimersByTime(3900);
+    });
+    expect(onContinue).not.toHaveBeenCalled();
+
+    await act(async () => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(onContinue).toHaveBeenCalledTimes(1);
+    // The gate leaves with the line.
+    expect(container.querySelector('.circular-gate')).toBeNull();
+
+    await act(async () => root.unmount());
+    container.remove();
+    vi.useRealTimers();
+  });
+
+  it('continues at once when the pressing comes after the recording', async () => {
+    vi.useFakeTimers();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    const onContinue = vi.fn();
+    await act(async () => {
+      root.render(<ScrapbookText line={recordedNarrator} onContinue={onContinue} />);
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(4500);
+    });
+    await act(async () => {
+      (container.querySelector('.circular-gate__button') as HTMLButtonElement | null)?.click();
+    });
+    expect(onContinue).toHaveBeenCalledTimes(1);
+    await act(async () => root.unmount());
+    container.remove();
+    vi.useRealTimers();
+  });
+
+  it('shows Continue as soon as the typing ends when the line has no recording', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    await act(async () => {
+      root.render(<ScrapbookText line={manualNarrator} onContinue={() => {}} />);
+    });
+    expect(container.querySelector('.circular-gate')).not.toBeNull();
+    await act(async () => root.unmount());
+    container.remove();
   });
 });

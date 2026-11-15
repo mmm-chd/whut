@@ -11,8 +11,10 @@ import type { Rect } from '../scene-04-percy-inspection/layout';
  * Sizes are host CSS pixels and the layout is derived, never stored.
  */
 export const P05_LAYOUT = {
-  /** Below this host width the card docks under the picture. */
-  sideBySideMinWidth: 900,
+  /** At and above this width the card gets its own column beside the picture. */
+  sideBySideMinWidth: 1160,
+  /** Between these two widths the card floats over the picture (tablet). */
+  overlayMinWidth: 720,
   padWide: 24,
   padNarrow: 14,
   /** Room above the picture for the heading and the progress line. */
@@ -36,6 +38,14 @@ export const P05_LAYOUT = {
   minHeight: 320,
 } as const;
 
+/**
+ * How the card shares the host with the picture:
+ * `side`    a column of its own, beside a narrower picture (desktop),
+ * `overlay` floating over the right of a full-width picture (tablet),
+ * `sheet`   a drawer under the picture (narrow host).
+ */
+export type P05Mode = 'side' | 'overlay' | 'sheet';
+
 export interface P05Layout {
   readonly valid: boolean;
   readonly width: number;
@@ -44,6 +54,7 @@ export interface P05Layout {
   readonly picture: Rect;
   /** Where the part card sits; always reserved, empty when nothing is open. */
   readonly card: Rect;
+  readonly mode: P05Mode;
   /** True when the card is a bottom sheet rather than a side column. */
   readonly stacked: boolean;
 }
@@ -56,6 +67,7 @@ export const EMPTY_P05_LAYOUT: P05Layout = {
   height: 0,
   picture: EMPTY,
   card: EMPTY,
+  mode: 'side',
   stacked: false,
 };
 
@@ -65,10 +77,14 @@ const clamp = (value: number, min: number, max: number): number =>
 /**
  * P-05 geometry for one host.
  *
- * `cardOpen` only matters on a narrow host: there the card is a bottom sheet,
- * and an empty sheet would squeeze the picture into a strip. Closed means the
- * picture keeps the whole height; open means the sheet takes its share, which
- * is the one place where opening a card does resize the picture.
+ * Three modes, one picture. On a desktop the card is a column and the picture
+ * gives up width rather than the model giving up size; on a tablet the card
+ * floats over the picture's right side, so the viewer keeps its full width; on
+ * a narrow host it becomes a bottom sheet.
+ *
+ * `cardOpen` only matters in `sheet` mode, where the drawer takes its height
+ * from the picture's bottom edge. In every mode the picture keeps its full
+ * size when a part is opened: opening a card never re-fits the model.
  */
 export function layoutP05(
   width: number,
@@ -86,7 +102,13 @@ export function layoutP05(
     return { ...EMPTY_P05_LAYOUT, width: Number.isFinite(width) ? usableWidth : 0, height: Number.isFinite(height) ? usableHeight : 0 };
   }
 
-  const stacked = usableWidth < P05_LAYOUT.sideBySideMinWidth;
+  const mode: P05Mode =
+    usableWidth >= P05_LAYOUT.sideBySideMinWidth
+      ? 'side'
+      : usableWidth >= P05_LAYOUT.overlayMinWidth
+        ? 'overlay'
+        : 'sheet';
+  const stacked = mode === 'sheet';
   const shortHost = usableHeight < P05_LAYOUT.shortHostHeight;
   const pad = stacked ? P05_LAYOUT.padNarrow : P05_LAYOUT.padWide;
   const topInset = shortHost
@@ -102,23 +124,26 @@ export function layoutP05(
   const contentWidth = usableWidth - pad * 2;
   const contentHeight = Math.max(80, usableHeight - topInset - bottomInset);
 
-  if (stacked) {
+  if (mode === 'sheet') {
+    // The sheet floats over the bottom of the picture instead of squeezing it.
+    // Squeezing left a strip too short to separate four chips, and two chips on
+    // one spot made the wrong part open.
     const sheetHeight = options.cardOpen
       ? Math.max(
           120,
           Math.min(contentHeight - 120, Math.floor(contentHeight * P05_LAYOUT.sheetShare)),
         )
       : 0;
-    const pictureHeight = Math.max(80, contentHeight - sheetHeight - P05_LAYOUT.gap);
     return {
       valid: true,
       width: usableWidth,
       height: usableHeight,
+      mode,
       stacked: true,
-      picture: { left: pad, top: topInset, width: contentWidth, height: pictureHeight },
+      picture: { left: pad, top: topInset, width: contentWidth, height: contentHeight },
       card: {
         left: pad,
-        top: topInset + pictureHeight + P05_LAYOUT.gap,
+        top: topInset + contentHeight - sheetHeight,
         width: contentWidth,
         height: sheetHeight,
       },
@@ -130,11 +155,37 @@ export function layoutP05(
     P05_LAYOUT.cardMin,
     P05_LAYOUT.cardMax,
   );
+
+  if (mode === 'overlay') {
+    // A tablet keeps the whole picture; the card sits over its right edge with
+    // a margin, so the rover is never fully covered.
+    const overlayWidth = clamp(
+      Math.floor(contentWidth * 0.34),
+      260,
+      340,
+    );
+    return {
+      valid: true,
+      width: usableWidth,
+      height: usableHeight,
+      mode,
+      stacked: false,
+      picture: { left: pad, top: topInset, width: contentWidth, height: contentHeight },
+      card: {
+        left: pad + contentWidth - overlayWidth,
+        top: topInset + 12,
+        width: overlayWidth,
+        height: Math.max(120, contentHeight - 24),
+      },
+    };
+  }
+
   const pictureWidth = contentWidth - cardWidth - P05_LAYOUT.gap;
   return {
     valid: true,
     width: usableWidth,
     height: usableHeight,
+    mode,
     stacked: false,
     picture: { left: pad, top: topInset, width: pictureWidth, height: contentHeight },
     card: {

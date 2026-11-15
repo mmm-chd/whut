@@ -3,10 +3,11 @@ import { scene02Config } from '../scenes/scene-02-launch-to-mars/scene.config';
 import { scene03Config } from '../scenes/scene-03-arrival-jezero/scene.config';
 import { runnerConfig } from '../scenes/scene-08-the-runner/scene.config';
 import { sampleWorkflowConfig } from '../scenes/scene-06-sample-workflow/scene.config';
+import { cheyavaFallsConfig } from '../scenes/scene-07-cheyava-falls/scene.config';
 import { cruiseSceneConfig } from '../scenes/filler-scene-01-cruise/scene.config';
 import { getScene, registerScene } from './SceneRegistry';
 
-const storyConfigs = [scene01Config, scene02Config, cruiseSceneConfig, scene03Config, sampleWorkflowConfig, runnerConfig];
+const storyConfigs = [scene01Config, scene02Config, cruiseSceneConfig, scene03Config, sampleWorkflowConfig, cheyavaFallsConfig, runnerConfig];
 
 export function ensureScenesRegistered(): void {
   for (const config of storyConfigs) {

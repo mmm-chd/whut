@@ -26,6 +26,15 @@ export interface DialogueLine {
    */
   delay?: number;
   /**
+   * Seconds the Continue gate stays closed after the line appears, even when
+   * the text has finished typing. A narrated line sets this to its own
+   * recording length so the reader cannot advance early and cut the voice —
+   * and so the pause before the next line is a breath, not a second copy of
+   * the recording. Omitted means "as soon as the typing ends", the old
+   * behaviour for every line that does not narrate.
+   */
+  gateAfter?: number;
+  /**
    * Paper panel behind the text. When false the line floats directly on the
    * scene as white crayon handwriting (see docs/pics reference frames).
    */

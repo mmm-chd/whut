@@ -1,0 +1,686 @@
+/*
+ * P-06 — Cheyava Falls.
+ *
+ * The journey plays on the shared Mars stage; the black time skip is a full
+ * frame of night; the deck is warm paper on top of it, the same family as the
+ * monitors in P-04 and the sampling cards in P-05.
+ */
+.p06-scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--cream);
+  background: #0a1c22;
+}
+
+/* The WebGL world sits under everything, edge to edge. */
+.p06-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/*
+ * The time skip is a title on black, not a subtitle: uppercase, wide tracking,
+ * centred, and gone before the reader can wonder whether it is stuck.
+ */
+.p06-time-skip {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  z-index: 5;
+  place-items: center;
+  background: #04121a;
+  color: var(--cream);
+  animation: p06-skip-in 280ms ease-out both;
+}
+
+.p06-time-skip p {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.1rem, 2.6vw, 1.7rem);
+  letter-spacing: 0.24em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@keyframes p06-skip-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.p06-deck {
+  position: relative;
+  display: flex;
+  z-index: 2;
+  width: min(1440px, 100%);
+  height: 100%;
+  min-height: 0;
+  margin-inline: auto;
+  flex-direction: column;
+  gap: 14px;
+  /*
+   * The extra room at the bottom balances the heading above the row, so the row
+   * itself sits on the middle line of the screen instead of a little below it.
+   */
+  padding: clamp(12px, 2.6vh, 26px) clamp(8px, 1.4vw, 18px) clamp(16px, 10vh, 78px);
+}
+
+.p06-deck[data-leaving='true'] {
+  animation: p06-deck-out 360ms cubic-bezier(0.55, 0.06, 0.68, 0.19) both;
+  pointer-events: none;
+}
+
+@keyframes p06-deck-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.p06-invite {
+  margin: 0;
+  color: rgb(232 244 252 / 84%);
+  font-size: clamp(0.86rem, 1.7vw, 0.98rem);
+  line-height: 1.5;
+  text-shadow: 0 2px 10px rgb(2 10 14 / 60%);
+}
+
+/*
+ * The deck body never scrolls down: the row of cards fills the height it is
+ * given, and each open card holds its own text inside its own column.
+ */
+.p06-deck-body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.p06-deck-heading {
+  margin: 0;
+  color: var(--cream);
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.5rem, 3.6vw, 2.1rem);
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 10px rgb(2 10 14 / 55%);
+}
+
+.p06-deck-lead {
+  margin: 0;
+  color: rgb(226 240 250 / 78%);
+  font-size: clamp(0.85rem, 1.6vw, 0.95rem);
+  line-height: 1.5;
+}
+
+/*
+ * A scrim behind the deck: the cards never appear out of a bare landscape in
+ * one frame. It fades in with the deck and fades out when the deck leaves.
+ */
+.p06-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgb(4 12 18 / 58%);
+  animation: p06-scrim-in 480ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  pointer-events: none;
+}
+
+.p06-scrim[data-leaving='true'] {
+  animation: p06-scrim-out 380ms cubic-bezier(0.55, 0.06, 0.68, 0.19) both;
+}
+
+@keyframes p06-scrim-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes p06-scrim-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* Five upright cards, side by side, always in a row. */
+.p06-card-list {
+  display: flex;
+  min-height: 0;
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: stretch;
+  gap: clamp(16px, 1.8vw, 30px);
+  /*
+   * The auto margins put the row in the middle of the room between the heading
+   * and the foot, whatever the heading's height turns out to be.
+   */
+  margin-block: auto;
+  margin-inline: 0;
+  padding: 0;
+  list-style: none;
+  /*
+   * No scroll container at all, so no scrollbar can exist: the five columns
+   * always share the width they are given. The row shrinks the cards rather
+   * than sliding them.
+   */
+  overflow: hidden;
+}
+
+/*
+ * A card is a little shorter than the deck's height: it is a card, not a column.
+ * The deck arrives card by card, left to right, so the row slides in with the
+ * scrim instead of appearing whole.
+ */
+.p06-card-item {
+  display: flex;
+  max-height: clamp(280px, 54vh, 400px);
+  min-width: 0;
+  flex: 1 1 0;
+  animation: p06-card-in 460ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes p06-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* The turn happens on the inner element; the card reserves both faces. */
+.p06-card {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  perspective: 1200px;
+}
+
+.p06-card-inner {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 0;
+  flex: 1 1 auto;
+  /* The turn is composited, not repainted: the card keeps its own layer while
+     it moves, which is what makes a side turn look continuous. */
+  will-change: transform;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+}
+
+.p06-card-face {
+  grid-area: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  /* An open card holds its text; the reader never sees a bar inside a card. */
+  scrollbar-width: none;
+  border: 2px solid #c3bcab;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  background: #fbf8f1;
+  box-shadow: 0 10px 20px rgb(3 12 16 / 32%);
+}
+
+/*
+ * An unopened card breathes: the border and a soft halo pulse so the reader can
+ * see, at a glance, which cards are still waiting. It stops the moment the card
+ * is turned, and it stops entirely for a reader who asked for less motion.
+ */
+.p06-card[data-opened='false'] .p06-card-face {
+  animation: p06-card-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes p06-card-pulse {
+  0%,
+  100% {
+    border-color: #c3bcab;
+    box-shadow: 0 10px 20px rgb(3 12 16 / 32%);
+  }
+
+  50% {
+    border-color: #2f7fa8;
+    box-shadow:
+      0 10px 20px rgb(3 12 16 / 32%),
+      0 0 0 3px rgb(47 127 168 / 28%);
+  }
+}
+
+/* Closed: number, one topic drawing, and the hint — read top to bottom. */
+.p06-card-back {
+  display: flex;
+}
+
+.p06-card-reveal {
+  display: flex;
+  width: 100%;
+  min-height: clamp(140px, 26vh, 196px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 14px 12px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: #16292e;
+  cursor: var(--cursor-active, pointer);
+  font: inherit;
+  text-align: center;
+}
+
+.p06-card-reveal:hover:not(:disabled),
+.p06-card-reveal:focus-visible {
+  background: rgb(233 224 205 / 62%);
+  outline: 2px solid #2f7fa8;
+  outline-offset: -4px;
+}
+
+.p06-card-reveal:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.p06-card-badge {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid #b98b6f;
+  border-radius: 50%;
+  color: #7b5b48;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.p06-icon {
+  width: clamp(64px, 8vw, 96px);
+  height: clamp(64px, 8vw, 96px);
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+
+.p06-icon-fill {
+  fill: #efe6d4;
+  stroke: #7b5b48;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.p06-icon-line,
+.p06-icon-dot {
+  fill: none;
+  stroke: #7b5b48;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.p06-icon-dot {
+  fill: #b98b6f;
+  stroke: #7b5b48;
+}
+
+.p06-card-hint {
+  margin-top: auto;
+  color: rgb(22 41 46 / 62%);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+/* Open: heading and the complete supplied text. */
+.p06-card-front {
+  display: flex;
+  transform: rotateY(180deg);
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+}
+
+.p06-card-front[inert] {
+  /* Belt and braces: an inert face never takes a pointer or a focus ring. */
+  pointer-events: none;
+}
+
+.p06-card-heading {
+  margin: 0;
+  color: #16292e;
+  font-family: var(--font-display, inherit);
+  font-size: 1.08rem;
+}
+
+.p06-card-heading:focus-visible {
+  outline: 2px solid #2f7fa8;
+  outline-offset: 2px;
+}
+
+.p06-card-body {
+  margin: 0;
+  color: #24383d;
+  font-size: 0.94rem;
+  line-height: 1.62;
+}
+
+/* The foot sits under the middle of the row, not under its first card. */
+.p06-deck-foot {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-top: 4px;
+  text-align: center;
+}
+
+.p06-continue {
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 2px solid var(--cream);
+  border-radius: 999px;
+  background: var(--cream);
+  color: #0c2128;
+  cursor: var(--cursor-active, pointer);
+  font: inherit;
+  font-weight: 600;
+}
+
+.p06-continue:hover:not(:disabled) {
+  border-color: #45b5ff;
+  background: #ffffff;
+}
+
+.p06-continue:disabled {
+  border-color: rgb(150 205 235 / 34%);
+  background: rgb(12 33 40 / 70%);
+  color: rgb(226 240 250 / 62%);
+  cursor: default;
+}
+
+.p06-deck-progress {
+  margin: 0;
+  color: rgb(226 240 250 / 66%);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.p06-card-face::-webkit-scrollbar {
+  display: none;
+}
+
+.p06-deck-hint {
+  margin: 0;
+  color: rgb(226 240 250 / 62%);
+  font-size: 0.8rem;
+}
+
+/*
+ * Short hosts: the deck keeps its row and its five cards, and the chrome around
+ * them gives way instead. Nothing is hidden that the reader needs — the hint is
+ * the only line that goes, and the card opens on a tap either way.
+ */
+@media (max-height: 560px) {
+  .p06-invite,
+  .p06-deck-lead,
+  .p06-card-hint {
+    display: none;
+  }
+
+  .p06-deck {
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .p06-deck-heading {
+    font-size: 1.1rem;
+  }
+
+  .p06-card-item {
+    /* Five columns of a small host still fit: no sideways sliding either. */
+    min-width: 0;
+  }
+
+  .p06-card-reveal {
+    min-height: 0;
+    gap: 6px;
+    padding: 8px 6px 10px;
+  }
+
+  .p06-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .p06-deck-foot {
+    gap: 4px;
+    padding-top: 0;
+  }
+
+  .p06-continue {
+    min-height: 36px;
+    padding: 6px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p06-card-face,
+  .p06-card-reveal {
+    transition: none;
+  }
+
+  .p06-card-item,
+  .p06-card[data-opened='false'] .p06-card-face,
+  .p06-scrim,
+  .p06-scrim[data-leaving='true'],
+  .p06-deck[data-leaving='true'] {
+    animation: none;
+  }
+}
+
+/*
+ * Card one's video is a poster button, and the player opens as a dialog over
+ * the whole scene: bigger, centred, closable with the X or Escape.
+ */
+.p06-video {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.p06-video-poster {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px solid #c3bcab;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 40%, rgb(34 62 74 / 96%), rgb(12 27 32 / 96%));
+  color: #f4ece0;
+  cursor: var(--cursor-active, pointer);
+  font: inherit;
+}
+
+.p06-video-poster:hover:not(:disabled),
+.p06-video-poster:focus-visible {
+  border-color: #2f7fa8;
+  outline: 2px solid #2f7fa8;
+  outline-offset: 2px;
+}
+
+.p06-video-poster:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* The triangle is drawn, not typed, so it cannot pick up a font's glyph. */
+.p06-video-play {
+  width: 0;
+  height: 0;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 21px solid #f4ece0;
+  margin-left: 5px;
+}
+
+.p06-video-poster-text {
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.p06-video-note {
+  margin: 0;
+  color: rgb(226 240 250 / 78%);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.p06-video-link {
+  color: #8fd0ef;
+  font-size: 0.84rem;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.p06-video-link:hover {
+  color: #c6e9fb;
+}
+
+/* The dialog: centred, as large as the viewport allows. */
+.p06-video-dialog {
+  width: min(1120px, 92vw);
+  max-width: none;
+  max-height: 92vh;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: #04121a;
+  color: var(--cream);
+  box-shadow: 0 28px 60px rgb(0 0 0 / 62%);
+  overflow: visible;
+}
+
+.p06-video-dialog::backdrop {
+  background: rgb(2 8 12 / 78%);
+  backdrop-filter: blur(2px);
+}
+
+.p06-video-dialog-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  background:
+    repeating-linear-gradient(135deg, #101b20 0 10px, #16262c 10px 20px);
+}
+
+.p06-video-dialog-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* The X sits on the dialog's top-right corner, clear of the player controls. */
+.p06-video-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 2px solid rgb(244 236 224 / 72%);
+  border-radius: 50%;
+  background: #0b2129;
+  color: #f4ece0;
+  cursor: var(--cursor-active, pointer);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.p06-video-close:hover,
+.p06-video-close:focus-visible {
+  border-color: #f4ece0;
+  background: #143542;
+  outline: none;
+}
+
+.p06-video-dialog > .p06-video-note,
+.p06-video-dialog > .p06-video-link {
+  display: block;
+  padding: 10px 16px;
+}
+
+/* The closing line and the fade that ends the chapter. */
+.p06-closing {
+  position: absolute;
+  inset: auto clamp(16px, 6vw, 90px) clamp(90px, 16vh, 140px);
+  z-index: 3;
+  padding: 16px 20px;
+  border: 2px solid rgb(255 241 214 / 26%);
+  border-radius: 16px;
+  background: rgb(8 24 30 / 88%);
+  box-shadow: 0 18px 34px rgb(3 10 14 / 46%);
+  color: var(--cream);
+  font-size: clamp(0.95rem, 1.9vw, 1.06rem);
+  line-height: 1.62;
+}
+
+.p06-closing p {
+  margin: 0;
+}
+
+.p06-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: #04121a;
+  animation: p06-fade-out 700ms ease-in forwards;
+}
+
+@keyframes p06-fade-out {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

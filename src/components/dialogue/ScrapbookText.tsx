@@ -28,6 +28,10 @@ export function ScrapbookText({ line, onContinue }: ScrapbookTextProps) {
   const instant = reducedMotionSetting || prefersReducedMotion === true;
   const [typed, setTyped] = useState(false);
   const [continued, setContinued] = useState(false);
+  /** The reader pressed Continue while the recording was still playing. */
+  const [armed, setArmed] = useState(false);
+  /** True once `gateAfter` seconds of un-paused stage time have passed. */
+  const [gateWaited, setGateWaited] = useState(false);
   const autoAdvanced = useRef(false);
   const panel = line.panel ?? true;
   const textSize = line.textSize ?? 'normal';
@@ -36,10 +40,43 @@ export function ScrapbookText({ line, onContinue }: ScrapbookTextProps) {
 
   const handleComplete = useCallback(() => setTyped(true), []);
 
+  // A narrated line owns the gate until its voice-over is done. The timer
+  // counts only un-paused time, so pausing the story also pausing the wait.
+  const gateAfterMs = Math.max(0, (line.gateAfter ?? 0) * 1000);
+  useEffect(() => {
+    if (gateAfterMs <= 0 || isPaused) {
+      return;
+    }
+    const timer = window.setTimeout(() => setGateWaited(true), gateAfterMs);
+    return () => window.clearTimeout(timer);
+  }, [gateAfterMs, isPaused, line.id]);
+  // A line without a recording has nothing to wait for: derived, not stored.
+  const gateOpen = gateAfterMs <= 0 || gateWaited;
+
   const handleGateActivate = useCallback(() => {
+    // Pressing early is a wish, not a cut: it is remembered and carried out
+    // once the voice has finished, so the reader is never held and the
+    // recording is never truncated.
+    if (!gateOpen) {
+      setArmed(true);
+      return;
+    }
     setContinued(true);
     onContinue?.(line);
-  }, [line, onContinue]);
+  }, [gateOpen, line, onContinue]);
+
+  // An early press is carried out here, the moment the recording ends. The
+  // gate stays on screen and reads `data-armed`, so the press is acknowledged
+  // instead of looking ignored; `carried` keeps it to one call.
+  const carried = useRef(false);
+  const done = continued || (armed && gateOpen);
+  useEffect(() => {
+    if (!armed || !gateOpen || carried.current) {
+      return;
+    }
+    carried.current = true;
+    onContinue?.(line);
+  }, [armed, gateOpen, line, onContinue]);
 
   // Auto-advance: resolve after the configured hold. The timer honours the
   // story pause, matching the Typewriter, and a zero delay fires at once.
@@ -59,7 +96,7 @@ export function ScrapbookText({ line, onContinue }: ScrapbookTextProps) {
     return () => window.clearTimeout(timer);
   }, [advance, delay, isPaused, line, onContinue, typed]);
 
-  const showGate = advance === 'manual' && typed && !continued;
+  const showGate = advance === 'manual' && typed && !done;
 
   return (
     <motion.div
@@ -73,6 +110,7 @@ export function ScrapbookText({ line, onContinue }: ScrapbookTextProps) {
       data-speaker={line.speaker}
       data-panel={panel ? 'true' : 'false'}
       data-gated={advance === 'manual' ? 'true' : undefined}
+      data-armed={armed ? 'true' : undefined}
       data-advance={advance}
       style={line.textAlign ? { textAlign: line.textAlign } : undefined}
       initial={{ opacity: 0, y: 12 }}

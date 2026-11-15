@@ -99,4 +99,53 @@ describe('the exit control', () => {
       }),
     ).toBe(true);
   });
+
+});
+
+describe('the close-up opens with nothing selected', () => {
+  it('shows four discoverable parts and no panel until one is chosen', async () => {
+    // `perseverance-3d-inspection-interaction.md` 3.1: no component is selected
+    // or highlighted on arrival, so the reader discovers a part themselves.
+    const { createInspectionState, reduceInspection } = await import(
+      '../scene-04-percy-inspection/inspectionState'
+    );
+    const idle = createInspectionState();
+    expect(idle.activePoint).toBeNull();
+
+    // The first choice is exactly a press on a chip, and the close returns to
+    // the same idle state.
+    const opened = reduceInspection(idle, { type: 'OPEN_POINT', point: 'cameras' });
+    expect(opened.activePoint).toBe('cameras');
+    expect(reduceInspection(opened, { type: 'CLOSE_POINT' }).activePoint).toBeNull();
+  });
+});
+
+describe('startsTurn', () => {
+  it('refuses a press that lands on a control, so its click is not swallowed', async () => {
+    const { startsTurn } = await import('./state');
+    const button = document.createElement('button');
+    const chipLabel = document.createElement('span');
+    button.append(chipLabel);
+    const link = document.createElement('a');
+    link.href = '#x';
+    const roleButton = document.createElement('div');
+    roleButton.setAttribute('role', 'button');
+    const field = document.createElement('input');
+
+    expect(startsTurn(chipLabel)).toBe(false);
+    expect(startsTurn(button)).toBe(false);
+    expect(startsTurn(link)).toBe(false);
+    expect(startsTurn(roleButton)).toBe(false);
+    expect(startsTurn(field)).toBe(false);
+  });
+
+  it('allows a press on the picture itself', async () => {
+    const { startsTurn } = await import('./state');
+    const canvas = document.createElement('canvas');
+    const screen = document.createElement('div');
+    screen.append(canvas);
+    expect(startsTurn(canvas)).toBe(true);
+    expect(startsTurn(screen)).toBe(true);
+    expect(startsTurn(null)).toBe(true);
+  });
 });
