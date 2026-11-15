@@ -87,6 +87,12 @@ import p04Narrator2Url from '../audio/voice-over/perseverance/P04 - Narrator 2.m
 import p04Narrator3Url from '../audio/voice-over/perseverance/P04 - Narrator 3.mp3';
 import p04Narrator4Url from '../audio/voice-over/perseverance/P04 - Narrator 4.mp3';
 import p04FinalQuoteUrl from '../audio/voice-over/perseverance/P04 - Final Quote.mp3';
+import p05Sample1Url from '../audio/voice-over/perseverance/P05 - Narrator 1.mp3';
+import p05Sample2Url from '../audio/voice-over/perseverance/P05 - Narrator 2.mp3';
+import p05Sample3Url from '../audio/voice-over/perseverance/P05 - Narrator 3.mp3';
+import p05Sample4Url from '../audio/voice-over/perseverance/P05 - Narrator 4.mp3';
+import p05Sample5Url from '../audio/voice-over/perseverance/P05 - Narrator 5.mp3';
+import p05SampleFinalUrl from '../audio/voice-over/perseverance/P05 - Final Quote.mp3';
 import placeholderUrl from './placeholder.svg';
 
 export type AssetStatus = 'placeholder' | 'draft' | 'final';
@@ -293,6 +299,13 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p04-vo-narrator-04': voiceAsset('p04-vo-narrator-04', p04Narrator4Url, undefined, 3790),
   // The script's final quote is spoken in the close-up, not on the ground.
   'p05-vo-rotation-hint': voiceAsset('p05-vo-rotation-hint', p04FinalQuoteUrl, undefined, 3790),
+  // P-05 sampling-game opening. The file-to-line mapping is a candidate until it is checked by ear.
+  'p05-sample-vo-narrator-01': voiceAsset('p05-sample-vo-narrator-01', p05Sample1Url, undefined, 2660),
+  'p05-sample-vo-narrator-02': voiceAsset('p05-sample-vo-narrator-02', p05Sample2Url, undefined, 4730),
+  'p05-sample-vo-narrator-03': voiceAsset('p05-sample-vo-narrator-03', p05Sample3Url, undefined, 8660),
+  'p05-sample-vo-narrator-04': voiceAsset('p05-sample-vo-narrator-04', p05Sample4Url, undefined, 2660),
+  'p05-sample-vo-narrator-05': voiceAsset('p05-sample-vo-narrator-05', p05Sample5Url, undefined, 7460),
+  'p05-sample-vo-intro-ready': voiceAsset('p05-sample-vo-intro-ready', p05SampleFinalUrl, undefined, 3020),
 
   // P-02 voice-over, one file per line, in the order of dialog-perseverance.pdf.
   'p02-vo-narrator-01': voiceAsset('p02-vo-narrator-01', p02Narrator1Url),

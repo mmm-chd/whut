@@ -218,9 +218,34 @@ describe('StorySequence', () => {
     await app.unmount();
   });
 
-  it('shows EndScreen only for terminal story completion', async () => {
+  it('hands the close-up to the sampling game under the shell cover', async () => {
+    vi.useFakeTimers();
     useStoryStore.setState({
       activeSceneId: 'scene-05-percy-inspector',
+      status: 'completed',
+      isPaused: false,
+      completedInteractions: [],
+      settings: { muted: true, volume: 0.35, reducedMotion: false },
+    });
+
+    const app = renderApp();
+    await app.render();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+
+    expect(useStoryStore.getState().activeSceneId).toBe('scene-06-sample-workflow');
+    expect(useStoryStore.getState().status).toBe('playing');
+    expect(app.container.querySelector('[data-scene="scene-06-sample-workflow"]')).not.toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-05-percy-inspector"]')).toBeNull();
+    expect(app.container.querySelector('.end-screen')).toBeNull();
+
+    await app.unmount();
+  });
+
+  it('shows EndScreen only for terminal story completion', async () => {
+    useStoryStore.setState({
+      activeSceneId: 'scene-06-sample-workflow',
       status: 'completed',
     });
 
@@ -229,7 +254,7 @@ describe('StorySequence', () => {
 
     expect(app.container.querySelector('.end-screen')).not.toBeNull();
     expect(app.container.textContent).toContain('To be continued');
-    expect(app.container.querySelector('[data-scene="scene-05-percy-inspector"]')).toBeNull();
+    expect(app.container.querySelector('[data-scene="scene-06-sample-workflow"]')).toBeNull();
 
     await app.unmount();
   });

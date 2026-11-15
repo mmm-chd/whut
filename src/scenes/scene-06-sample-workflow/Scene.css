@@ -1,0 +1,711 @@
+/*
+ * The sampling game (story P-05), dressed like the scenes before it: the shared
+ * Mars picture is the whole stage, and the game sits on it as scrapbook paper
+ * (cream sheets, a rust-brown border, washi tape, crayon headings, rounded
+ * pill buttons). Scoped to `p05s-` so the close-up scene's `p05-` rules never
+ * touch it.
+ */
+.p05s-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: var(--cream);
+  background: #2b1a16;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p05s-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.p05s-heading {
+  position: absolute;
+  left: 260px;
+  right: 24px;
+  top: 16px;
+  margin: 0;
+  font-size: clamp(1.15rem, 2.4vw, 1.75rem);
+  letter-spacing: 0.02em;
+  color: var(--cream);
+  text-shadow: 0 2px 0 rgb(59 33 24 / 55%);
+}
+
+.p05s-heading:focus {
+  outline: none;
+}
+
+/* Game chrome never blocks the picture; only its own controls take the pointer. */
+.p05s-main {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.p05s-main > * {
+  pointer-events: auto;
+}
+
+/* ---------- close-up photo (left) ---------- */
+
+.p05s-pov-column {
+  position: absolute;
+  top: 84px;
+  bottom: 3%;
+  left: 3%;
+  display: flex;
+  width: min(57%, 820px);
+  min-height: 0;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* The photo only comes out once the reader is asked to play. */
+.p05s-scene[data-phase='loading'] .p05s-pov-column,
+.p05s-scene[data-phase='opening'] .p05s-pov-column,
+.p05s-scene[data-phase='intro'] .p05s-pov-column {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+}
+
+.p05s-photo {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin: 0;
+  padding: 12px 12px 6px;
+  border: 3px solid #7b4636;
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 14px 28px rgb(20 10 8 / 45%);
+}
+
+/* Washi tape holding the photo to the page. */
+.p05s-photo::before,
+.p05s-photo::after,
+.p05s-panel::before,
+.p05s-complete-card::before {
+  position: absolute;
+  z-index: 2;
+  top: -13px;
+  width: 74px;
+  height: 24px;
+  background: rgb(240 201 160 / 78%);
+  box-shadow: 0 1px 2px rgb(20 10 8 / 25%);
+  content: '';
+  pointer-events: none;
+}
+
+.p05s-photo::before {
+  left: 18px;
+  transform: rotate(-5deg);
+}
+
+.p05s-photo::after {
+  right: 18px;
+  transform: rotate(4deg);
+}
+
+.p05s-panel::before {
+  left: 50%;
+  margin-left: -37px;
+  transform: rotate(-2deg);
+}
+
+.p05s-complete-card::before {
+  left: 50%;
+  margin-left: -37px;
+  transform: rotate(3deg);
+}
+
+.p05s-pov-wrap {
+  position: relative;
+  display: grid;
+  min-height: 150px;
+  flex: 1 1 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid #7b4636;
+  container-type: size;
+  border-radius: 4px;
+  /* The ground colours of the picture's top and bottom edges, so a letterboxed
+     canvas melts into its frame instead of showing a band. */
+  background: linear-gradient(#c4573d, #8a3a2b 55%, #7d3326);
+}
+
+.p05s-pov {
+  display: block;
+  /* The largest 4:3 picture that fits the frame, never stretched or cropped. */
+  width: min(100cqw, calc(100cqh * 4 / 3));
+  height: auto;
+  aspect-ratio: 4 / 3;
+  touch-action: none;
+  cursor: var(--cursor-default, default);
+}
+
+.p05s-pov[data-interactive='true'][data-mode='brush'] {
+  cursor: none;
+}
+
+.p05s-pov[data-interactive='true'][data-mode='pan'] {
+  cursor: var(--cursor-grab, grab);
+}
+
+.p05s-brush-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 3px solid #fff1d6;
+  border-radius: 50%;
+  background: rgb(255 241 214 / 18%);
+  box-shadow: 0 0 0 2px rgb(59 33 24 / 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.p05s-photo-caption {
+  margin: 6px 0 2px;
+  color: #3b2118;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* ---------- controls ---------- */
+
+/* Reserved height, so the photo never changes size as the buttons come and go. */
+.p05s-actions {
+  display: flex;
+  min-height: 92px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.p05s-controls,
+.p05s-rocks,
+.p05s-modes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 0 2px 0 rgb(59 33 24 / 60%);
+}
+
+.p05s-button {
+  min-height: 44px;
+  padding: 6px 18px;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  background: #fff6e2;
+  color: #3b2118;
+  font: inherit;
+  font-size: 0.95rem;
+  text-shadow: none;
+  cursor: var(--cursor-active, pointer);
+}
+
+.p05s-button:hover:not(:disabled),
+.p05s-button:focus-visible {
+  background: #ffd9a8;
+}
+
+.p05s-button:focus-visible,
+.p05s-pov:focus-visible {
+  outline: 3px solid #45b5ff;
+  outline-offset: 2px;
+}
+
+.p05s-button[data-primary] {
+  padding-inline: 24px;
+  border-width: 3px;
+  background: #ffd9a8;
+  box-shadow: 0 4px 0 #7b4636;
+}
+
+.p05s-button[data-primary]:hover:not(:disabled) {
+  background: #ffc98a;
+}
+
+.p05s-button[data-active='true'],
+.p05s-button[aria-pressed='true'] {
+  background: #e9b97d;
+  box-shadow: inset 0 0 0 2px #7b4636;
+}
+
+.p05s-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.p05s-rocks-label,
+.p05s-meter {
+  margin: 0;
+  color: var(--cream);
+  font-size: 0.95rem;
+}
+
+.p05s-rock-button {
+  min-height: 38px;
+  padding: 2px 14px;
+  font-size: 0.85rem;
+}
+
+.p05s-progress {
+  flex: 1 1 120px;
+  height: 16px;
+  overflow: hidden;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  background: #fff6e2;
+}
+
+.p05s-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #b95e43;
+}
+
+.p05s-intro {
+  position: absolute;
+  bottom: 9%;
+  left: 6%;
+}
+
+/* ---------- mission sheet (right) ---------- */
+
+.p05s-panel {
+  position: absolute;
+  top: 84px;
+  right: 3%;
+  width: min(32%, 380px);
+  max-height: calc(100% - 84px - 30%);
+  padding: 22px 16px 14px;
+  overflow-y: auto;
+  border: 3px solid #7b4636;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 12px 24px rgb(20 10 8 / 40%);
+  color: #3b2118;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p05s-panel-title,
+.p05s-subtitle {
+  margin: 0 0 8px;
+  font-family: 'DK Cool Crayon', 'Segoe Print', cursive;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+.p05s-subtitle {
+  margin-top: 14px;
+  font-size: 1.05rem;
+}
+
+.p05s-steps,
+.p05s-slots {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.p05s-step {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr auto;
+  gap: 2px 8px;
+  align-items: center;
+  padding: 5px 8px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.p05s-step-glyph {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 2px solid #7b4636;
+  border-radius: 50%;
+  background: #fff6e2;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.p05s-step[data-state='current'] {
+  background: #ffd9a8;
+}
+
+.p05s-step[data-state='current'] .p05s-step-glyph {
+  background: #b95e43;
+  color: #fff1d6;
+}
+
+.p05s-step[data-state='done'] .p05s-step-glyph {
+  background: #5e8c7e;
+  color: #fff1d6;
+}
+
+.p05s-step[data-state='done'] .p05s-step-label {
+  text-decoration: line-through;
+  text-decoration-color: rgb(123 70 54 / 55%);
+}
+
+.p05s-step-word {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.p05s-step-detail {
+  grid-column: 2 / -1;
+  font-size: 0.82rem;
+}
+
+.p05s-slots {
+  display: flex;
+  gap: 14px;
+}
+
+.p05s-slot {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+}
+
+/* A little test tube that fills when its sample is stored. */
+.p05s-tube-icon {
+  position: relative;
+  width: 2.2rem;
+  height: 3.6rem;
+  border: 3px solid #7b4636;
+  border-radius: 6px 6px 18px 18px;
+  background: #fff6e2;
+  overflow: hidden;
+}
+
+.p05s-tube-icon::before {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--fill, transparent) 0 68%, transparent 68%);
+  content: '';
+}
+
+.p05s-tube-icon[data-kind='core'] {
+  --fill: #b9835f;
+}
+
+.p05s-tube-icon[data-kind='atmosphere'] {
+  --fill: #bfe0e8;
+}
+
+.p05s-tube-icon[data-kind='empty'] {
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+.p05s-slot-number {
+  position: absolute;
+  z-index: 1;
+  top: 3px;
+  left: 50%;
+  display: grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #3b2118;
+  color: #fff1d6;
+  font-size: 0.7rem;
+  transform: translateX(-50%);
+}
+
+.p05s-note,
+.p05s-info {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.p05s-info {
+  padding: 8px 10px;
+  border-left: 4px solid #7b4636;
+  border-radius: 8px;
+  background: rgb(123 70 54 / 12%);
+}
+
+.p05s-facts {
+  margin-top: 12px;
+  font-size: 0.8rem;
+}
+
+.p05s-facts summary {
+  cursor: var(--cursor-active, pointer);
+}
+
+.p05s-facts ul {
+  padding-left: 1.1rem;
+}
+
+.p05s-draft {
+  opacity: 0.65;
+}
+
+/* ---------- transfer picture (inside the photo) ---------- */
+
+.p05s-transfer {
+  position: absolute;
+  right: 5%;
+  bottom: 6%;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  color: #fff1d6;
+  font-size: 0.78rem;
+  text-shadow: 0 2px 0 rgb(59 33 24 / 70%);
+  transition: transform 0.6s ease, opacity 0.4s ease;
+}
+
+.p05s-tube {
+  width: 34px;
+  filter: drop-shadow(0 3px 2px rgb(20 10 8 / 45%));
+}
+
+.p05s-tube-cap {
+  height: 9px;
+  margin-bottom: -2px;
+  border: 2px solid #7b4636;
+  border-radius: 4px 4px 0 0;
+  background: #e9dfc9;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.4s ease;
+}
+
+.p05s-tube-body {
+  display: flex;
+  height: 84px;
+  align-items: flex-end;
+  overflow: hidden;
+  border: 3px solid #7b4636;
+  border-radius: 4px 4px 14px 14px;
+  background: #fff6e2;
+}
+
+.p05s-tube-fill {
+  width: 100%;
+  height: 0%;
+  background: #b9835f;
+  transition: height 0.6s ease;
+}
+
+.p05s-transfer[data-kind='atmosphere'] .p05s-tube-fill {
+  background: #bfe0e8;
+}
+
+.p05s-transfer[data-stage='ready'] .p05s-tube-fill {
+  height: 8%;
+}
+
+.p05s-transfer:not([data-stage='ready']) .p05s-tube-fill {
+  height: 62%;
+}
+
+.p05s-transfer[data-stage='seal'] .p05s-tube-cap,
+.p05s-transfer[data-stage='store'] .p05s-tube-cap {
+  opacity: 1;
+  transform: none;
+}
+
+.p05s-transfer[data-stage='store'] {
+  transform: translateX(-70%) scale(0.8);
+  opacity: 0.4;
+}
+
+/* ---------- narration, completion ---------- */
+
+.p05s-dialogue {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+}
+
+/* Narration speaks from the sky on the left, clear of the mission sheet. */
+.p05s-dialogue .scrapbook-text--narrator-top-right {
+  top: 14%;
+  right: auto;
+  left: 4%;
+  width: min(56%, 40rem);
+  text-align: left;
+}
+
+.p05s-dialogue .scrapbook-text--bottom {
+  right: auto;
+  bottom: 24%;
+  left: 6%;
+  width: min(50%, 36rem);
+  text-align: left;
+}
+
+.p05s-complete {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgb(30 14 10 / 50%);
+}
+
+.p05s-complete-card {
+  position: relative;
+  display: grid;
+  max-width: min(92vw, 34rem);
+  justify-items: center;
+  gap: 12px;
+  padding: 28px 30px 24px;
+  border: 3px solid #7b4636;
+  border-radius: 14px;
+  background: var(--paper);
+  color: #3b2118;
+  text-align: center;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+}
+
+.p05s-complete-title {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+
+.p05s-complete-note,
+.p05s-reward,
+.p05s-choice-note {
+  margin: 0;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.9rem;
+}
+
+.p05s-stamp {
+  display: grid;
+  min-width: 11rem;
+  place-items: center;
+  padding: 18px 22px;
+  border: 5px double #b95e43;
+  border-radius: 14px;
+  color: #b95e43;
+  font-size: 1.7rem;
+  transform: rotate(-6deg);
+  animation: p05s-stamp-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 1;
+}
+
+@keyframes p05s-stamp-in {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(1.6);
+  }
+}
+
+.p05s-choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.p05s-choice {
+  display: grid;
+  max-width: 14rem;
+  justify-items: center;
+  gap: 6px;
+}
+
+.p05s-setup {
+  position: absolute;
+  inset: 90px 24px auto;
+  z-index: 40;
+  padding: 16px;
+  border: 3px solid #7b4636;
+  border-radius: 12px;
+  background: var(--paper);
+  color: #3b2118;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p05s-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- compact landscape ---------- */
+
+@media (max-width: 900px), (max-height: 480px) {
+  .p05s-heading {
+    left: 250px;
+    font-size: 1rem;
+  }
+
+  .p05s-pov-column {
+    top: 64px;
+    width: 58%;
+  }
+
+  .p05s-panel {
+    top: 64px;
+    width: 36%;
+    max-height: calc(100% - 64px - 12px);
+    padding: 18px 10px 10px;
+  }
+
+  .p05s-photo-caption,
+  .p05s-rocks-label {
+    display: none;
+  }
+
+  .p05s-photo {
+    padding: 8px 8px 4px;
+  }
+
+  .p05s-actions {
+    min-height: 84px;
+    gap: 4px;
+  }
+
+  .p05s-button {
+    min-height: 38px;
+    padding: 2px 14px;
+    font-size: 0.85rem;
+  }
+
+  .p05s-tube-icon {
+    width: 1.8rem;
+    height: 2.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p05s-pov-column,
+  .p05s-transfer,
+  .p05s-tube-cap,
+  .p05s-tube-fill,
+  .p05s-brush-ring {
+    transition-duration: 0.01s;
+  }
+
+  .p05s-stamp {
+    animation: none;
+  }
+}

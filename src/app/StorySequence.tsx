@@ -5,6 +5,7 @@ import { Scene02LaunchToMars } from '../scenes/scene-02-launch-to-mars/Scene';
 import { Scene03ArrivalJezero } from '../scenes/scene-03-arrival-jezero/Scene';
 import { Scene04PercyInspection } from '../scenes/scene-04-percy-inspection/Scene';
 import { Scene05PercyInspector } from '../scenes/scene-05-percy-inspector/Scene';
+import { Scene06SampleWorkflow } from '../scenes/scene-06-sample-workflow/Scene';
 import { useStoryScore } from '../audio/useStoryScore';
 import { useStoryStore } from '../stores/story.store';
 import {
@@ -30,6 +31,8 @@ function renderScene(id: StorySceneId) {
       return <Scene04PercyInspection />;
     case 'scene-05-percy-inspector':
       return <Scene05PercyInspector />;
+    case 'scene-06-sample-workflow':
+      return <Scene06SampleWorkflow />;
   }
 }
 
@@ -45,7 +48,9 @@ interface CoverState {
  * then runs `resetScene()` and `startScene(nextId)` in one tick, which is the
  * legal `completed -> idle -> playing` trace, and replaces the displayed
  * scene. P-02 mounts with its own opaque rewind card, so the shell cover can
- * disappear immediately there; the cruise entry is revealed by the shell.
+ * disappear immediately there; the cruise entry is revealed by the shell. The
+ * close-up fades to black itself, so the shell cover closes at once and the
+ * sampling game is revealed from black.
  */
 export function StorySequence() {
   // One looping score for the whole run: it outlives every scene swap.
@@ -112,7 +117,10 @@ export function StorySequence() {
 
     // P-02 already fades to black during its exit, so the cover appears
     // instantly there. P-01 needs the shell to fade to full black first.
-    const instantCover = reducedMotion || outgoing === 'scene-02-launch-to-mars';
+    const instantCover =
+      reducedMotion ||
+      outgoing === 'scene-02-launch-to-mars' ||
+      outgoing === 'scene-05-percy-inspector';
     setCover({ opacity: 1, instant: instantCover });
 
     timerRef.current = window.setTimeout(() => {

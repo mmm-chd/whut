@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 /docs
 /animation-baseline
+.claude
 
 .prettierignore
 .prettierrc
