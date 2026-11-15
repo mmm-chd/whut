@@ -128,8 +128,11 @@ export function ScrapbookText({ line, onContinue }: ScrapbookTextProps) {
         'scrapbook-text',
         `scrapbook-text--${line.placement}`,
         panel ? 'scrapbook-text--panel' : 'scrapbook-text--bare',
+        line.speaker === 'percy' ? 'scrapbook-text--bubble' : '',
         `scrapbook-text--size-${textSize}`,
-      ].join(' ')}
+      ]
+        .filter(Boolean)
+        .join(' ')}
       data-dialogue-line={line.id}
       data-speaker={line.speaker}
       data-panel={panel ? 'true' : 'false'}

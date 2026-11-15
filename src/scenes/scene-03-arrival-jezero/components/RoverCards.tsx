@@ -1,7 +1,7 @@
 import { AssetImage } from '../../../assets/AssetLoader';
 import { PREVIOUS_ROVERS } from '../rovers';
 
-/** Scrapbook cards for the earlier rovers: names only, scaffold pictures (see rovers.ts). */
+/** Scrapbook cards for the earlier rovers: names only (see rovers.ts). */
 
 interface RoverCardsProps {
   /** How many cards have been revealed (0..4), in narration order. */

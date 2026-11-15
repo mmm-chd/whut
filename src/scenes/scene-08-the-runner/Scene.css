@@ -358,9 +358,9 @@
   z-index: 4;
   display: grid;
   /* Narrow enough to leave Percy's start cell, at the middle of the bottom edge, clear. */
-  max-width: min(17rem, 42%);
-  gap: 6px;
-  padding: 10px 12px;
+  max-width: min(22rem, 46%);
+  gap: 8px;
+  padding: 14px 16px;
   border: 3px solid #7b4636;
   border-radius: 12px;
   background: var(--paper);
@@ -375,12 +375,12 @@
 }
 
 .p07-status-title {
-  font-size: 0.92rem;
+  font-size: 1.12rem;
   line-height: 1.35;
 }
 
 .p07-status-body {
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   opacity: 0.85;
 }
 
@@ -568,12 +568,9 @@
 
   /* A smaller Continue gate, close under the text, so it costs the cards little room. */
   .p07-dialogue .circular-gate--dialogue {
-    margin-top: 0.2rem;
+    margin-top: 0.7rem;
   }
 
-  .p07-dialogue .circular-gate--dialogue .circular-gate__button {
-    width: 64px;
-  }
 
   .p07-hint {
     max-width: 9.5rem;

@@ -16,6 +16,7 @@ function make(overrides: Partial<Parameters<typeof createP03Timeline>[0]> = {}) 
     onPhase: vi.fn(),
     onLabel: vi.fn(),
     onGate: vi.fn(),
+    onGame: vi.fn(),
     onCards: vi.fn(),
     onPercyExit: vi.fn(),
     onExcited: vi.fn(),
@@ -26,16 +27,21 @@ function make(overrides: Partial<Parameters<typeof createP03Timeline>[0]> = {}) 
 
 const labelOf = (id: string) => getP03Line(id).timelineLabel;
 
-/** Walk the whole cue sheet, releasing every gate as the reader would. */
+/** Walk the whole cue sheet, releasing every gate (and the time slider) as the reader would. */
 function runThrough(timeline: P03Timeline) {
   timeline.pause();
-  const gates = p03StoryHoldingLineIds
-    .map((id) => ({ id, at: timeline.labels[labelOf(id)] }))
-    .sort((a, b) => a.at - b.at);
-  for (const gate of gates) {
+  const events = [
+    ...p03StoryHoldingLineIds.map((id) => ({ id, at: timeline.labels[labelOf(id)] })),
+    { id: 'time-game', at: timeline.labels['time-game'] },
+  ].sort((a, b) => a.at - b.at);
+  for (const event of events) {
     timeline.pause();
-    timeline.seek(gate.at + 0.02, false);
-    timeline.releaseDialogue(gate.id);
+    timeline.seek(event.at + 0.02, false);
+    if (event.id === 'time-game') {
+      timeline.releaseGame();
+    } else {
+      timeline.releaseDialogue(event.id);
+    }
   }
   timeline.pause();
   timeline.seek(10_000, false);
@@ -81,7 +87,7 @@ describe('createP03Timeline', () => {
     const order: string[] = [];
     const timeline = make({
       onLabel: (label) => order.push(`label:${label}`),
-      onGate: (gate) => order.push(`gate:${gate.lineId}`),
+      onGate: (gate) => order.push(gate.kind === 'dialogue' ? `gate:${gate.lineId}` : 'gate:game'),
     });
     timeline.pause();
     runThrough(timeline);
@@ -93,7 +99,7 @@ describe('createP03Timeline', () => {
 
   it('opens gates only for holding lines, never for walk narration', () => {
     const gates: string[] = [];
-    const timeline = make({ onGate: (gate) => gates.push(gate.lineId) });
+    const timeline = make({ onGate: (gate) => gate.kind === 'dialogue' && gates.push(gate.lineId) });
     runThrough(timeline);
     expect(gates).toEqual([...p03StoryHoldingLineIds]);
     for (const id of ['p03-narrator-01', 'p03-narrator-02', 'p03-narrator-03', 'p03-narrator-04']) {
@@ -136,7 +142,7 @@ describe('createP03Timeline', () => {
 
     expect(onPhase.mock.calls.map(([phase]) => phase)).toEqual([
       'landing', 'door', 'exit', 'reveal', 'walk', 'look-around', 'inspect', 'confused',
-      'rovers', 'mission', 'excited', 'final-quote', 'transition',
+      'rovers', 'mission', 'excited', 'timeline', 'final-quote', 'transition',
     ]);
     expect(onPercyExit).toHaveBeenCalledTimes(1);
     expect(onCards.mock.calls.map(([shown]) => shown)).toEqual([1, 2, 3, 4]);

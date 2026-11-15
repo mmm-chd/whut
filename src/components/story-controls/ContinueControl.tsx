@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import { canContinue } from '../../engine/selectors';
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
@@ -33,6 +34,7 @@ export function ContinueControl({ requiredInteractions }: ContinueControlProps) 
       <span className="continue-control__label">
         {canProceed ? 'Continue' : 'Continue — inspect all rocks first'}
       </span>
+      {canProceed ? <ChevronRight size={20} strokeWidth={3} aria-hidden="true" /> : null}
     </button>
   );
 }

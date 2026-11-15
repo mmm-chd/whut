@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import { WebGLStage } from '../../three/WebGLStage';
 import { cruiseWorldTextureIds } from './assets';
 import { CruiseWorld } from './World';
@@ -37,13 +38,18 @@ export function CruiseEntryScene() {
         <CruiseWorld reducedMotion={reducedMotion} />
       </WebGLStage>
       <div className="cruise-scene__content">
-        <p className="cruise-scene__eyebrow">On the way to Mars</p>
         <h2 className="cruise-scene__title">Sit tight, it&rsquo;s gonna take a while~</h2>
         <p className="cruise-scene__body">
           Percy and Ginny are cruising through space. Their next adventure is being prepared.
         </p>
+        <div className="cruise-scene__trip" aria-hidden="true">
+          <span className="cruise-scene__dot cruise-scene__dot--earth" />
+          <span className="cruise-scene__line" />
+          <span className="cruise-scene__dot cruise-scene__dot--mars" />
+        </div>
         <button type="button" className="cruise-scene__continue" onClick={continueToMars}>
           Continue to Mars
+          <ChevronRight size={22} strokeWidth={3} aria-hidden="true" />
         </button>
       </div>
     </main>

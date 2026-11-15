@@ -128,6 +128,19 @@ async function resolveThrough(lineId: string) {
   });
 }
 
+/** The reader slides back to the lake and presses on. */
+async function playTheSlider() {
+  await seek(driver().labels['time-game'] + 0.02);
+  const ticks = harness.container.querySelectorAll<HTMLButtonElement>('.tt-tick');
+  expect(ticks).toHaveLength(6);
+  await act(async () => {
+    ticks[ticks.length - 1].click();
+  });
+  await act(async () => {
+    harness.container.querySelector<HTMLButtonElement>('[data-time-travel-done]')?.click();
+  });
+}
+
 async function playToFinalGate() {
   const gates = [...p03StoryHoldingLineIds]
     .filter((id) => id !== 'p03-narrator-12')
@@ -136,6 +149,7 @@ async function playToFinalGate() {
     await seek(labelTime(id) + 0.02);
     await resolveThrough(id);
   }
+  await playTheSlider();
   await seek(labelTime('p03-narrator-12') + 0.02);
 }
 
@@ -185,7 +199,7 @@ describe('Scene03ArrivalJezero', () => {
     expect(names).toEqual(['Sojourner', 'Spirit', 'Opportunity', 'Curiosity']);
   });
 
-  it('marks the story waiting only at the final quote', async () => {
+  it('marks the story waiting when the time slider opens', async () => {
     await harness.render();
     const gates = ['p03-percy-01', 'p03-percy-02', 'p03-narrator-06'];
     await seek(labelTime(gates[0]) + 0.02);
@@ -193,6 +207,41 @@ describe('Scene03ArrivalJezero', () => {
     await playToFinalGate();
     expect(phase()).toBe('final-quote');
     expect(useStoryStore.getState().status).toBe('waiting');
+  });
+
+  it('holds the story on the time slider until the reader reaches the lake', async () => {
+    await harness.render();
+    const gates = [...p03StoryHoldingLineIds]
+      .filter((id) => id !== 'p03-narrator-12')
+      .sort((a, b) => labelTime(a) - labelTime(b));
+    for (const id of gates) {
+      await seek(labelTime(id) + 0.02);
+      await resolveThrough(id);
+    }
+    await seek(driver().labels['time-game'] + 0.02);
+    expect(phase()).toBe('timeline');
+    expect(harness.container.querySelector('[data-time-travel]')).not.toBeNull();
+    expect(useStoryStore.getState().status).toBe('waiting');
+    // Done only appears once the lake has been reached.
+    expect(harness.container.querySelector('[data-time-travel-done]')).toBeNull();
+    const slider = harness.container.querySelector<HTMLInputElement>('.tt-slider')!;
+    expect(slider.max).toBe('5');
+    const ticks = harness.container.querySelectorAll<HTMLButtonElement>('.tt-tick');
+    await act(async () => {
+      ticks[2].click();
+    });
+    expect(harness.container.querySelector('[data-stop-card]')?.getAttribute('data-stop-card')).toBe('jul-2024');
+    expect(harness.container.querySelector('[data-time-travel-done]')).toBeNull();
+    expect(phase()).toBe('timeline');
+    await act(async () => {
+      ticks[5].click();
+    });
+    expect(harness.container.querySelector('[data-stop-card]')?.getAttribute('data-stop-card')).toBe('ancient');
+    expect(harness.container.querySelector('[data-percy-bubble]')).not.toBeNull();
+    await act(async () => {
+      harness.container.querySelector<HTMLButtonElement>('[data-time-travel-done]')?.click();
+    });
+    expect(harness.container.querySelector('[data-time-travel]')).toBeNull();
   });
 
   it('accepts the final Continue once and completes after the fade', async () => {

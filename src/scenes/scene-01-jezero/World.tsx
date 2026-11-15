@@ -8,6 +8,9 @@ import { Vignette } from '../../three/layers';
 import { SceneGroup } from '../../three/SceneGroup';
 import { SpriteLayer } from '../../three/SpriteLayer';
 import { useAssetTexture } from '../../three/textures';
+import { PercyRig } from '../../characters/percy/PercyRig';
+import { createPercyNodes } from '../../characters/percy/percyNodes';
+import { PERCY_DESIGN_WIDTH } from '../../characters/percy/rigLayout';
 import { PARALLAX } from './camera';
 import { DUST_PARTICLES } from './dust';
 import {
@@ -37,9 +40,9 @@ const ORDER = {
   percyGlow: 8,
   percyShadow: 9,
   percy: 10,
-  fgV1: 11,
-  fgV2: 12,
-  dust: 20,
+  fgV1: 24,
+  fgV2: 25,
+  dust: 26,
   vignette: 30,
 } as const;
 
@@ -199,12 +202,15 @@ function RockActor({
 }
 
 function PercyActor({ layout, nodes }: { layout: P01Layout; nodes: P01Nodes }) {
-  const texture = useAssetTexture('rover');
-  if (!texture) {
-    return null;
-  }
   const { width: roverW, anchorX, anchorY } = layout.percy;
-  const roverH = roverW / (texture.width / texture.height);
+  // The same layered Percy every other scene draws, at rest: his width on screen is `roverW`.
+  const unit = roverW / PERCY_DESIGN_WIDTH;
+  const percyNodes = useMemo(() => {
+    const rig = createPercyNodes();
+    rig.body.x = anchorX / unit;
+    return rig;
+  }, [anchorX, unit]);
+  const roverH = roverW * 0.57;
   const top = anchorY - roverH;
 
   // Glow box: inset -20% / -15% of the rover, clipped to its inscribed ellipse.
@@ -238,15 +244,7 @@ function PercyActor({ layout, nodes }: { layout: P01Layout; nodes: P01Nodes }) {
           opacity={0.85}
           order={ORDER.percyShadow}
         />
-        <SpriteLayer
-          asset="rover"
-          x={anchorX}
-          y={anchorY}
-          w={roverW}
-          originX={0.5}
-          originY={1}
-          order={ORDER.percy}
-        />
+        <PercyRig nodes={percyNodes} unit={unit} groundY={anchorY} order={ORDER.percy} />
       </SceneGroup>
     </PanGroup>
   );

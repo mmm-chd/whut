@@ -13,7 +13,7 @@ import { DOOR, ROCKET, type CameraPose, type P03Layout } from './layout';
 import { isPercyOffscreen, type P03Nodes } from './nodes';
 import type { P03Phase } from './state';
 
-export type P03Gate = { kind: 'dialogue'; lineId: string };
+export type P03Gate = { kind: 'dialogue'; lineId: string } | { kind: 'game' };
 
 export interface P03TimelineOptions {
   nodes: P03Nodes;
@@ -23,6 +23,8 @@ export interface P03TimelineOptions {
   onPhase: (phase: P03Phase) => void;
   onLabel: (label: string) => void;
   onGate: (gate: P03Gate) => void;
+  /** The time-slider game opens; the story waits until `releaseGame`. */
+  onGame: () => void;
   /** Reports how many rover cards are shown. */
   onCards: (shown: number) => void;
   /** Percy's whole visible width is past the picture edge after the exit. */
@@ -44,6 +46,7 @@ export interface P03Timeline extends PausableTimeline {
   seek: (time: number, suppressEvents?: boolean) => void;
   paused: () => boolean;
   releaseDialogue: (lineId: string) => void;
+  releaseGame: () => void;
   setPresentationPaused: (value: boolean) => void;
   setReducedMotion: (value: boolean) => void;
   dispose: () => void;
@@ -282,15 +285,27 @@ export function createP03Timeline(options: P03TimelineOptions): P03Timeline {
   call(() => options.onExcited(), cursor + hop);
   cursor += hop + 0.2;
 
-  // --- Final quote: pull back, then one Continue --------------------------------------
-  phase('final-quote', cursor);
+  // --- Time slider: pull back, say why, then the reader plays ---------------------------
+  phase('timeline', cursor);
   addPointMast(timeline, percy, cursor, reduced());
   toPose(layout.poses.final, cursor, motion(3, 0.3));
   const quoteAt = cursor + 1;
-  // The transition quote leaves on its own (it holds the story until it does),
-  // then the final quote waits for the reader's one Continue.
+  // The transition quote leaves on its own (it holds the story until it does).
   cue('p03-narrator-11', quoteAt);
-  const finalAt = quoteAt + 0.6;
+  const gameAt = quoteAt + 0.6;
+  timeline.addLabel('time-game', gameAt);
+  timeline.addPause(gameAt, () => {
+    if (disposed) {
+      return;
+    }
+    heldGate = { kind: 'game' };
+    options.onGame();
+  });
+
+  // --- Final quote: one Continue, anywhere on the screen --------------------------------
+  const finalPhaseAt = gameAt + 0.05;
+  phase('final-quote', finalPhaseAt);
+  const finalAt = finalPhaseAt + 0.5;
   cue('p03-narrator-12', finalAt);
 
   const transitionAt = finalAt + 0.5;
@@ -340,8 +355,17 @@ export function createP03Timeline(options: P03TimelineOptions): P03Timeline {
     },
     isRunning: () =>
       !disposed && !presentationPaused && !timeline.paused() && timeline.progress() < 1,
+    releaseGame: () => {
+      if (disposed || heldGate?.kind !== 'game') {
+        return;
+      }
+      heldGate = null;
+      if (!presentationPaused) {
+        timeline.resume();
+      }
+    },
     releaseDialogue: (lineId) => {
-      if (disposed || heldGate?.lineId !== lineId) {
+      if (disposed || heldGate?.kind !== 'dialogue' || heldGate.lineId !== lineId) {
         return;
       }
       heldGate = null;

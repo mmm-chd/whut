@@ -22,16 +22,50 @@
   bottom: clamp(1.4rem, 6vh, 4rem);
 }
 
-/* Dialogue-attached gate: flows inside the scrapbook panel, under the text.
+/* Dialogue-attached gate: a scrapbook pill under the text, with a clear gap
+   so it never touches whatever sits below the caption.
    The panel sets pointer-events: none, so re-enable it here. */
 .circular-gate--dialogue {
   position: static;
-  margin-top: 1rem;
+  margin-top: clamp(1.1rem, 3vh, 1.9rem);
+  margin-bottom: clamp(0.6rem, 2vh, 1.2rem);
   gap: 0.6rem;
   pointer-events: auto;
 }
 
 .circular-gate--dialogue .circular-gate__button {
+  display: inline-flex;
+  gap: 0.4rem;
+  width: auto;
+  aspect-ratio: auto;
+  padding: 0.5rem 1.15rem 0.55rem 1.4rem;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  background: #fff3d6;
+  box-shadow: 0 8px 18px rgba(20, 10, 8, 0.35);
+}
+
+.circular-gate--dialogue .circular-gate__button:hover {
+  background: #ffe9b0;
+}
+
+.circular-gate--dialogue .circular-gate__pulse {
+  inset: -6px;
+  border-radius: 999px;
+}
+
+.circular-gate--dialogue .circular-gate__label {
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  letter-spacing: 0.03em;
+}
+
+.circular-gate--dialogue .circular-gate__icon {
+  position: relative;
+  z-index: 1;
+  flex: none;
+}
+
+.circular-gate__button {
   width: clamp(64px, 5.4vw, 84px);
 }
 

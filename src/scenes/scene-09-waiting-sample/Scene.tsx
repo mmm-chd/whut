@@ -156,6 +156,23 @@ function EndingRun({ layout, budgetMs }: { readonly layout: P08Layout; readonly 
         </aside>
       ) : null}
 
+      {phase === 'hope' && !state.percyStopped && !api.dingVisible ? (
+        <div className="p08-ding p08-ding--waiting" role="status" aria-live="polite">
+          <svg viewBox="0 0 40 28" className="p08-ding-icon" aria-hidden="true" focusable="false">
+            <rect x="3" y="3" width="34" height="22" rx="4" fill="#fff6e2" stroke="#3b2118" strokeWidth="3" />
+            <path d="M5 6 L20 17 L35 6" fill="none" stroke="#3b2118" strokeWidth="3" strokeLinejoin="round" />
+          </svg>
+          <span>
+            Waiting for a message from Earth
+            <span className="p08-wait-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          </span>
+        </div>
+      ) : null}
+
       {api.dingVisible ? (
         <div className="p08-ding" role="status" aria-live="polite">
           <svg viewBox="0 0 40 28" className="p08-ding-icon" aria-hidden="true" focusable="false">

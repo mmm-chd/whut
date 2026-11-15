@@ -33,18 +33,21 @@
   display: grid;
   z-index: 5;
   place-items: center;
-  background: #04121a;
-  color: var(--cream);
-  animation: p06-skip-in 280ms ease-out both;
+  padding: 8vw;
+  /* The same black card as the rewind between P-01 and P-02. */
+  background: #0b0f14;
+  color: #fff6e2;
+  animation: p06-skip-in 700ms ease both;
 }
 
 .p06-time-skip p {
+  max-width: 46rem;
   margin: 0;
-  font-family: var(--font-display, inherit);
-  font-size: clamp(1.1rem, 2.6vw, 1.7rem);
-  letter-spacing: 0.24em;
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: clamp(2rem, 5.2vw, 4.6rem);
+  line-height: 1.12;
   text-align: center;
-  text-transform: uppercase;
+  text-wrap: balance;
 }
 
 @keyframes p06-skip-in {

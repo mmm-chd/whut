@@ -1,7 +1,7 @@
 /**
  * The rovers that came before Percy. Names only: the spec
- * gives no other facts, so none are invented here. Pictures are scaffold
- * silhouettes until the scrapbook art arrives (same asset IDs).
+ * gives no other facts, so none are invented here. Pictures are the scrapbook
+ * rover art in `assets/fixed/p03`.
  */
 export const PREVIOUS_ROVERS = [
   { id: 'sojourner', name: 'Sojourner', asset: 'p03-card-sojourner' },

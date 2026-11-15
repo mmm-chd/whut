@@ -17,38 +17,93 @@
   transform: translate(-50%, -50%);
 }
 
-.cruise-scene__eyebrow {
-  margin: 0 0 0.8rem;
-  color: #e6b96d;
-  font-size: clamp(0.75rem, 1.2vw, 1rem);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-}
-
 .cruise-scene__title {
   margin: 0;
   font-size: clamp(2rem, 5vw, 4.4rem);
+  font-weight: 400;
   line-height: 1.12;
   text-wrap: balance;
+  text-shadow: 0 3px 0 rgb(74 36 24 / 55%), 0 0 22px rgb(11 16 32 / 70%);
 }
 
 .cruise-scene__body {
   margin: 1.4rem auto 0;
   max-width: 34rem;
-  color: #dfe7f2;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: #fff1d6;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
   font-size: clamp(0.95rem, 1.5vw, 1.2rem);
   line-height: 1.55;
+  text-shadow: 0 2px 8px rgb(11 16 32 / 80%);
+}
+
+/* Earth to Mars: a dashed path with a marker that creeps along it. */
+.cruise-scene__trip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1.6rem;
+}
+
+.cruise-scene__dot {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #fff6e2;
+  border-radius: 50%;
+}
+
+.cruise-scene__dot--earth {
+  background: #4c7ba5;
+}
+
+.cruise-scene__dot--mars {
+  background: #b95e43;
+}
+
+.cruise-scene__line {
+  position: relative;
+  width: clamp(6rem, 22vw, 14rem);
+  height: 0;
+  border-top: 3px dashed rgb(255 246 226 / 70%);
+}
+
+.cruise-scene__line::after {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #f2c14e;
+  content: '';
+  animation: cruise-creep 9s linear infinite;
+}
+
+@keyframes cruise-creep {
+  to {
+    left: calc(100% - 13px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cruise-scene__line::after {
+    left: 40%;
+    animation: none;
+  }
 }
 
 /* Scaffold control (see Scene.tsx): remove with the real cruise. */
 .cruise-scene__continue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   min-width: 11rem;
   min-height: 2.75rem;
   margin-top: 1.6rem;
-  padding: 0.6rem 1.6rem;
+  padding: 0.6rem 1.4rem 0.6rem 1.7rem;
   color: #3b2118;
-  background: #f6e7c9;
+  background: #fff3d6;
+  box-shadow: 0 8px 18px rgb(11 16 32 / 45%);
   border: 3px solid #7b4636;
   border-radius: 999px;
   font: inherit;

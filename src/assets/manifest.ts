@@ -40,10 +40,10 @@ import percyTireRearUrl from './fixed/percy/tire-rear.png';
 import percyTireFront1Url from './fixed/percy/tire-front-1.png';
 import percyTireFront2Url from './fixed/percy/tire-front-2.png';
 import percyTireFront3Url from './fixed/percy/tire-front-3.png';
-import p03CardSojournerUrl from './drafts/p03/card-sojourner.svg';
-import p03CardSpiritUrl from './drafts/p03/card-spirit.svg';
-import p03CardOpportunityUrl from './drafts/p03/card-opportunity.svg';
-import p03CardCuriosityUrl from './drafts/p03/card-curiosity.svg';
+import p03CardSojournerUrl from './fixed/p03/rover-sojourner.webp';
+import p03CardSpiritUrl from './fixed/p03/rover-spirit.webp';
+import p03CardOpportunityUrl from './fixed/p03/rover-opportunity.webp';
+import p03CardCuriosityUrl from './fixed/p03/rover-curiosity.webp';
 import homeRocketUrl from './drafts/home/home-rocket.svg';
 import homeFlameUrl from './drafts/home/home-flame.svg';
 import homeSmokeDeepUrl from './drafts/home/home-smoke-deep.svg';
@@ -420,11 +420,11 @@ export const assetManifest: Record<string, AssetEntry> = {
   'percy-tire-front-2': finalAsset('percy-tire-front-2', 'image', percyTireFront2Url, 'Percy rig part: tire-front-2'),
   'percy-tire-front-3': finalAsset('percy-tire-front-3', 'image', percyTireFront3Url, 'Percy rig part: tire-front-3'),
 
-  // P-03 rover cards (scaffold silhouettes until the scrapbook art arrives)
-  'p03-card-sojourner': draftImage('p03-card-sojourner', p03CardSojournerUrl, 'Sojourner rover'),
-  'p03-card-spirit': draftImage('p03-card-spirit', p03CardSpiritUrl, 'Spirit rover'),
-  'p03-card-opportunity': draftImage('p03-card-opportunity', p03CardOpportunityUrl, 'Opportunity rover'),
-  'p03-card-curiosity': draftImage('p03-card-curiosity', p03CardCuriosityUrl, 'Curiosity rover'),
+  // P-03 rover cards
+  'p03-card-sojourner': finalAsset('p03-card-sojourner', 'image', p03CardSojournerUrl, 'Sojourner rover'),
+  'p03-card-spirit': finalAsset('p03-card-spirit', 'image', p03CardSpiritUrl, 'Spirit rover'),
+  'p03-card-opportunity': finalAsset('p03-card-opportunity', 'image', p03CardOpportunityUrl, 'Opportunity rover'),
+  'p03-card-curiosity': finalAsset('p03-card-curiosity', 'image', p03CardCuriosityUrl, 'Curiosity rover'),
 
   // Font
   'font-crayon': finalAsset('font-crayon', 'font', crayonFontUrl),

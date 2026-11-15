@@ -5,6 +5,7 @@ import { useStoryStore } from '../../stores/story.store';
 import { WebGLStage } from '../../three/WebGLStage';
 import { p03WorldTextureIds } from './assets';
 import { RoverCards } from './components/RoverCards';
+import { TimeTravelGame } from './components/TimeTravelGame';
 import { createP03Nodes } from './nodes';
 import { scene03Config } from './scene.config';
 import { useP03Scene } from './useP03Scene';
@@ -16,7 +17,7 @@ export function Scene03ArrivalJezero() {
   const status = useStoryStore((state) => state.status);
   // The animation state the timeline drives and the WebGL world reads.
   const [nodes] = useState(() => createP03Nodes(reducedMotion));
-  const { phase, cardsShown } = useP03Scene(nodes);
+  const { phase, cardsShown, gameOpen, completeGame } = useP03Scene(nodes);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const focusedHeading = useRef(false);
@@ -51,6 +52,17 @@ export function Scene03ArrivalJezero() {
       </h1>
 
       <RoverCards shown={cardsShown} visible={phase === 'rovers'} />
+
+      {gameOpen ? <TimeTravelGame onDone={completeGame} /> : null}
+
+      {/* The last line asks for one Continue; a press anywhere is that Continue. */}
+      {phase === 'final-quote' ? (
+        <div
+          className="p03-click-catcher"
+          aria-hidden="true"
+          onClick={() => document.querySelector<HTMLButtonElement>('.p03-dialogue .circular-gate__button')?.click()}
+        />
+      ) : null}
 
       <div className="p03-dialogue">
         <DialogueLayer />

@@ -22,6 +22,10 @@ import { createP03Timeline, type P03Timeline } from './timeline';
 export interface P03SceneApi {
   phase: P03Phase;
   cardsShown: number;
+  /** The time-slider game is on screen. */
+  gameOpen: boolean;
+  /** The reader reached the lake and pressed on. */
+  completeGame: () => void;
 }
 
 const INTERACTION_ID = 'p03-continue';
@@ -48,6 +52,7 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
 
   const [phase, setPhase] = useState<P03Phase>('landing');
   const [cardsShown, setCardsShown] = useState(0);
+  const [gameOpen, setGameOpen] = useState(false);
 
   const tokenRef = useRef<symbol | null>(null);
   const driverRef = useRef<P03Timeline | null>(null);
@@ -57,6 +62,7 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
   const cardsRef = useRef(0);
   const excitedRef = useRef(false);
   const continueAcceptedRef = useRef(false);
+  const gameCompletedRef = useRef(false);
   const startRunRef = useRef<() => void>(() => {});
 
   const snapshot = useCallback((): P03GuardSnapshot => {
@@ -75,6 +81,7 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
       percyExited: percyExitedRef.current,
       roversShown: cardsRef.current,
       excitedPlayed: excitedRef.current,
+      gameCompleted: gameCompletedRef.current,
       continueAccepted: continueAcceptedRef.current,
       fadeFinished: false,
     };
@@ -92,9 +99,11 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
     cardsRef.current = 0;
     excitedRef.current = false;
     continueAcceptedRef.current = false;
+    gameCompletedRef.current = false;
     phaseRef.current = 'landing';
     setPhase('landing');
     setCardsShown(0);
+    setGameOpen(false);
 
     const layout = currentLayout();
     const reduced = useStoryStore.getState().settings.reducedMotion;
@@ -113,7 +122,7 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
         }
         phaseRef.current = next;
         setPhase(next);
-        if (next === 'final-quote' && useStoryStore.getState().status === 'playing') {
+        if (next === 'timeline' && useStoryStore.getState().status === 'playing') {
           controllerRef.current.markWaiting();
         }
       },
@@ -126,8 +135,13 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
           useDialogueStore.getState().cue(line);
         }
       },
+      onGame: () => {
+        if (isCurrent()) {
+          setGameOpen(true);
+        }
+      },
       onGate: (gate) => {
-        if (!isCurrent()) {
+        if (!isCurrent() || gate.kind !== 'dialogue') {
           return;
         }
         useDialogueStore.getState().holdStory(gate.lineId, () => {
@@ -222,9 +236,25 @@ export function useP03Scene(nodes: P03Nodes): P03SceneApi {
     };
   }, [startRun]);
 
+  const completeGame = useCallback(() => {
+    const state = useStoryStore.getState();
+    if (
+      tokenRef.current === null ||
+      gameCompletedRef.current ||
+      phaseRef.current !== 'timeline' ||
+      state.isPaused ||
+      state.activeSceneId !== scene03Config.id
+    ) {
+      return;
+    }
+    gameCompletedRef.current = true;
+    setGameOpen(false);
+    driverRef.current?.releaseGame();
+  }, []);
+
   useEffect(() => {
     driverRef.current?.setReducedMotion(reducedMotion);
   }, [reducedMotion]);
 
-  return { phase, cardsShown };
+  return { phase, cardsShown, gameOpen, completeGame };
 }

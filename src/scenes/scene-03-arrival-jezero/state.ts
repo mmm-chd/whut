@@ -13,6 +13,7 @@ export type P03Phase =
   | 'rovers'
   | 'mission'
   | 'excited'
+  | 'timeline'
   | 'final-quote'
   | 'transition'
   | 'done';
@@ -30,6 +31,8 @@ export interface P03GuardSnapshot {
   percyExited: boolean;
   roversShown: number;
   excitedPlayed: boolean;
+  /** The reader slid back to the lake and chose to go on. */
+  gameCompleted: boolean;
   continueAccepted: boolean;
   fadeFinished: boolean;
 }
@@ -45,6 +48,7 @@ export function canAcceptP03Continue(s: P03GuardSnapshot): boolean {
     !s.paused &&
     s.status === 'waiting' &&
     s.phase === 'final-quote' &&
+    s.gameCompleted &&
     s.precedingDialogueResolved &&
     !s.continueAccepted
   );
@@ -65,6 +69,7 @@ export function canCompleteP03(s: P03GuardSnapshot): boolean {
     s.percyExited &&
     s.roversShown === 4 &&
     s.excitedPlayed &&
+    s.gameCompleted &&
     s.continueAccepted &&
     s.fadeFinished
   );

@@ -1,4 +1,4 @@
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, ChevronRight } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import './CircularGate.css';
 
@@ -29,6 +29,9 @@ export function CircularGate({ label, hint, placement = 'stage', onActivate }: C
         <span className="circular-gate__label">Continue</span>
         {placement === 'stage' ? (
           <ArrowDown className="circular-gate__icon" size={22} aria-hidden="true" />
+        ) : null}
+        {placement === 'dialogue' ? (
+          <ChevronRight className="circular-gate__icon" size={20} strokeWidth={3} aria-hidden="true" />
         ) : null}
       </button>
       {hint ? <span className="circular-gate__hint">{hint}</span> : null}

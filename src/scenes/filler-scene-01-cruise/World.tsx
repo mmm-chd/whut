@@ -12,7 +12,7 @@ const ORDER = { bg: 0, rocket: 2, exhaust: 1, veil: 10 } as const;
 const DRIFT_SECONDS = 26;
 const REM = 16;
 /** Rocket box: 5rem x 10rem; the body sits inset 0 1rem 2rem. */
-const ROCKET = { top: 0.18, left: -8 * REM, body: { x: 1 * REM, w: 3 * REM, h: 8 * REM } } as const;
+const ROCKET = { top: 0.18, left: -8 * REM, body: { x: 1 * REM, w: 4 * REM, h: 11 * REM } } as const;
 const VEIL_RGB = [7, 12, 24] as const;
 
 /**

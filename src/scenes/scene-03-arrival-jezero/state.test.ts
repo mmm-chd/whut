@@ -16,6 +16,7 @@ const ready: P03GuardSnapshot = {
   percyExited: true,
   roversShown: 4,
   excitedPlayed: true,
+  gameCompleted: true,
   continueAccepted: false,
   fadeFinished: false,
 };
