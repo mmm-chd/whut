@@ -213,6 +213,10 @@
 
 .home-modal__card {
   width: min(520px, calc(100vw - 48px));
+  /* Long About text must stay reachable (and the Close button clickable) on
+     short screens, so the card scrolls instead of overflowing the viewport. */
+  max-height: min(86vh, 720px);
+  overflow-y: auto;
   padding: 28px 30px 24px;
   background: var(--cream);
   color: var(--day-ink);

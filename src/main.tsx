@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
-import { DevRoot } from './dev/DevRoot'; // DEV-TOOL
 import { applyBootRoute } from './app/useStageUrl';
 import fontUrl from './assets/fonts/DK Cool Crayon.ttf?url';
 import './index.css';
@@ -27,6 +26,6 @@ applyBootRoute();
 
 createRoot(rootElement).render(
   <StrictMode>
-    {import.meta.env.DEV ? <DevRoot /> : <App />} {/* DEV-TOOL */}
+    <App />
   </StrictMode>,
 );

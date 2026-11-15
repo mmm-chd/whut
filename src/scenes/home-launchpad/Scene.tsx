@@ -121,10 +121,34 @@ function InfoModal({ kind, onClose }: InfoModalProps) {
             </p>
           </>
         ) : (
-          <p className="home-modal__text">
-            An interactive storybook about the journey to Mars. Press Play, ride the paper
-            rocket into space, then meet the explorers inside the book.
-          </p>
+          <>
+            <p className="home-modal__text">
+              “What Happens Up There” is an interactive digital storybook website that
+              tells the stories of NASA’s robotic space exploration objects on the Moon
+              and Mars. Designed for children ages 8–12, it turns NASA’s complex space
+              mission archives into an educational, interactive, and emotionally
+              engaging learning experience.
+            </p>
+            <p className="home-modal__text">
+              Each character is a real object — a rover, a lander, or another
+              exploration vehicle — with a personality and backstory based on its
+              actual function, achievements, and mission history. Through minigames
+              inspired by each object’s functions and mission facts, users learn about
+              its contributions to the history of space exploration.
+            </p>
+            <p className="home-modal__text">
+              With the theme “Abandoned but Not Forgotten”, the project reframes
+              neglect as a way to preserve the stories of objects that have completed
+              their missions, pioneered exploration, or lost communication — but still
+              have a place in the history of human exploration.
+            </p>
+            <p className="home-modal__text">
+              Drawing on the NASA Space Science Data Coordinated Archive (NSSDCA),
+              What Happens Up There combines scientific accuracy, accessible
+              education, and emotional storytelling to bring forgotten stories back
+              to life.
+            </p>
+          </>
         )}
         <button type="button" ref={closeRef} className="home-modal__close" onClick={onClose}>
           Close
