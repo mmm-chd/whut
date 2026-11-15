@@ -1,6 +1,8 @@
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
+import { PauseMenu } from './PauseMenu';
 import './PlaybackControls.css';
 
 export interface PlaybackControlsProps {
@@ -21,6 +23,29 @@ export function PlaybackControls({ allowPauseWhileWaiting = false }: PlaybackCon
   const setMuted = useStoryStore((state) => state.setMuted);
   const setVolume = useStoryStore((state) => state.setVolume);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // The menu belongs to a pause: if the story resumes some other way, it closes.
+  useEffect(() => {
+    if (!isPaused) {
+      setMenuOpen(false);
+    }
+  }, [isPaused]);
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    resume();
+  };
+
+  const onPauseButton = () => {
+    if (isPaused) {
+      closeMenu();
+      return;
+    }
+    pause();
+    setMenuOpen(true);
+  };
+
   const canPause = status === 'playing' || (allowPauseWhileWaiting && status === 'waiting');
   const canReplay = status === 'playing' || status === 'waiting';
 
@@ -29,9 +54,10 @@ export function PlaybackControls({ allowPauseWhileWaiting = false }: PlaybackCon
       <button
         type="button"
         className="playback-controls__button"
-        onClick={isPaused ? resume : pause}
+        onClick={onPauseButton}
         disabled={!canPause}
         aria-label={isPaused ? 'Resume story' : 'Pause story'}
+        aria-haspopup="dialog"
       >
         {isPaused ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
       </button>
@@ -66,6 +92,7 @@ export function PlaybackControls({ allowPauseWhileWaiting = false }: PlaybackCon
         onChange={(event) => setVolume(Number(event.target.value))}
         aria-label="Volume"
       />
+      {menuOpen ? <PauseMenu onResume={closeMenu} /> : null}
     </div>
   );
 }

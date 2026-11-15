@@ -10,6 +10,6 @@ export const STORY_SCORE_ID = 'music-perseverance';
  * card, so the track loops through the whole run instead of restarting at every
  * scene swap.
  */
-export function useStoryScore(): void {
-  useScoreTrack(STORY_SCORE_ID);
+export function useStoryScore(enabled = true): void {
+  useScoreTrack(STORY_SCORE_ID, enabled);
 }

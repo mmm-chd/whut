@@ -22,6 +22,8 @@ export interface InspectionCardProps {
    * is not.
    */
   readonly media?: { readonly label: string; readonly note: string } | null;
+  /** Real media for the slot (a picture or a video); wins over the placeholder. */
+  readonly mediaContent?: ReactNode;
   readonly discovered?: boolean;
 }
 
@@ -37,6 +39,7 @@ export function InspectionCard({
   onClose,
   returnFocusTo,
   media,
+  mediaContent,
   discovered = false,
 }: InspectionCardProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -72,7 +75,11 @@ export function InspectionCard({
       <h2 className="p04-card-title" id={titleId} tabIndex={-1} ref={headingRef}>
         {title}
       </h2>
-      {media ? (
+      {mediaContent ? (
+        <div className="p04-card-media-real" data-media-slot={point}>
+          {mediaContent}
+        </div>
+      ) : media ? (
         <div className="p04-card-media" data-media-slot={point}>
           <p className="p04-card-media-label">{media.label}</p>
           <p className="p04-card-media-note">{media.note}</p>

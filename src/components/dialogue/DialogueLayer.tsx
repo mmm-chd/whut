@@ -24,14 +24,17 @@ export function DialogueLayer({ presentationPaused = false }: DialogueLayerProps
   const audio = useAudioManager(presentationPaused);
 
   // Play the voice-over for the active line (silent fallback when no audio file).
+  // It follows the line, not the `active` object: `holdStory` swaps in a copy of
+  // the same line with `holdsStory` set, and that must not restart the recording.
+  const audioId = active?.line.audioId ?? null;
+  const lineKey = active ? `${active.line.id}-${active.key}` : null;
   useEffect(() => {
-    const audioId = active?.line.audioId;
-    if (!audioId) {
+    if (!audioId || lineKey === null) {
       return;
     }
     audio.play(audioId);
     return () => audio.stop(audioId);
-  }, [active, audio]);
+  }, [audio, audioId, lineKey]);
 
   // A fresh scene run (start or replay) begins with an empty dialogue state;
   // the replayed timeline re-cues every line itself.

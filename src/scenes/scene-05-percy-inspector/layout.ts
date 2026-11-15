@@ -11,22 +11,26 @@ import type { Rect } from '../scene-04-percy-inspection/layout';
  * Sizes are host CSS pixels and the layout is derived, never stored.
  */
 export const P05_LAYOUT = {
-  /** At and above this width the card gets its own column beside the picture. */
-  sideBySideMinWidth: 1160,
+  /**
+   * At and above this width the card would get its own column beside the picture.
+   * The picture now fills the screen on every wide host and the card floats over
+   * it, so no host is wide enough for a column.
+   */
+  sideBySideMinWidth: Number.POSITIVE_INFINITY,
   /** Between these two widths the card floats over the picture (tablet). */
   overlayMinWidth: 720,
-  padWide: 24,
+  padWide: 14,
   padNarrow: 14,
   /** Room above the picture for the heading and the progress line. */
   topInsetWide: 84,
   topInsetNarrow: 116,
   /** Room below the picture for the exit control and the playback bar. */
-  bottomInsetWide: 76,
+  bottomInsetWide: 30,
   bottomInsetNarrow: 92,
   /** A short host cannot afford the tall insets: the strip would be the picture. */
   shortHostHeight: 480,
   topInsetShort: 84,
-  bottomInsetShort: 56,
+  bottomInsetShort: 30,
   gap: 20,
   cardMin: 280,
   cardMax: 380,

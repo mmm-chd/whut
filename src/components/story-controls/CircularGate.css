@@ -49,9 +49,56 @@
   background: #ffe9b0;
 }
 
-.circular-gate--dialogue .circular-gate__pulse {
-  inset: -6px;
+.circular-gate--dialogue .circular-gate__button {
+  overflow: visible;
+}
+
+/* Sonar ripples: three thin rings spread out from the pill and fade, one after
+   another, like the pulse on a "tap here" marker. */
+.circular-gate--dialogue .circular-gate__pulse,
+.circular-gate--dialogue .circular-gate__button::before,
+.circular-gate--dialogue .circular-gate__button::after {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 243, 214, 0.9);
   border-radius: 999px;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  animation: gate-ripple 2.4s ease-out infinite;
+}
+
+.circular-gate--dialogue .circular-gate__button::before {
+  animation-delay: 0.8s;
+}
+
+.circular-gate--dialogue .circular-gate__button::after {
+  animation-delay: 1.6s;
+}
+
+.circular-gate--dialogue .circular-gate__button:hover::before,
+.circular-gate--dialogue .circular-gate__button:hover::after,
+.circular-gate--dialogue .circular-gate__button:hover .circular-gate__pulse {
+  animation-play-state: paused;
+}
+
+@keyframes gate-ripple {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35, 1.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circular-gate--dialogue .circular-gate__pulse,
+  .circular-gate--dialogue .circular-gate__button::before,
+  .circular-gate--dialogue .circular-gate__button::after {
+    animation: none;
+  }
 }
 
 .circular-gate--dialogue .circular-gate__label {

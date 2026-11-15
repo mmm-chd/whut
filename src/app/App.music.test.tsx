@@ -92,7 +92,13 @@ describe('score per page', () => {
       useExperienceStore.setState({ stage: 'story' });
     });
 
+    // The menu bed stops, and the story bed waits for Continue on the title card.
     expect(AudioManager.prototype.stop).toHaveBeenCalledWith(MENU_SCORE_ID);
+    expect(AudioManager.prototype.playMusic).not.toHaveBeenCalledWith(STORY_SCORE_ID);
+
+    await act(async () => {
+      useStoryStore.getState().startScene('p01-jezero');
+    });
     expect(AudioManager.prototype.playMusic).toHaveBeenLastCalledWith(STORY_SCORE_ID);
 
     await app.unmount();
@@ -100,6 +106,7 @@ describe('score per page', () => {
 
   it('returns to the menu bed when the reader leaves the story', async () => {
     useExperienceStore.setState({ stage: 'story' });
+    useStoryStore.setState({ activeSceneId: 'p01-jezero', status: 'playing' });
     const app = renderApp();
     await app.render();
     expect(AudioManager.prototype.playMusic).toHaveBeenLastCalledWith(STORY_SCORE_ID);

@@ -14,6 +14,8 @@ export function useAudioManager(presentationPausedOverride = false): AudioManage
   const manager = getAudioManager();
   const muted = useStoryStore((state) => state.settings.muted);
   const volume = useStoryStore((state) => state.settings.volume);
+  const voiceVolume = useStoryStore((state) => state.settings.voiceVolume);
+  const musicVolume = useStoryStore((state) => state.settings.musicVolume);
   const isPaused = useStoryStore((state) => state.isPaused);
 
   useEffect(() => {
@@ -23,6 +25,14 @@ export function useAudioManager(presentationPausedOverride = false): AudioManage
   useEffect(() => {
     manager.setVolume(volume);
   }, [manager, volume]);
+
+  useEffect(() => {
+    manager.setVoiceVolume(voiceVolume ?? 1);
+  }, [manager, voiceVolume]);
+
+  useEffect(() => {
+    manager.setMusicVolume(musicVolume ?? 1);
+  }, [manager, musicVolume]);
 
   // A hidden tab or a rotated phone holds the audio too, without touching the
   // store's own pause flag, so a store resume cannot restart sound the host is

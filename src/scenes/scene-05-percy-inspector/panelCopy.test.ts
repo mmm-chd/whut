@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { P04_POINT_IDS } from '../scene-04-percy-inspection/inspectionState';
-import { P05_PANEL_CATEGORY, P05_PANEL_MEDIA } from './panelCopy';
+import { P05_PANEL_CATEGORY } from './panelCopy';
+import { P05_MEDIA, mediaHasSound, youtubeEmbedUrl } from './panelMedia';
 import { INSPECTOR_BACKGROUND, INSPECTOR_BACKGROUND_LIGHT } from '../scene-04-percy-inspection/inspector/modelConfig';
 
 /**
- * The panel's category line and its reserved media slot, per part.
- *
- * Only the two media-led parts get a slot: MOXIE and the Earth team are
- * interactions, so their primary content is the activity itself.
+ * The panel's category line and its media, per part.
  */
 describe('p05 panel copy', () => {
   it('labels every part with a category', () => {
@@ -18,13 +16,18 @@ describe('p05 panel copy', () => {
     expect(P05_PANEL_CATEGORY['earth-team']).toBe('Mission operations');
   });
 
-  it('reserves a media slot only where the content is media', () => {
-    expect(P05_PANEL_MEDIA.cameras).not.toBeNull();
-    expect(P05_PANEL_MEDIA.microphone).not.toBeNull();
-    expect(P05_PANEL_MEDIA.moxie).toBeNull();
-    expect(P05_PANEL_MEDIA['earth-team']).toBeNull();
-    // An empty slot must say it is empty, never pretend to hold a recording.
-    expect(P05_PANEL_MEDIA.cameras?.note).toContain('not loaded yet');
+  it('gives media to the camera, microphone and MOXIE cards, and none to the Earth team', () => {
+    expect(P05_MEDIA.cameras?.kind).toBe('gif');
+    expect(P05_MEDIA.microphone).toEqual(expect.objectContaining({ kind: 'youtube', id: 'GHenFGnixzU' }));
+    expect(P05_MEDIA.moxie).toEqual(expect.objectContaining({ kind: 'youtube', id: 'WHodcMRoRZw' }));
+    expect(P05_MEDIA['earth-team']).toBeNull();
+  });
+
+  it('embeds video through the privacy-friendly domain, and only video has sound', () => {
+    expect(youtubeEmbedUrl('abc')).toMatch(/^https:\/\/www\.youtube-nocookie\.com\/embed\/abc\?/);
+    expect(mediaHasSound(P05_MEDIA.microphone)).toBe(true);
+    expect(mediaHasSound(P05_MEDIA.cameras)).toBe(false);
+    expect(mediaHasSound(P05_MEDIA['earth-team'])).toBe(false);
   });
 });
 

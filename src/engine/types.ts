@@ -15,5 +15,9 @@ export interface SceneConfig {
 export interface StorySettings {
   muted: boolean;
   volume: number;
+  /** Share of the master volume given to narration (0..1). */
+  voiceVolume?: number;
+  /** Share of the master volume given to the background music (0..1). */
+  musicVolume?: number;
   reducedMotion: boolean;
 }

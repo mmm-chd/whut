@@ -62,11 +62,20 @@ interface CoverState {
  * sampling game is revealed from black.
  */
 export function StorySequence() {
-  // One looping score for the whole run: it outlives every scene swap.
-  useStoryScore();
-
   const activeSceneId = useStoryStore((state) => state.activeSceneId);
   const status = useStoryStore((state) => state.status);
+
+  // One looping score for the whole run: it outlives every scene swap. It stays
+  // quiet on the title card and starts when the reader presses Continue there.
+  const [scoreOn, setScoreOn] = useState(false);
+  useEffect(() => {
+    if (status === 'playing' || status === 'waiting') {
+      setScoreOn(true);
+    } else if (activeSceneId === null && status === 'idle') {
+      setScoreOn(false);
+    }
+  }, [activeSceneId, status]);
+  useStoryScore(scoreOn);
   const isPaused = useStoryStore((state) => state.isPaused);
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
   const resetScene = useStoryStore((state) => state.resetScene);
@@ -129,6 +138,8 @@ export function StorySequence() {
     const instantCover =
       reducedMotion ||
       outgoing === 'scene-02-launch-to-mars' ||
+      // P-04 fades its own picture to black before it completes: a second shell fade would be a double fade.
+      outgoing === 'scene-04-percy-inspection' ||
       outgoing === 'scene-05-percy-inspector' ||
       outgoing === 'scene-08-the-runner';
     setCover({ opacity: 1, instant: instantCover });

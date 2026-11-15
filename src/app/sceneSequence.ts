@@ -33,6 +33,11 @@ const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
 
 const STORY_SCENE_IDS = Object.keys(NEXT_SCENE) as StorySceneId[];
 
+/** Every story scene in play order, for menus that list or jump between them. */
+export function listStorySceneIds(): readonly StorySceneId[] {
+  return STORY_SCENE_IDS;
+}
+
 export function getNextSceneId(id: StorySceneId): StorySceneId | null {
   return NEXT_SCENE[id];
 }

@@ -20,12 +20,16 @@ interface StoryState {
   resetStory: () => void;
   setMuted: (muted: boolean) => void;
   setVolume: (volume: number) => void;
+  setVoiceVolume: (volume: number) => void;
+  setMusicVolume: (volume: number) => void;
   setReducedMotion: (reducedMotion: boolean) => void;
 }
 
 const initialSettings: StorySettings = {
   muted: false,
   volume: 0.8,
+  voiceVolume: 1,
+  musicVolume: 1,
   reducedMotion: false,
 };
 
@@ -78,6 +82,14 @@ export const useStoryStore = create<StoryState>((set) => ({
         ...state.settings,
         volume: Math.min(1, Math.max(0, volume)),
       },
+    })),
+  setVoiceVolume: (voiceVolume) =>
+    set((state) => ({
+      settings: { ...state.settings, voiceVolume: Math.min(1, Math.max(0, voiceVolume)) },
+    })),
+  setMusicVolume: (musicVolume) =>
+    set((state) => ({
+      settings: { ...state.settings, musicVolume: Math.min(1, Math.max(0, musicVolume)) },
     })),
   setReducedMotion: (reducedMotion) =>
     set((state) => ({ settings: { ...state.settings, reducedMotion } })),

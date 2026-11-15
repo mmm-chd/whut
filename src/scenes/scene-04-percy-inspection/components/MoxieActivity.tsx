@@ -5,7 +5,7 @@
  * Reopening a finished card lets the reader walk the steps again without
  * resetting the credit, so this component never owns progress itself.
  */
-const STEPS = [
+const DEFAULT_STEPS = [
   'Martian air is pulled in.',
   'The air is warmed and pressed.',
   'Oxygen is separated from the carbon dioxide.',
@@ -17,9 +17,12 @@ export interface MoxieActivityProps {
   readonly finished: boolean;
   readonly onNext: () => void;
   readonly onFinish: () => void;
+  /** The steps to walk through; P-05 brings its own wording. */
+  readonly steps?: readonly string[];
 }
 
-export function MoxieActivity({ step, finished, onNext, onFinish }: MoxieActivityProps) {
+export function MoxieActivity({ step, finished, onNext, onFinish, steps }: MoxieActivityProps) {
+  const STEPS = steps ?? DEFAULT_STEPS;
   const atLastStep = step === STEPS.length - 1;
 
   return (

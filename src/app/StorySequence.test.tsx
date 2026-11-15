@@ -167,7 +167,7 @@ describe('StorySequence', () => {
     await app.unmount();
   });
 
-  it('takes the reader from the cruise to P-03 through the scaffold Continue', async () => {
+  it('takes the reader from the cruise to P-03 by clicking its facts until the bar is full', async () => {
     vi.useFakeTimers();
     const settings = { muted: true, volume: 0.35, reducedMotion: false };
     useStoryStore.setState({
@@ -188,10 +188,17 @@ describe('StorySequence', () => {
     await app.render();
     expect(app.container.querySelector('[data-scene="filler-scene-01-cruise"]')).not.toBeNull();
 
-    const button = app.container.querySelector<HTMLButtonElement>('.cruise-scene__continue');
-    expect(button).not.toBeNull();
+    // Three clicks on the fact card fill the bar; the story moves on by itself after it is full.
+    expect(app.container.querySelector('[role="progressbar"]')).not.toBeNull();
+    for (let click = 0; click < 3; click += 1) {
+      expect(useStoryStore.getState().status).toBe('playing');
+      await act(async () => {
+        app.container.querySelector<HTMLButtonElement>('[data-cruise-fact]')?.click();
+      });
+    }
+    expect(app.container.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('3');
     await act(async () => {
-      button?.click();
+      await vi.advanceTimersByTimeAsync(1500);
     });
     // The cover fades to black first; the cruise is still mounted under it.
     expect(app.container.querySelector('[data-scene="filler-scene-01-cruise"]')).not.toBeNull();

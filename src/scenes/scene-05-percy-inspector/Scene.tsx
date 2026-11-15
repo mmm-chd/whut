@@ -2,18 +2,14 @@ import { useCallback, useEffect, useReducer, useRef, useState, type CSSPropertie
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { DialogueLayer } from '../../components/dialogue/DialogueLayer';
 import { useDialogueStore } from '../../components/dialogue/dialogue.store';
+import { getAudioManager } from '../../audio/audioManagerInstance';
 import { useStoryStore } from '../../stores/story.store';
 import {
-  allPointsComplete,
-  completedPointIds,
   createInspectionState,
   reduceInspection,
   type InspectionPointId,
 } from '../scene-04-percy-inspection/inspectionState';
-import { pointFact } from '../scene-04-percy-inspection/components/pointCopy';
 import { InspectionCard } from '../scene-04-percy-inspection/components/InspectionCard';
-import { MoxieActivity } from '../scene-04-percy-inspection/components/MoxieActivity';
-import { EarthTeamActivity } from '../scene-04-percy-inspection/components/EarthTeamActivity';
 import { InspectorCanvas } from '../scene-04-percy-inspection/inspector/InspectorCanvas';
 import {
   INSPECTOR_BACKGROUND_LIGHT,
@@ -32,8 +28,11 @@ import {
 import { useInspectorRenderer } from '../scene-04-percy-inspection/inspector/useInspectorRenderer';
 import { cursorCss } from '../../components/cursor/cursors';
 import { PartChips } from './components/PartChips';
+import { P05_INFO } from './infoText';
 import { p05RotationHintLine } from './dialogue';
-import { P05_PANEL_CATEGORY, P05_PANEL_MEDIA } from './panelCopy';
+import { PanelMedia } from './components/PanelMedia';
+import { P05_PANEL_CATEGORY } from './panelCopy';
+import { P05_MEDIA, mediaHasSound } from './panelMedia';
 import { layoutP05 } from './layout';
 import {
   canExitInspection,
@@ -44,7 +43,9 @@ import {
 } from './state';
 import './Scene.css';
 
-const EARTH_REPLY_MS = 900;
+/** How long a part's card must stay open before the part counts as discovered. */
+const DISCOVER_AFTER_MS = 3000;
+
 
 /**
  * P-05, the close-up.
@@ -76,7 +77,6 @@ export function Scene05PercyInspector() {
   const [occluded, setOccluded] = useState<readonly InspectionPointId[]>([]);
   // Only feeds the grabbing cursor: the rotation itself lives in the hook.
   const [turning, setTurning] = useState(false);
-  const replyTimer = useRef<number | null>(null);
 
   const rotation = useInspectorRotation();
   const inspector = useInspectorRenderer({
@@ -84,8 +84,30 @@ export function Scene05PercyInspector() {
     onSettled: (renderer) => dispatchScene({ type: 'MODEL_SETTLED', renderer }),
   });
 
-  const completed = allPointsComplete(inspection);
-  const completedIds = completedPointIds(inspection);
+  // A part counts as discovered once its card has stayed open for 3 seconds.
+  const paused = useStoryStore((state) => state.isPaused);
+  const [dwelled, setDwelled] = useState<readonly InspectionPointId[]>([]);
+  const dwellPoint = inspection.activePoint;
+  useEffect(() => {
+    if (!dwellPoint || paused || dwelled.includes(dwellPoint)) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setDwelled((list) => (list.includes(dwellPoint) ? list : [...list, dwellPoint]));
+    }, DISCOVER_AFTER_MS);
+    return () => window.clearTimeout(timer);
+  }, [dwelled, dwellPoint, paused]);
+  // A video with its own sound takes over the room: the story score waits while it is open.
+  const soundOn = mediaHasSound(dwellPoint ? P05_MEDIA[dwellPoint] : null);
+  useEffect(() => {
+    if (!soundOn) {
+      return;
+    }
+    return getAudioManager().holdMusic(Symbol('p05-video'));
+  }, [soundOn]);
+  const discoveredIds = dwelled;
+  // Leaving unlocks when every part has been discovered.
+  const completed = discoveredIds.length === 4;
 
   // Host size, measured on the scene's own element; jsdom has no observer, so
   // the window is the fallback instead of leaving the scene unmeasured.
@@ -110,15 +132,6 @@ export function Scene05PercyInspector() {
       observer.observe(hostRef.current);
     }
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (replyTimer.current !== null) {
-        window.clearTimeout(replyTimer.current);
-        replyTimer.current = null;
-      }
-    };
   }, []);
 
   // The script's last quote is spoken here, once, as soon as the picture is
@@ -185,46 +198,13 @@ export function Scene05PercyInspector() {
     setOrigin(null);
   };
 
-  const sendInstruction = () => {
-    dispatchInspection({ type: 'CONFIRM_LOOK_LEFT' });
-    if (replyTimer.current !== null) {
-      window.clearTimeout(replyTimer.current);
-    }
-    replyTimer.current = window.setTimeout(() => {
-      replyTimer.current = null;
-      dispatchInspection({ type: 'COMMAND_FINISHED' });
-    }, EARTH_REPLY_MS);
-  };
-
-  const cardBody = (point: InspectionPointId) => {
-    if (point === 'moxie') {
-      return (
-        <MoxieActivity
-          step={inspection.moxieStep}
-          finished={inspection.moxieFinished}
-          onNext={() => dispatchInspection({ type: 'MOXIE_NEXT' })}
-          onFinish={() => dispatchInspection({ type: 'MOXIE_FINISH' })}
-        />
-      );
-    }
-    if (point === 'earth-team') {
-      return (
-        <EarthTeamActivity
-          messageOpened={inspection.messageOpened}
-          commandState={inspection.commandState}
-          onOpenMessage={() => dispatchInspection({ type: 'OPEN_MESSAGE' })}
-          onConfirm={sendInstruction}
-        />
-      );
-    }
-    const fact = pointFact(point);
-    return (
-      <>
-        <p className="p04-card-summary">{fact.summary}</p>
-        <p className="p04-card-source">Source: {fact.source}</p>
-      </>
-    );
-  };
+  // Every part is plain text now: no activities, just the revised info.
+  const cardBody = (point: InspectionPointId) =>
+    P05_INFO[point].map((text) => (
+      <p key={text} className="p04-card-summary">
+        {text}
+      </p>
+    ));
 
   const dragRef = useRef<ReturnType<typeof beginDrag> | null>(null);
   const interactive = inspectorInteractive(scene);
@@ -378,7 +358,7 @@ export function Scene05PercyInspector() {
             occluded={occluded}
             activePoint={inspection.activePoint}
             hoveredPoint={hovered}
-            completed={completedIds}
+            completed={discoveredIds}
             rightLimit={chipRightLimit}
             hidden={chipsStandAside}
             onHover={setHovered}
@@ -396,7 +376,7 @@ export function Scene05PercyInspector() {
             occluded={[]}
             activePoint={inspection.activePoint}
             hoveredPoint={hovered}
-            completed={completedIds}
+            completed={discoveredIds}
             rightLimit={chipRightLimit}
             hidden={chipsStandAside}
             onHover={setHovered}
@@ -425,7 +405,7 @@ export function Scene05PercyInspector() {
             Perseverance Inspection
           </h1>
           <p className="p05-progress" aria-live="polite">
-            {`${completedIds.length} of 4 parts read`}
+            {`${discoveredIds.length} of 4 parts discovered`}
           </p>
         </div>
         <button
@@ -440,7 +420,7 @@ export function Scene05PercyInspector() {
         </button>
         {!completed ? (
           <p className="p05-exit-hint" id="p05-exit-hint">
-            Read all four parts to leave.
+            Open all four parts to leave.
           </p>
         ) : null}
       </header>
@@ -502,8 +482,10 @@ export function Scene05PercyInspector() {
                 point={inspection.activePoint}
                 title={cardTitle(inspection.activePoint)}
                 category={P05_PANEL_CATEGORY[inspection.activePoint]}
-                media={P05_PANEL_MEDIA[inspection.activePoint]}
-                discovered={completedIds.includes(inspection.activePoint)}
+                mediaContent={
+                  P05_MEDIA[inspection.activePoint] ? <PanelMedia media={P05_MEDIA[inspection.activePoint]!} /> : null
+                }
+                discovered={discoveredIds.includes(inspection.activePoint)}
                 onClose={closePoint}
                 returnFocusTo={origin}
               >

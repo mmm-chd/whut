@@ -13,6 +13,10 @@ export const MUSIC_GAIN = 0.1;
 /** Voice-over is boosted (capped at full scale) so it stays clear over the music. */
 export const VOICE_GAIN = 1.25;
 
+/** The bed rises and falls over these times, so a hand-off is never a click. */
+export const MUSIC_FADE_IN_MS = 1800;
+export const MUSIC_FADE_OUT_MS = 900;
+
 /**
  * Owns Howler instances outside React and Zustand.
  * Missing or placeholder audio is a supported state: text keeps working.
@@ -25,6 +29,10 @@ export class AudioManager {
   private pausedIds = new Set<string>();
   private muted = false;
   private volume = 0.8;
+  private voiceShare = 1;
+  private musicShare = 1;
+  /** Bumped whenever a bed starts or stops, so a stale fade-out cannot cut a new start. */
+  private fadeGeneration = new Map<string, number>();
   private warned = new Set<string>();
   private musicIds = new Set<string>();
   /**
@@ -36,8 +44,26 @@ export class AudioManager {
 
   private levelFor(id: string): number {
     return this.musicIds.has(id)
-      ? this.volume * MUSIC_GAIN
-      : Math.min(1, this.volume * VOICE_GAIN);
+      ? this.volume * MUSIC_GAIN * this.musicShare
+      : Math.min(1, this.volume * VOICE_GAIN * this.voiceShare);
+  }
+
+  private bump(id: string): number {
+    const next = (this.fadeGeneration.get(id) ?? 0) + 1;
+    this.fadeGeneration.set(id, next);
+    return next;
+  }
+
+  /** Narration level as a share of the master volume. */
+  setVoiceVolume(share: number): void {
+    this.voiceShare = Math.min(1, Math.max(0, share));
+    this.sounds.forEach((sound, id) => sound.volume(this.levelFor(id)));
+  }
+
+  /** Background music level as a share of the master volume. */
+  setMusicVolume(share: number): void {
+    this.musicShare = Math.min(1, Math.max(0, share));
+    this.sounds.forEach((sound, id) => sound.volume(this.levelFor(id)));
   }
 
   setMuted(muted: boolean): void {
@@ -157,6 +183,14 @@ export class AudioManager {
     } else {
       sound.play();
     }
+    if (options.loop) {
+      this.bump(id);
+      if (typeof sound.fade === 'function' && this.musicHolders.size === 0) {
+        // Rise from silence instead of starting at full level.
+        sound.volume(0);
+        sound.fade(0, this.levelFor(id), MUSIC_FADE_IN_MS);
+      }
+    }
     if (options.loop && this.musicHolders.size > 0) {
       // A score asked for during a hold is remembered but stays silent.
       sound.pause();
@@ -174,6 +208,19 @@ export class AudioManager {
 
   stop(id: string): void {
     const sound = this.sounds.get(id);
+    if (sound && this.musicIds.has(id) && this.musicId === id && sound.playing() && typeof sound.fade === 'function') {
+      // The bed fades out, then stops, unless somebody started it again meanwhile.
+      const generation = this.bump(id);
+      sound.fade(sound.volume() as number, 0, MUSIC_FADE_OUT_MS);
+      window.setTimeout(() => {
+        if (this.fadeGeneration.get(id) === generation) {
+          this.sounds.get(id)?.stop();
+        }
+      }, MUSIC_FADE_OUT_MS + 50);
+      this.musicId = null;
+      this.pausedIds.delete(id);
+      return;
+    }
     if (sound) {
       sound.stop();
     }

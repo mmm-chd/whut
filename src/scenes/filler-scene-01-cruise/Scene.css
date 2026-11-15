@@ -1,3 +1,8 @@
+/*
+ * Cruise filler: deep space, a ship lying on its side and creeping right, a
+ * "Did you know?" card on top and a bar that fills by itself underneath. The
+ * scrapbook paper, crayon headings and pill buttons match the rest of the story.
+ */
 .cruise-scene {
   position: fixed;
   inset: 0;
@@ -7,110 +12,380 @@
   font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
 }
 
-.cruise-scene__content {
+.cruise-know-wrap {
+  position: absolute;
+  top: clamp(14px, 5vh, 44px);
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: min(36rem, 46vw);
+  transform: translateX(-50%);
+}
+
+.cruise-know {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: clamp(10px, 2vh, 18px) clamp(14px, 2vw, 24px);
+  border: 3px solid #7b4636;
+  border-radius: 14px;
+  background: var(--paper, #f1e4ca);
+  color: #3b2118;
+  box-shadow: 0 12px 24px rgb(5 8 18 / 50%);
+  font: inherit;
+  text-align: center;
+  cursor: var(--cursor-active, pointer);
+  user-select: none;
+  transition: transform 160ms ease;
+}
+
+.cruise-know:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.cruise-know:focus-visible {
+  outline: 3px solid #f2c14e;
+  outline-offset: 4px;
+}
+
+.cruise-know:disabled {
+  cursor: var(--cursor-default, default);
+}
+
+.cruise-know > * {
+  cursor: inherit;
+}
+
+.cruise-know__title {
+  display: block;
+  user-select: none;
+  margin: 0;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 400;
+}
+
+.cruise-know__text {
+  display: block;
+  margin: 0;
+  min-height: 4.2em;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: clamp(0.9rem, 1.45vw, 1.2rem);
+  line-height: 1.4;
+  animation: cruise-fact-in 0.5s ease both;
+}
+
+@keyframes cruise-fact-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* "Click to discover more": a small pill with a ripple, under the card. */
+.cruise-hint {
+  position: relative;
+  justify-self: center;
+  margin: 0.4rem 0 0;
+  padding: 4px 16px;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  background: #fff3d6;
+  color: #3b2118;
+  font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+  box-shadow: 0 8px 18px rgb(5 8 18 / 45%);
+  font-family: inherit;
+  cursor: var(--cursor-active, pointer);
+}
+
+.cruise-hint:hover {
+  background: #ffe9b0;
+}
+
+.cruise-hint:focus-visible {
+  outline: 3px solid #f2c14e;
+  outline-offset: 4px;
+}
+
+.cruise-hint::before,
+.cruise-hint::after {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgb(255 243 214 / 90%);
+  border-radius: 999px;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  animation: cruise-hint-ripple 2.4s ease-out infinite;
+}
+
+.cruise-hint::after {
+  animation-delay: 1.2s;
+}
+
+@keyframes cruise-hint-ripple {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3, 1.9);
+  }
+}
+
+/* ---------- the ship ---------- */
+
+.cruise-flight {
+  position: absolute;
+  top: 54%;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 0;
+  pointer-events: none;
+}
+
+/* The ship crosses the screen left to right, leaves, and comes back in from the
+   left, again and again. The negative delay starts it already in view at the left. */
+.cruise-ship {
+  --u: calc(min(34vw, 58vh) / 876);
+  position: absolute;
+  top: calc(var(--u) * -146);
+  left: 0;
+  width: calc(var(--u) * 876);
+  height: calc(var(--u) * 292);
+  animation: cruise-cross 34s linear -9s infinite;
+}
+
+@keyframes cruise-cross {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+
+.cruise-ship__body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: cruise-bob 4s ease-in-out infinite;
+}
+
+.cruise-ship__rocket {
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: 2;
-  width: min(46rem, 82vw);
-  text-align: center;
-  transform: translate(-50%, -50%);
+  max-width: none;
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
-.cruise-scene__title {
+.cruise-ship__window {
+  position: absolute;
+}
+
+.cruise-ship__inside,
+.cruise-ship__fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cruise-ship__inside img.cruise-ship__fill {
+  object-fit: cover;
+}
+
+.cruise-ship__rider {
+  position: absolute;
+  object-fit: contain;
+}
+
+/* Exhaust: one tongue per nozzle, behind the rocket. Each slot's right edge is a bell. */
+.cruise-flames {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cruise-flames__slot {
+  position: absolute;
+}
+
+.cruise-flame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.cruise-ship__body {
+  z-index: 1;
+}
+
+.cruise-flame__tongue,
+.cruise-flame__glow {
+  transform-box: view-box;
+  transform-origin: 100% 50%;
+}
+
+.cruise-flame__tongue--outer {
+  animation: cruise-lick 0.42s ease-in-out infinite alternate;
+}
+
+.cruise-flame__tongue--mid {
+  animation: cruise-lick 0.3s ease-in-out -0.1s infinite alternate;
+}
+
+.cruise-flame__tongue--core {
+  animation: cruise-lick 0.22s ease-in-out -0.05s infinite alternate;
+}
+
+.cruise-flame__glow {
+  animation: cruise-glow 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes cruise-lick {
+  from {
+    transform: scale(0.88, 0.94) skewY(-2deg);
+  }
+  to {
+    transform: scale(1.06, 1.04) skewY(2deg);
+  }
+}
+
+@keyframes cruise-glow {
+  from {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.cruise-flame__spark {
+  opacity: 0;
+  animation: cruise-spark 1.3s ease-out infinite;
+}
+
+.cruise-flame__spark--b {
+  animation-delay: 0.45s;
+}
+
+.cruise-flame__spark--c {
+  animation-delay: 0.9s;
+}
+
+@keyframes cruise-spark {
+  0% {
+    opacity: 0.95;
+    transform: translateX(70px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-26px) translateY(-6px);
+  }
+}
+
+@keyframes cruise-bob {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes cruise-flame {
+  from {
+    transform: translateY(-50%) scaleX(0.9);
+  }
+  to {
+    transform: translateY(-50%) scaleX(1.08);
+  }
+}
+
+/* ---------- the bar ---------- */
+
+.cruise-bottom {
+  position: absolute;
+  right: 0;
+  bottom: clamp(18px, 7vh, 64px);
+  left: 0;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.cruise-bar {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6px;
+  width: min(30rem, 66vw);
+  padding: 6px;
+  border: 3px solid #7b4636;
+  border-radius: 999px;
+  background: #e4d0ab;
+  box-shadow: 0 8px 18px rgb(5 8 18 / 45%);
+}
+
+.cruise-bar__segment {
+  height: clamp(16px, 3vh, 24px);
+  border-radius: 999px;
+  background: rgb(123 70 54 / 18%);
+  transition:
+    background-color 0.5s ease,
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cruise-bar__segment[data-on='true'] {
+  background: #f2c14e;
+  box-shadow: inset 0 -3px 0 rgb(123 70 54 / 30%);
+}
+
+.cruise-bottom__caption {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 4.4rem);
-  font-weight: 400;
-  line-height: 1.12;
-  text-wrap: balance;
-  text-shadow: 0 3px 0 rgb(74 36 24 / 55%), 0 0 22px rgb(11 16 32 / 70%);
-}
-
-.cruise-scene__body {
-  margin: 1.4rem auto 0;
-  max-width: 34rem;
-  color: #fff1d6;
-  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
-  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
-  line-height: 1.55;
+  font-size: clamp(0.95rem, 1.5vw, 1.25rem);
   text-shadow: 0 2px 8px rgb(11 16 32 / 80%);
 }
 
-/* Earth to Mars: a dashed path with a marker that creeps along it. */
-.cruise-scene__trip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 1.6rem;
-}
+@media (max-height: 480px) {
+  .cruise-know-wrap {
+    top: 10px;
+  }
 
-.cruise-scene__dot {
-  width: 22px;
-  height: 22px;
-  border: 3px solid #fff6e2;
-  border-radius: 50%;
-}
+  .cruise-flight {
+    top: 58%;
+  }
 
-.cruise-scene__dot--earth {
-  background: #4c7ba5;
-}
+  .cruise-know__text {
+    font-size: 0.82rem;
+    line-height: 1.3;
+  }
 
-.cruise-scene__dot--mars {
-  background: #b95e43;
-}
-
-.cruise-scene__line {
-  position: relative;
-  width: clamp(6rem, 22vw, 14rem);
-  height: 0;
-  border-top: 3px dashed rgb(255 246 226 / 70%);
-}
-
-.cruise-scene__line::after {
-  position: absolute;
-  top: -8px;
-  left: 0;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: #f2c14e;
-  content: '';
-  animation: cruise-creep 9s linear infinite;
-}
-
-@keyframes cruise-creep {
-  to {
-    left: calc(100% - 13px);
+  .cruise-bottom {
+    bottom: 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cruise-scene__line::after {
-    left: 40%;
+  .cruise-ship {
+    animation: none;
+    transform: translateX(8vw);
+  }
+
+  .cruise-ship__body,
+  .cruise-flame__tongue,
+  .cruise-flame__glow,
+  .cruise-flame__spark,
+  .cruise-hint::before,
+  .cruise-hint::after,
+  .cruise-know__text {
     animation: none;
   }
-}
-
-/* Scaffold control (see Scene.tsx): remove with the real cruise. */
-.cruise-scene__continue {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: 11rem;
-  min-height: 2.75rem;
-  margin-top: 1.6rem;
-  padding: 0.6rem 1.4rem 0.6rem 1.7rem;
-  color: #3b2118;
-  background: #fff3d6;
-  box-shadow: 0 8px 18px rgb(11 16 32 / 45%);
-  border: 3px solid #7b4636;
-  border-radius: 999px;
-  font: inherit;
-  cursor: pointer;
-}
-
-.cruise-scene__continue:focus-visible {
-  outline: 3px solid #f2c14e;
-  outline-offset: 4px;
 }

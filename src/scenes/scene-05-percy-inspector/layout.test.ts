@@ -10,12 +10,12 @@ const overlaps = (a: { left: number; top: number; width: number; height: number 
   );
 
 describe('layoutP05', () => {
-  it('puts the picture and the card side by side on a wide host', () => {
+  it('gives the picture the whole width on a wide host, with the card over it', () => {
     const layout = layoutP05(1280, 720);
     expect(layout.valid).toBe(true);
     expect(layout.stacked).toBe(false);
     expect(layout.picture.width).toBeGreaterThan(layout.card.width);
-    expect(overlaps(layout.picture, layout.card)).toBe(false);
+    expect(overlaps(layout.picture, layout.card)).toBe(true);
     expect(layout.card.width).toBeLessThanOrEqual(P05_LAYOUT.cardMax);
   });
 
@@ -94,10 +94,18 @@ describe('narrow host with no card open', () => {
     expect(uncovered).toBeGreaterThan(200);
   });
 
-  it('gives the card its own column on a desktop', () => {
+  it('fills the screen on a desktop and floats the card over the picture', () => {
     const layout = layoutP05(1280, 720);
-    expect(layout.mode).toBe('side');
+    expect(layout.mode).toBe('overlay');
     expect(layout.stacked).toBe(false);
-    expect(overlaps(layout.picture, layout.card)).toBe(false);
+    // The picture runs nearly edge to edge and well down the page, with a small margin.
+    expect(layout.picture.left).toBeGreaterThan(0);
+    expect(layout.picture.left).toBeLessThanOrEqual(20);
+    expect(layout.picture.width).toBeGreaterThan(1280 - 40);
+    expect(layout.picture.top + layout.picture.height).toBeGreaterThan(720 - 40);
+    expect(layout.picture.top + layout.picture.height).toBeLessThanOrEqual(720);
+    // The card is over the picture, with the rover left uncovered beside it.
+    expect(overlaps(layout.picture, layout.card)).toBe(true);
+    expect(layout.card.left - layout.picture.left).toBeGreaterThan(400);
   });
 });
