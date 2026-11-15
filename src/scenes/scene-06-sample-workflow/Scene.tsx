@@ -57,7 +57,7 @@ import { p05SampleWorldTextureIds } from './assets';
 import { layoutSample } from './layout';
 import { createSampleNodes } from './nodes';
 import { SAMPLE_SCENE_ID } from './scene.config';
-import { useHostSize } from './useHostSize';
+import { useHostSize } from '../shared/useHostSize';
 import { usePercyPose } from './usePercyPose';
 import { usePhaseTimer } from './usePhaseTimer';
 import { SampleWorld } from './World';

@@ -243,6 +243,38 @@ describe('StorySequence', () => {
     await app.unmount();
   });
 
+  it('mounts the Runner when it is the active scene', async () => {
+    useStoryStore.setState({
+      activeSceneId: 'scene-08-the-runner',
+      status: 'playing',
+      isPaused: false,
+      completedInteractions: [],
+    });
+
+    const app = renderApp();
+    await app.render();
+
+    expect(app.container.querySelector('[data-scene="scene-08-the-runner"]')).not.toBeNull();
+    expect(app.container.querySelector('.end-screen')).toBeNull();
+
+    await app.unmount();
+  });
+
+  it('ends on the Runner copy when the Runner completes and nothing follows it yet', async () => {
+    useStoryStore.setState({
+      activeSceneId: 'scene-08-the-runner',
+      status: 'completed',
+    });
+
+    const app = renderApp();
+    await app.render();
+
+    expect(app.container.querySelector('.end-screen')).not.toBeNull();
+    expect(app.container.textContent).toContain('Percy reached the destination you chose');
+
+    await app.unmount();
+  });
+
   it('shows EndScreen only for terminal story completion', async () => {
     useStoryStore.setState({
       activeSceneId: 'scene-06-sample-workflow',

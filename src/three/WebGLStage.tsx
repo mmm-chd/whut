@@ -13,7 +13,7 @@ ColorManagement.enabled = false;
 let webglSupport: boolean | null = null;
 
 /** True when this browser can create the WebGL2 context the stage needs. */
-function hasWebGL2(): boolean {
+export function hasWebGL2(): boolean {
   if (webglSupport !== null) {
     return webglSupport;
   }

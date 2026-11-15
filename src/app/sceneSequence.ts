@@ -13,7 +13,8 @@ export type StorySceneId =
   | 'scene-03-arrival-jezero'
   | 'scene-04-percy-inspection'
   | 'scene-05-percy-inspector'
-  | 'scene-06-sample-workflow';
+  | 'scene-06-sample-workflow'
+  | 'scene-08-the-runner';
 
 const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'p01-jezero': 'scene-02-launch-to-mars',
@@ -23,6 +24,9 @@ const NEXT_SCENE: Record<StorySceneId, StorySceneId | null> = {
   'scene-04-percy-inspection': 'scene-05-percy-inspector',
   'scene-05-percy-inspector': 'scene-06-sample-workflow',
   'scene-06-sample-workflow': null,
+  // The Runner (story P-07) has no inbound edge yet: P-06 sits between the sampling
+  // game and it and is built separately. Whoever lands P-06 adds `scene-07 -> scene-08`.
+  'scene-08-the-runner': null,
 };
 
 const STORY_SCENE_IDS = Object.keys(NEXT_SCENE) as StorySceneId[];

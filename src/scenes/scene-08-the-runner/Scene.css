@@ -1,0 +1,513 @@
+/*
+ * The Runner (story P-07). The same hand-made book as the scenes before it:
+ * cream scrapbook paper with a rust-brown border and washi tape, crayon
+ * headings, a handwritten body face, round pill buttons. The Mars picture is
+ * the board, taped to a dark rust page; narration speaks in crayon on that page
+ * to its left. Scoped to `p07-`.
+ */
+.p07-scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: var(--cream);
+  background: radial-gradient(120% 95% at 72% 42%, #4d2b20 0%, #34201a 55%, #251610 100%);
+  font-family: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p07-heading {
+  position: absolute;
+  left: 260px;
+  right: 24px;
+  top: 16px;
+  margin: 0;
+  font-size: clamp(1.15rem, 2.4vw, 1.75rem);
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 0 rgb(59 33 24 / 55%);
+}
+
+.p07-heading:focus {
+  outline: none;
+}
+
+/* Browser surfaces take the book's colours too. */
+.p07-scene ::selection {
+  background: #b95e43;
+  color: #fff1d6;
+}
+
+.p07-cards {
+  scrollbar-color: #7b4636 transparent;
+  scrollbar-width: thin;
+}
+
+.p07-cards::-webkit-scrollbar {
+  width: 8px;
+}
+
+.p07-cards::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: #7b4636;
+}
+
+/* ---------- story column (left) ---------- */
+
+.p07-copy {
+  position: absolute;
+  z-index: 8;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.p07-dialogue {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 9.5rem;
+  pointer-events: none;
+}
+
+/* Narration and Percy both speak from the top of this column. */
+.p07-dialogue .scrapbook-text--narrator-top-right,
+.p07-dialogue .scrapbook-text--percy-top-left {
+  top: 0;
+  right: auto;
+  left: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.p07-dialogue .scrapbook-text--bottom {
+  top: 0;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.p07-dialogue .circular-gate--dialogue {
+  pointer-events: auto;
+}
+
+.p07-cards {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+
+.p07-compare {
+  position: relative;
+}
+
+.p07-compare::before {
+  position: absolute;
+  top: -12px;
+  left: 38px;
+  width: 66px;
+  height: 22px;
+  background: rgb(240 201 160 / 78%);
+  box-shadow: 0 1px 2px rgb(20 10 8 / 25%);
+  content: '';
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+
+.p07-compare,
+.p07-fact {
+  flex: 0 0 auto;
+  padding: 12px 14px;
+  border: 3px solid #7b4636;
+  border-radius: 12px;
+  background: var(--paper);
+  color: #3b2118;
+  box-shadow: 0 10px 22px rgb(20 10 8 / 35%);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.p07-card-title {
+  margin: 0 0 6px;
+  font-family: 'DK Cool Crayon', 'Segoe Print', cursive;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.p07-fact p,
+.p07-compare p {
+  margin: 0;
+}
+
+.p07-fact[data-read='true'] {
+  opacity: 0.88;
+}
+
+.p07-draft {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.p07-compare-row {
+  margin-bottom: 8px;
+}
+
+.p07-compare-name {
+  font-family: 'DK Cool Crayon', 'Segoe Print', cursive;
+  font-size: 0.95rem;
+}
+
+.p07-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 3px 0;
+}
+
+.p07-tile {
+  width: 22px;
+  height: 13px;
+  flex: 0 0 auto;
+}
+
+.p07-compare-note,
+.p07-compare-key {
+  font-size: 0.88rem;
+}
+
+/* ---------- the board ---------- */
+
+.p07-frame {
+  position: absolute;
+  z-index: 6;
+  /* Content-box: the board is the content, the paper rim and border sit outside it. */
+  box-sizing: content-box;
+  padding: 12px;
+  border: 3px solid #7b4636;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 16px 30px rgb(15 8 6 / 45%);
+}
+
+.p07-frame::before,
+.p07-frame::after {
+  position: absolute;
+  z-index: 2;
+  top: -13px;
+  width: 74px;
+  height: 24px;
+  background: rgb(240 201 160 / 78%);
+  box-shadow: 0 1px 2px rgb(20 10 8 / 25%);
+  content: '';
+  pointer-events: none;
+}
+
+.p07-frame::before {
+  left: 20px;
+  transform: rotate(-5deg);
+}
+
+.p07-frame::after {
+  right: 20px;
+  transform: rotate(4deg);
+}
+
+.p07-board {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #a14030;
+  outline: 2px solid #7b4636;
+}
+
+.p07-stage,
+.p07-fallback,
+.p07-overlay,
+.p07-surface {
+  position: absolute;
+  inset: 0;
+}
+
+.p07-fallback,
+.p07-overlay {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.p07-surface {
+  cursor: var(--cursor-default, default);
+  touch-action: manipulation;
+}
+
+.p07-surface[data-interactive='true'] {
+  cursor: var(--cursor-active, pointer);
+}
+
+.p07-surface:focus-visible {
+  outline: 3px solid #45b5ff;
+  outline-offset: -5px;
+}
+
+/* ---------- status panel (bottom-right of the board) ---------- */
+
+.p07-status {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 4;
+  display: grid;
+  /* Narrow enough to leave Percy's start cell, at the middle of the bottom edge, clear. */
+  max-width: min(17rem, 42%);
+  gap: 6px;
+  padding: 10px 12px;
+  border: 3px solid #7b4636;
+  border-radius: 12px;
+  background: var(--paper);
+  color: #3b2118;
+  box-shadow: 0 8px 18px rgb(20 10 8 / 38%);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p07-status-title,
+.p07-status-body {
+  margin: 0;
+}
+
+.p07-status-title {
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.p07-status-body {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.p07-signal {
+  width: 100%;
+  height: auto;
+}
+
+.p07-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: rgb(20 10 8 / 62%);
+  animation: p07-dim 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  pointer-events: none;
+}
+
+.p07-scene[data-paused='true'] .p07-dim {
+  animation-play-state: paused;
+}
+
+@keyframes p07-dim {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- controls under the board ---------- */
+
+.p07-controls-wrap {
+  position: absolute;
+  z-index: 8;
+}
+
+.p07-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.p07-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.p07-primary {
+  display: flex;
+  margin-left: auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* The reason a button waits sits beside it, never below, so the bar keeps its height. */
+.p07-primary .p07-hint {
+  order: -1;
+}
+
+.p07-controls > [data-send] {
+  margin-left: auto;
+}
+
+.p07-button {
+  min-height: 44px;
+  padding: 6px 18px;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  background: #fff6e2;
+  color: #3b2118;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.9rem;
+  cursor: var(--cursor-active, pointer);
+}
+
+.p07-button:hover:not(:disabled),
+.p07-button:focus-visible {
+  background: #ffd9a8;
+}
+
+.p07-button:focus-visible {
+  outline: 3px solid #45b5ff;
+  outline-offset: 2px;
+}
+
+.p07-button[aria-pressed='true'] {
+  background: #e9b97d;
+  box-shadow: inset 0 0 0 2px #7b4636;
+}
+
+.p07-button[data-primary] {
+  padding-inline: 24px;
+  border-width: 3px;
+  background: #ffd9a8;
+  box-shadow: 0 6px 14px rgb(15 8 6 / 38%);
+}
+
+.p07-button[data-primary]:hover:not(:disabled) {
+  background: #ffc98a;
+}
+
+.p07-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* The reader's own choice stays at full ink while the others fade. */
+.p07-button[aria-pressed='true']:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+/* Waiting for the facts looks different from a command already sent. */
+.p07-button[data-arrived]:disabled {
+  border-style: dashed;
+}
+
+.p07-hint {
+  margin: 0;
+  max-width: 16rem;
+  color: var(--cream);
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.78rem;
+  text-align: right;
+  text-shadow: 0 2px 0 rgb(59 33 24 / 60%);
+}
+
+.p07-setup {
+  position: absolute;
+  inset: 90px 24px auto;
+  z-index: 40;
+  padding: 16px;
+  border: 3px solid #7b4636;
+  border-radius: 12px;
+  background: var(--paper);
+  color: #3b2118;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+}
+
+.p07-exit-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: #120a07;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- compact landscape ---------- */
+
+@media (max-width: 900px), (max-height: 480px) {
+  .p07-heading {
+    left: 250px;
+    font-size: 1rem;
+  }
+
+  .p07-frame {
+    padding: 8px;
+  }
+
+  .p07-compare,
+  .p07-fact {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .p07-compare-note {
+    font-size: 0.74rem;
+  }
+
+  /* The status card moves to the left corner so it never hides a destination. */
+  .p07-status {
+    right: auto;
+    left: 8px;
+  }
+
+  .p07-dialogue {
+    min-height: 6.5rem;
+  }
+
+  .p07-tile {
+    width: 14px;
+    height: 9px;
+  }
+
+  .p07-compare-key {
+    display: none;
+  }
+
+  .p07-hint {
+    max-width: 9.5rem;
+    font-size: 0.7rem;
+  }
+
+  .p07-controls {
+    flex-wrap: nowrap;
+  }
+
+  .p07-button {
+    min-height: 44px;
+    padding: 2px 12px;
+    font-size: 0.8rem;
+  }
+
+  .p07-status {
+    padding: 6px 8px;
+  }
+
+  .p07-status-title {
+    font-size: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p07-dim {
+    animation: none;
+    opacity: 0;
+  }
+}
