@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { assetManifest } from '../../assets/manifest';
-import { DISTANCE_SNAPSHOT, P07_FACTS, fieldIcons } from './content';
+import { DISTANCE_SNAPSHOT, P07_FACTS } from './content';
 import {
   P07_INVITATION_LINE_ID,
   p07AutonavFactLine,
@@ -65,9 +65,17 @@ describe('opening dialogue', () => {
 });
 
 describe('facts and comparison', () => {
-  it('draws Oppy and Percy as the same number of tiles because the distances match', () => {
-    expect(fieldIcons(DISTANCE_SNAPSHOT.opportunityKm)).toBe(43);
-    expect(fieldIcons(DISTANCE_SNAPSHOT.perseveranceKm ?? 0)).toBe(43);
+  it('keeps Percy just ahead of Oppy, as the infographic shows', () => {
+    expect(DISTANCE_SNAPSHOT.opportunityKm).toBe(45.16);
+    expect(DISTANCE_SNAPSHOT.perseveranceKm).toBeGreaterThan(DISTANCE_SNAPSHOT.opportunityKm);
+  });
+
+  it('ships web copies of the infographic with descriptions', async () => {
+    const { assetManifest } = await import('../../assets/manifest');
+    for (const id of ['p07-infographic', 'p07-infographic-top']) {
+      expect(assetManifest[id]?.path).toBeTruthy();
+      expect(assetManifest[id]?.alt?.length ?? 0).toBeGreaterThan(30);
+    }
   });
 
   it('marks only the fact that was not read in full as draft', () => {

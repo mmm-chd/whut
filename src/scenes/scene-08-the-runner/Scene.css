@@ -36,6 +36,9 @@
 }
 
 .p07-cards {
+  /* Lets the cards below react to the room this column really has. */
+  container-type: size;
+  container-name: p07cards;
   scrollbar-color: #7b4636 transparent;
   scrollbar-width: thin;
 }
@@ -67,21 +70,16 @@
   pointer-events: none;
 }
 
-/* Narration and Percy both speak from the top of this column. */
+/*
+ * Narration and Percy both speak from the top of this column. The line sits in
+ * the flow (not over the cards), so the Continue gate under the invitation
+ * pushes the cards down instead of covering them.
+ */
 .p07-dialogue .scrapbook-text--narrator-top-right,
-.p07-dialogue .scrapbook-text--percy-top-left {
-  top: 0;
-  right: auto;
-  left: 0;
-  width: 100%;
-  text-align: left;
-}
-
+.p07-dialogue .scrapbook-text--percy-top-left,
 .p07-dialogue .scrapbook-text--bottom {
-  top: 0;
-  right: auto;
-  bottom: auto;
-  left: 0;
+  position: relative;
+  inset: auto;
   width: 100%;
   text-align: left;
 }
@@ -100,24 +98,6 @@
   padding-bottom: 4px;
 }
 
-.p07-compare {
-  position: relative;
-}
-
-.p07-compare::before {
-  position: absolute;
-  top: -12px;
-  left: 38px;
-  width: 66px;
-  height: 22px;
-  background: rgb(240 201 160 / 78%);
-  box-shadow: 0 1px 2px rgb(20 10 8 / 25%);
-  content: '';
-  transform: rotate(-3deg);
-  pointer-events: none;
-}
-
-.p07-compare,
 .p07-fact {
   flex: 0 0 auto;
   padding: 12px 14px;
@@ -138,8 +118,7 @@
   font-weight: 400;
 }
 
-.p07-fact p,
-.p07-compare p {
+.p07-fact p {
   margin: 0;
 }
 
@@ -153,31 +132,147 @@
   opacity: 0.7;
 }
 
-.p07-compare-row {
-  margin-bottom: 8px;
-}
-
-.p07-compare-name {
-  font-family: 'DK Cool Crayon', 'Segoe Print', cursive;
-  font-size: 0.95rem;
-}
-
-.p07-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  margin: 3px 0;
-}
-
-.p07-tile {
-  width: 22px;
-  height: 13px;
+.p07-info {
+  position: relative;
   flex: 0 0 auto;
+  margin: 0;
+  padding: 10px 10px 8px;
+  border: 3px solid #7b4636;
+  border-radius: 12px;
+  background: var(--paper);
+  color: #3b2118;
+  box-shadow: 0 10px 22px rgb(20 10 8 / 35%);
 }
 
-.p07-compare-note,
-.p07-compare-key {
+.p07-info::before {
+  position: absolute;
+  z-index: 2;
+  top: -12px;
+  left: 38px;
+  width: 66px;
+  height: 22px;
+  background: rgb(240 201 160 / 78%);
+  box-shadow: 0 1px 2px rgb(20 10 8 / 25%);
+  content: '';
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+
+.p07-info-open {
+  display: grid;
+  width: 100%;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: var(--cursor-active, pointer);
+}
+
+.p07-info-open:focus-visible {
+  outline: 3px solid #45b5ff;
+  outline-offset: 3px;
+}
+
+.p07-info-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 2px solid #7b4636;
+  border-radius: 4px;
+}
+
+.p07-info-cta {
+  justify-self: start;
+  padding: 4px 14px;
+  border: 2px solid #7b4636;
+  border-radius: 999px;
+  background: #ffd9a8;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
   font-size: 0.88rem;
+}
+
+.p07-info-open:hover .p07-info-cta {
+  background: #ffc98a;
+}
+
+.p07-info-caption {
+  margin: 6px 0 0;
+  font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+/* Short column: the poster card becomes one row (picture left, button right), so
+   the picture and the button are never cut off by the column's edge. */
+@container p07cards (max-height: 210px) {
+  .p07-info {
+    padding: 8px;
+  }
+
+  .p07-info-open {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+  }
+
+  .p07-info-cta {
+    justify-self: center;
+    text-align: center;
+  }
+
+  .p07-info-caption {
+    display: none;
+  }
+}
+
+/* ---------- the poster, full size ---------- */
+
+.p07-viewer {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  /* A flex box, not a grid: a percentage max-height only holds against a definite
+     height, and the sheet must never grow past the screen or the poster is cut off. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(18 10 7 / 74%);
+}
+
+.p07-viewer-sheet {
+  display: grid;
+  width: min(100%, 760px);
+  max-height: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  justify-items: end;
+  gap: 10px;
+}
+
+.p07-viewer-scroll {
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  border: 3px solid #7b4636;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+  scrollbar-color: #7b4636 transparent;
+  scrollbar-width: thin;
+}
+
+.p07-viewer-scroll:focus-visible {
+  outline: 3px solid #45b5ff;
+  outline-offset: 2px;
+}
+
+.p07-viewer-image {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* ---------- the board ---------- */
@@ -452,14 +547,13 @@
     padding: 8px;
   }
 
-  .p07-compare,
   .p07-fact {
     padding: 8px 10px;
     font-size: 0.8rem;
   }
 
-  .p07-compare-note {
-    font-size: 0.74rem;
+  .p07-info-caption {
+    display: none;
   }
 
   /* The status card moves to the left corner so it never hides a destination. */
@@ -472,13 +566,13 @@
     min-height: 6.5rem;
   }
 
-  .p07-tile {
-    width: 14px;
-    height: 9px;
+  /* A smaller Continue gate, close under the text, so it costs the cards little room. */
+  .p07-dialogue .circular-gate--dialogue {
+    margin-top: 0.2rem;
   }
 
-  .p07-compare-key {
-    display: none;
+  .p07-dialogue .circular-gate--dialogue .circular-gate__button {
+    width: 64px;
   }
 
   .p07-hint {

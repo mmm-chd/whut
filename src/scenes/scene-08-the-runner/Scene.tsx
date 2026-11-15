@@ -14,7 +14,7 @@ import { PlaybackControls } from '../../components/story-controls/PlaybackContro
 import { useNarrativeController } from '../../engine/useNarrativeController';
 import { useStoryStore } from '../../stores/story.store';
 import { WebGLStage, hasWebGL2 } from '../../three/WebGLStage';
-import { DistanceComparison } from './components/DistanceComparison';
+import { InfographicCard, InfographicViewer } from './components/Infographic';
 import { CommandStatus } from './components/CommandStatus';
 import { MapControls } from './components/MapControls';
 import { RouteOverlay } from './components/RouteOverlay';
@@ -101,6 +101,9 @@ function RunnerRun({ runId }: { readonly runId: number }) {
   const api = useP07Scene(runId);
   const { state, nodes, beat } = api;
   const [focused, setFocused] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const infoTrigger = useRef<HTMLButtonElement>(null);
+  const closeViewer = useCallback(() => setViewerOpen(false), []);
   const webgl = useMemo(() => hasWebGL2(), []);
 
   // The flat fallback marker follows Percy by writing its transform directly.
@@ -245,7 +248,9 @@ function RunnerRun({ runId }: { readonly runId: number }) {
               <DialogueLayer />
             </div>
             <div className="p07-cards">
-              {api.comparisonShown && !(layout.compact && facts.some((entry) => entry.shown)) ? <DistanceComparison /> : null}
+              {api.comparisonShown && !(layout.compact && facts.some((entry) => entry.shown)) ? (
+                <InfographicCard triggerRef={infoTrigger} onOpen={() => setViewerOpen(true)} />
+              ) : null}
               {facts.map(({ fact, shown, read }) =>
                 fact && shown ? (
                   <article key={fact.id} className="p07-fact" data-fact={fact.id} data-read={read}>
@@ -342,6 +347,8 @@ function RunnerRun({ runId }: { readonly runId: number }) {
           </div>
         </>
       ) : null}
+
+      {viewerOpen ? <InfographicViewer onClose={closeViewer} returnFocusTo={infoTrigger} /> : null}
 
       <div className="p07-exit-fade" style={{ opacity: exitValue }} aria-hidden="true" />
       <PlaybackControls />

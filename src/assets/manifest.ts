@@ -101,6 +101,8 @@ import p07Narrator5Url from '../audio/voice-over/perseverance/P07 - Narrator 5.m
 import p07Percy1Url from '../audio/voice-over/perseverance/percy/P07 - Percy 1.mp3';
 import p07Percy2Url from '../audio/voice-over/perseverance/percy/P07 - Percy 2.mp3';
 import p07Percy3Url from '../audio/voice-over/perseverance/percy/P07 - Percy 3.mp3';
+import p07InfographicUrl from './fixed/p07/infographic.webp';
+import p07InfographicTopUrl from './fixed/p07/infographic-top.webp';
 import placeholderUrl from './placeholder.svg';
 
 export type AssetStatus = 'placeholder' | 'draft' | 'final';
@@ -323,6 +325,19 @@ export const assetManifest: Record<string, AssetEntry> = {
   'p07-vo-percy-02': voiceAsset('p07-vo-percy-02', p07Percy2Url, undefined, 13704),
   'p07-vo-percy-03': voiceAsset('p07-vo-percy-03', p07Narrator5Url, undefined, 2352),
   'p07-vo-percy-04': voiceAsset('p07-vo-percy-04', p07Percy3Url, undefined, 10128),
+  // P-07 infographic: web copies of `src/assets/Infografis.png`, which stays untouched.
+  'p07-infographic': finalAsset(
+    'p07-infographic',
+    'image',
+    p07InfographicUrl,
+    'An infographic of driving records on Mars and the Moon. Perseverance leads with 45.2 km, just ahead of Opportunity at 45.16 km, then Lunokhod 2, Curiosity, three Apollo lunar rovers, Lunokhod 1, Spirit, Sojourner and the two Yutu rovers.',
+  ),
+  'p07-infographic-top': finalAsset(
+    'p07-infographic-top',
+    'image',
+    p07InfographicTopUrl,
+    'The top of the infographic: Perseverance at 45.2 km and Opportunity at 45.16 km.',
+  ),
 
   // P-02 voice-over, one file per line, in the order of dialog-perseverance.pdf.
   'p02-vo-narrator-01': voiceAsset('p02-vo-narrator-01', p02Narrator1Url),

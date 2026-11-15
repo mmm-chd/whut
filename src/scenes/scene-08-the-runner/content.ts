@@ -42,23 +42,6 @@ export const DISTANCE_SNAPSHOT: DistanceSnapshot = {
   review: 'verified',
 };
 
-/**
- * The picture's unit. P-04 told the reader 45.16 km is "430 football fields",
- * which is a 105 m field, so the same unit is used here and both stories agree.
- */
-export const FIELD_LENGTH_M = 105;
-
-export function fieldCount(km: number): number {
-  return Number.isFinite(km) && km > 0 ? (km * 1000) / FIELD_LENGTH_M : 0;
-}
-
-/** How many field icons one strip draws; a label carries the exact idea. */
-export const FIELDS_PER_ICON = 10;
-
-export function fieldIcons(km: number): number {
-  return Math.round(fieldCount(km) / FIELDS_PER_ICON);
-}
-
 export const P07_FACTS: readonly FactRecord[] = [
   {
     id: 'oppy-distance',
