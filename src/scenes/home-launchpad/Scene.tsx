@@ -86,6 +86,94 @@ interface InfoModalProps {
   onClose: () => void;
 }
 
+/** The full credit roll: the team, the sources, and the voices. */
+function CreditContent() {
+  return (
+    <>
+      <h2 className="home-modal__title">The People Who Keep Looking Up</h2>
+      <p className="home-modal__text">
+        <strong>Porpopil</strong>
+      </p>
+
+      <h3 className="home-modal__section">Team Members</h3>
+      <ul className="home-modal__list">
+        <li>
+          <strong>Severus Melvin Richard Mulyono</strong> — Project Leader &amp; Programmer
+        </li>
+        <li>
+          <strong>Zulfiqar Sylmi Setiawan</strong> — Programmer
+        </li>
+        <li>
+          <strong>Esta Janitra Lituhayu</strong> — Artist Coordinator
+        </li>
+        <li>
+          <strong>Emmanuel Michael Anugerah Sriwardana</strong> — Designer &amp; Content Manager
+        </li>
+        <li>
+          <strong>Myra Isadora</strong> — Project Designer &amp; Typewriter
+        </li>
+      </ul>
+
+      <h3 className="home-modal__section">A Big Thank You to NASA!</h3>
+      <p className="home-modal__text">
+        For providing such an incredible collection of information and mission records
+        that made these stories possible.
+      </p>
+      <ul className="home-modal__list">
+        <li>NASA Space Science Data Coordinated Archive (NSSDCA)</li>
+        <li>NASA Science</li>
+        <li>NASA Mission Archives</li>
+      </ul>
+
+      <h3 className="home-modal__section">The Visuals Behind the Stories</h3>
+      <p className="home-modal__text">
+        Those visuals you see throughout this journey are brought to life through:
+      </p>
+      <ul className="home-modal__list">
+        <li>
+          <strong>Illustrations:</strong> AI-Generated
+        </li>
+        <li>
+          <strong>3D Models:</strong> NASA 3D Resources
+        </li>
+        <li>
+          <strong>Background &amp; Environment Assets:</strong> AI-Generated
+        </li>
+        <li>
+          <strong>Fonts &amp; Typography:</strong> DK Cool Latin, Fredoka Latin
+        </li>
+      </ul>
+
+      <h3 className="home-modal__section">Raise a Toast to the Voices Behind Our Characters!</h3>
+      <p className="home-modal__text">
+        A special appreciation to the wonderful volunteers who lent their voices to
+        bring our characters and stories to life.
+      </p>
+      <ul className="home-modal__list">
+        <li>
+          <strong>Narration &amp; Voice-over:</strong>
+          <ul className="home-modal__list">
+            <li>
+              <strong>Maria Gracia Anabelle Nugroho</strong> as Percy (Volunteer)
+            </li>
+            <li>
+              <strong>Elisabeth Michelle Alexandria S.</strong> as Narrator (Volunteer)
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Background Music:</strong> Pixabay (Free License)
+        </li>
+      </ul>
+
+      <p className="home-modal__closing">
+        Thank you for being part of our journey. Every mission leaves a story worth
+        remembering.
+      </p>
+    </>
+  );
+}
+
 function InfoModal({ kind, onClose }: InfoModalProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -111,15 +199,7 @@ function InfoModal({ kind, onClose }: InfoModalProps) {
       >
         <p className="home-modal__eyebrow">{kind === 'credit' ? 'Credit' : 'About'}</p>
         {kind === 'credit' ? (
-          <>
-            <p className="home-modal__text">
-              An AI-assisted creative project. Some visual assets and illustrations are
-              AI-generated.
-            </p>
-            <p className="home-modal__text">
-              Font: DK Cool Crayon. Story: the Perseverance &amp; Ingenuity missions, NASA/JPL.
-            </p>
-          </>
+          <CreditContent />
         ) : (
           <>
             <p className="home-modal__text">

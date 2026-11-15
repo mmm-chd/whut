@@ -32,9 +32,16 @@ export function useStageUrl(): void {
   // Stage -> URL.
   useEffect(() => {
     const path = pathForRoute(routeForStage(stage));
-    if (window.location.pathname !== path) {
-      window.history.pushState({ route: path }, '', path);
+    const current = window.location.pathname;
+    if (current === path) {
+      return;
     }
+    // A `/story/<character>` deep link keeps its slug until the stage leaves
+    // the story; rewriting it to `/story` would erase the character name.
+    if (stage === 'story' && routeForPath(current) === 'story') {
+      return;
+    }
+    window.history.pushState({ route: path }, '', path);
   }, [stage]);
 
   // URL -> stage (Back/Forward).

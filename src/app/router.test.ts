@@ -28,6 +28,17 @@ describe('route parsing', () => {
     expect(routeForPath('')).toBe('home');
   });
 
+  it('accepts a story deep link with a character slug', () => {
+    expect(routeForPath('/story/perseverance')).toBe('story');
+    expect(routeForPath('/story/ingenuity')).toBe('story');
+  });
+
+  it('does not extend the story prefix to look-alike paths', () => {
+    expect(routeForPath('/storyline')).toBe('home');
+    expect(routeForPath('/story/perseverance/extra')).toBe('story');
+    expect(isCanonicalPath('/story/perseverance/extra')).toBe(false);
+  });
+
   it('falls back to home for unknown paths', () => {
     expect(routeForPath('/nope')).toBe('home');
     expect(routeForPath('/characters/percy')).toBe('home');
@@ -67,6 +78,7 @@ describe('boot stage', () => {
   it('skips the intro when deep linking to a later stage', () => {
     expect(bootStage('/characters')).toBe('book');
     expect(bootStage('/story')).toBe('story');
+    expect(bootStage('/story/perseverance')).toBe('story');
   });
 
   it('falls back to the splash for unknown paths', () => {
@@ -80,5 +92,11 @@ describe('canonical paths', () => {
     expect(isCanonicalPath('/characters')).toBe(true);
     expect(isCanonicalPath('/characters/')).toBe(false);
     expect(isCanonicalPath('/missing')).toBe(false);
+  });
+
+  it('keeps a story slug canonical so the boot never rewrites it away', () => {
+    expect(isCanonicalPath('/story')).toBe(true);
+    expect(isCanonicalPath('/story/perseverance')).toBe(true);
+    expect(isCanonicalPath('/story/')).toBe(false);
   });
 });

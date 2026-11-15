@@ -33,7 +33,13 @@ function normalisePath(pathname: string): string {
 
 /** Unknown paths fall back to the homepage rather than a blank screen. */
 export function routeForPath(pathname: string): AppRoute {
-  return PATH_ROUTES[normalisePath(pathname)] ?? 'home';
+  const normalised = normalisePath(pathname);
+  // `/story/<character>` (e.g. `/story/perseverance`) addresses the story too:
+  // the slug keeps the address descriptive while the engine stays the same.
+  if (normalised === '/story' || normalised.startsWith('/story/')) {
+    return 'story';
+  }
+  return PATH_ROUTES[normalised] ?? 'home';
 }
 
 export function pathForRoute(route: AppRoute): string {
@@ -77,5 +83,11 @@ export function bootStage(pathname: string): ExperienceStage {
 
 /** True when the current URL is the canonical spelling of its route. */
 export function isCanonicalPath(pathname: string): boolean {
+  // `/story` and `/story/<character>` are both canonical spellings; the slug
+  // survives the boot so the address bar keeps its character name. Like the
+  // other routes, trailing slashes and casing are rewritten to this spelling.
+  if (/^\/story(\/[a-z0-9-]+)?$/.test(pathname)) {
+    return true;
+  }
   return pathname === pathForRoute(routeForPath(pathname));
 }

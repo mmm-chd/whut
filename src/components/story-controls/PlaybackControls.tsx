@@ -1,6 +1,7 @@
-import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Home, Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNarrativeController } from '../../engine/useNarrativeController';
+import { leaveToMainMenu } from '../../app/storyNavigation';
 import { useStoryStore } from '../../stores/story.store';
 import { PauseMenu } from './PauseMenu';
 import './PlaybackControls.css';
@@ -51,6 +52,15 @@ export function PlaybackControls({ allowPauseWhileWaiting = false }: PlaybackCon
 
   return (
     <div className="playback-controls" role="group" aria-label="Story playback controls">
+      <button
+        type="button"
+        className="playback-controls__button"
+        onClick={leaveToMainMenu}
+        aria-label="Back to the main menu"
+      >
+        <Home size={18} aria-hidden="true" />
+      </button>
+
       <button
         type="button"
         className="playback-controls__button"

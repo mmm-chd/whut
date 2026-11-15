@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { useExperienceStore } from '../../app/experience.store';
 import { useStoryStore } from '../../stores/story.store';
 import { WebGLStage } from '../../three/WebGLStage';
@@ -106,6 +107,17 @@ export function SceneBook() {
         <img className="book-rocket__flame" src={BOOK_FLAME_URL} alt="" draggable={false} />
         <img className="book-rocket__body" src={BOOK_ROCKET_URL} alt="" draggable={false} />
       </div>
+
+      <button
+        type="button"
+        className="book-back"
+        data-visible={reveal === 'ready'}
+        aria-label="Back to the launchpad"
+        onClick={() => setStage('homepage')}
+      >
+        <ArrowLeft size={16} aria-hidden="true" />
+        Back
+      </button>
 
       <header className="book-hud">
         <p className="book-hud__eyebrow">The Adventure Journal</p>

@@ -217,12 +217,38 @@
      short screens, so the card scrolls instead of overflowing the viewport. */
   max-height: min(86vh, 720px);
   overflow-y: auto;
+  /* Reserve the scrollbar's lane even when content fits, so the text edge
+     never shifts when the credit roll appears. */
+  scrollbar-gutter: stable;
+  /* Firefox: a slim teal thumb on the paper, no visible track. */
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--day-teal) 65%, var(--cream)) transparent;
   padding: 28px 30px 24px;
   background: var(--cream);
   color: var(--day-ink);
   border-radius: 16px;
   box-shadow: 0 10px 0 color-mix(in srgb, var(--day-ink) 30%, transparent);
   transform: rotate(-0.6deg);
+}
+
+/* WebKit/Blink: shape the scrollbar to the paper-card look — a rounded teal
+   crayon stroke floating over the cream, with no hard-edged track. */
+.home-modal__card::-webkit-scrollbar {
+  width: 12px;
+}
+
+.home-modal__card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.home-modal__card::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--day-teal) 65%, var(--cream));
+  border-radius: 999px;
+  border: 4px solid var(--cream);
+}
+
+.home-modal__card::-webkit-scrollbar-thumb:hover {
+  background: var(--day-teal);
 }
 
 .home-modal__eyebrow {
@@ -236,6 +262,44 @@
   margin: 0 0 12px;
   font-size: 15px;
   line-height: 1.5;
+}
+
+/* Full credit roll: a large crayon title, mid-size section headings, tidy
+   bullets, and an italic farewell line. */
+.home-modal__title {
+  margin: 0 0 6px;
+  font-family: 'DK Cool Crayon', system-ui, sans-serif;
+  font-size: 26px;
+  line-height: 1.15;
+  color: var(--day-teal);
+}
+
+.home-modal__section {
+  margin: 16px 0 6px;
+  font-size: 16px;
+  color: var(--day-ink);
+}
+
+.home-modal__list {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.home-modal__list .home-modal__list {
+  margin: 4px 0 0;
+}
+
+.home-modal__closing {
+  margin: 18px 0 2px;
+  font-size: 15px;
+  line-height: 1.5;
+  font-style: italic;
+  text-align: center;
+  color: color-mix(in srgb, var(--day-ink) 85%, transparent);
 }
 
 .home-modal__close {
