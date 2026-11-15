@@ -1,14 +1,14 @@
 import { createNode, resetNode, type SceneNode } from '../../three/nodeState';
 import {
+  CROWD_ARC,
   HILL_FAR_KEYS,
   HILL_NEAR_KEYS,
   MOON,
   PAPER_CLOUDS,
-  SEA_KEYS,
+  crowdFeetY,
 } from './backdrop';
 import {
-  BOAT,
-  CROWD,
+  CROWD_ROWS,
   FLAME,
   ROCKET,
   SMOKE_LAYERS,
@@ -31,21 +31,30 @@ export interface HomeNodes {
   sky: { motion: SceneNode };
   /** Deep-space overlay revealed behind the smoke during the transition. */
   space: { fade: SceneNode };
+  /**
+   * The space wedge's apex, in design px relative to `WEDGE.apexRest`:
+   * 0 = resting below the frame, -570 at lift-off, then it climbs with the
+   * rocket (plan §6.2).
+   */
+  wedge: { motion: SceneNode };
   moon: HomeLayerNodes;
-  sea: { motion: SceneNode; idle: SceneNode };
-  boat: HomeLayerNodes;
+  /** Ridges and the regolith mass the crowd stands on. */
+  ground: { motion: SceneNode; idle: SceneNode };
   clouds: HomeLayerNodes[];
   towers: HomeLayerNodes;
-  smokeFar: HomeLayerNodes;
-  smokeMid: HomeLayerNodes;
-  smokeNear: HomeLayerNodes;
+  /** Sand behind the rocket, welded to the wedge's edge (plan T7b). */
+  smokeBack: HomeLayerNodes;
+  /** Sand in front of the rocket, welded to the same edge. */
+  smokeFront: HomeLayerNodes;
   rocket: {
     motion: SceneNode;
     idle: SceneNode;
     exhaust: SceneNode;
     vibration: SceneNode;
   };
-  crowd: { motion: SceneNode; poseA: SceneNode; poseB: SceneNode };
+  /** One motion node for the whole crowd, one pose pair per row so the rows
+   *  never wave in unison (plan §6.1). */
+  crowd: { motion: SceneNode; rows: { poseA: SceneNode; poseB: SceneNode }[] };
   flags: { launched: boolean; reducedMotion: boolean };
 }
 
@@ -54,25 +63,28 @@ function restingNodes(reducedMotion: boolean): HomeNodes {
   return {
     sky: { motion: createNode() },
     space: { fade: createNode({ opacity: 0 }) },
+    wedge: { motion: createNode() },
     moon: { motion: createNode(), idle: createNode() },
-    sea: { motion: createNode(), idle: createNode() },
-    boat: { motion: createNode(), idle: createNode() },
+    ground: { motion: createNode(), idle: createNode() },
     clouds: PAPER_CLOUDS.map(() => ({ motion: createNode(), idle: createNode() })),
     towers: { motion: createNode(), idle: createNode() },
-    smokeFar: { motion: createNode(), idle: createNode() },
-    smokeMid: { motion: createNode(), idle: createNode() },
-    smokeNear: { motion: createNode(), idle: createNode() },
+    // Idle is the rocket waiting on the pad: no smoke at all until ignition
+    // (owner lock L5). The stack fades in as the rocket climbs.
+    smokeBack: { motion: createNode({ opacity: 0 }), idle: createNode() },
+    smokeFront: { motion: createNode({ opacity: 0 }), idle: createNode() },
     rocket: {
       motion: createNode(),
       idle: createNode(),
-      // The pilot flame glows dimly while the rocket waits (concept 4.7).
-      exhaust: createNode({ opacity: 0.85, scaleY: 0.62 }),
+      // Cold engine: nothing burns until the reader presses Play (plan T5b).
+      exhaust: createNode({ opacity: 0, scaleY: 0.62 }),
       vibration: createNode(),
     },
     crowd: {
       motion: createNode(),
-      poseA: createNode(),
-      poseB: createNode({ opacity: 0 }),
+      rows: CROWD_ROWS.map(() => ({
+        poseA: createNode(),
+        poseB: createNode({ opacity: 0 }),
+      })),
     },
     flags: { launched: false, reducedMotion },
   };
@@ -85,16 +97,14 @@ export function createHomeNodes(reducedMotion = false): HomeNodes {
 export function resetHomeNodes(nodes: HomeNodes, reducedMotion = false): void {
   resetNode(nodes.sky.motion);
   resetNode(nodes.space.fade, { opacity: 0 });
-  for (const layer of [
-    nodes.moon,
-    nodes.sea,
-    nodes.boat,
-    nodes.towers,
-    nodes.smokeFar,
-    nodes.smokeMid,
-    nodes.smokeNear,
-  ] as HomeLayerNodes[]) {
+  resetNode(nodes.wedge.motion);
+  for (const layer of [nodes.moon, nodes.ground, nodes.towers] as HomeLayerNodes[]) {
     resetNode(layer.motion);
+    resetNode(layer.idle);
+  }
+  // Smoke rests hidden: it exists only while the engine is burning.
+  for (const layer of [nodes.smokeBack, nodes.smokeFront] as HomeLayerNodes[]) {
+    resetNode(layer.motion, { opacity: 0 });
     resetNode(layer.idle);
   }
   for (const cloud of nodes.clouds) {
@@ -103,11 +113,13 @@ export function resetHomeNodes(nodes: HomeNodes, reducedMotion = false): void {
   }
   resetNode(nodes.rocket.motion);
   resetNode(nodes.rocket.idle);
-  resetNode(nodes.rocket.exhaust, { opacity: 0.85, scaleY: 0.62 });
+  resetNode(nodes.rocket.exhaust, { opacity: 0, scaleY: 0.62 });
   resetNode(nodes.rocket.vibration);
   resetNode(nodes.crowd.motion);
-  resetNode(nodes.crowd.poseA);
-  resetNode(nodes.crowd.poseB, { opacity: 0 });
+  for (const row of nodes.crowd.rows) {
+    resetNode(row.poseA);
+    resetNode(row.poseB, { opacity: 0 });
+  }
   Object.assign(nodes.flags, { launched: false, reducedMotion });
 }
 
@@ -137,10 +149,10 @@ export const HOME_LAYOUT = {
   flame: FLAME,
   moon: MOON,
   hills: { far: HILL_FAR_KEYS, near: HILL_NEAR_KEYS },
-  sea: SEA_KEYS,
+  crowdArc: CROWD_ARC,
+  crowdFeet: crowdFeetY,
   towers: TOWERS,
   clouds: PAPER_CLOUDS,
-  boat: BOAT,
   smoke: SMOKE_LAYERS,
-  crowd: CROWD,
+  crowdRows: CROWD_ROWS,
 } as const;

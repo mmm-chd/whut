@@ -131,4 +131,30 @@ describe('Play button', () => {
 
     await scene.unmount();
   });
+
+  it('never shows count-down text and takes the HUD out of the frame', async () => {
+    const scene = mountScene();
+    await scene.render();
+
+    const button = scene.container.querySelector<HTMLButtonElement>('.home-play');
+    if (!button) {
+      throw new Error('Play button not rendered');
+    }
+    // The count-down is deleted, not hidden (L9): no stamp node of any kind.
+    expect(scene.container.querySelector('.home-countdown')).toBeNull();
+    expect(/(^|\s)[321](\s|$)|GO!/.test(scene.container.textContent ?? '')).toBe(false);
+
+    await act(async () => {
+      button.click();
+    });
+    await scene.frame();
+    await scene.frame();
+
+    const hud = scene.container.querySelector('.home-hud');
+    expect(hud?.getAttribute('data-phase')).not.toBe('idle');
+    // The HUD is faded out through CSS rather than left over the dust.
+    expect(hud?.className).toContain('home-hud');
+
+    await scene.unmount();
+  });
 });

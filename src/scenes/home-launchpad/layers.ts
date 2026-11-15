@@ -1,5 +1,5 @@
 import { DESIGN_HEIGHT, DESIGN_WIDTH, fitScale } from '../../three/designSpace';
-import { DUSK_SKY, SKY_OVERSCAN, SPACE_SKY, layerStops } from './backdrop';
+import { HOME_SKY, SKY_OVERSCAN, SPACE_SKY, crowdRowFeetY, layerStops } from './backdrop';
 
 /**
  * Homepage "The Launchpad" layout, in design pixels (y down, 1920x1080).
@@ -7,26 +7,30 @@ import { DUSK_SKY, SKY_OVERSCAN, SPACE_SKY, layerStops } from './backdrop';
  * NASA_Storybook_Concept.md sections 4.5-4.7.
  */
 
-/** "Dusk" palette, sampled from the reference (perceptual, draft values). */
-export const DUSK = {
-  skyTop: '#6b4a9a',
-  skyMid1: '#a34e8f',
-  skyMid2: '#d5507a',
-  skyLow: '#e87e6f',
-  horizon: '#f2926e',
-  hills: '#8e4e9e',
-  hillsDark: '#6e3d86',
-  sea: '#e4706b',
-  seaWave: '#f2926e',
-  silhouette: '#2a1f63',
+/**
+ * The launchpad palette: the clear day of the prototype
+ * (`docs-base/Cerita Roket (2).html`), plan section 4.2. Four sky stops read
+ * straight off its `gSky` gradient, then the far strip, the two ground tones of
+ * its `gGround` gradient, the teal crowd mass, and the clouds' cream. The
+ * splash keeps its own navy card; the journal keeps the Mars paper palette.
+ */
+export const HOME = {
+  skyTop: '#6f9bb8',
+  skyMid1: '#8db1c6',
+  skyMid2: '#b9d0d5',
+  skyLow: '#b9d0d5',
+  horizon: '#5d8aa3',
+  hills: '#bd9a50',
+  hillsDark: '#cfb46c',
+  silhouette: '#1f3a40',
   spaceTop: '#0e1b30',
   spaceBottom: '#13243c',
   star: '#d9e4ec',
-  cream: '#fff1d6',
+  cream: '#f3e3c3',
 } as const;
 
 /** Sky stops shifted onto the oversized backdrop layer (design y -> layer y). */
-export const SKY_STOPS = layerStops(DUSK_SKY, SKY_OVERSCAN.top);
+export const SKY_STOPS = layerStops(HOME_SKY, SKY_OVERSCAN.top);
 export const SPACE_STOPS = layerStops(SPACE_SKY, SKY_OVERSCAN.top);
 
 /**
@@ -51,14 +55,15 @@ export const FLAME = { left: 912, top: 552, width: 96, height: 214 } as const;
 /** The Play button rides on the rocket body at this design point. */
 export const PLAY_ANCHOR = { x: ROCKET_CENTER.x, y: 396 } as const;
 
-/** Towers flank the rocket and stand on the horizon (reference). */
+/**
+ * Cream lattice towers flanking the rocket (reference). `contain` keeps the
+ * asset's 110:340 aspect, so a width fixes the height: the bases land on the
+ * horizon at about y 800.
+ */
 export const TOWERS = [
-  { left: 688, top: 320, width: 120 },
-  { left: 1140, top: 372, width: 100 },
+  { left: 655, top: 336, width: 150 },
+  { left: 1112, top: 305, width: 160 },
 ] as const;
-
-/** The little boat sits on the sea, right of the rocket. */
-export const BOAT = { left: 1508, top: 884, width: 118 } as const;
 
 /** Smoke clusters: two sprites per layer for full-width coverage. */
 export interface SmokeCluster {
@@ -67,25 +72,88 @@ export interface SmokeCluster {
   width: number;
 }
 
+/**
+ * Two sand layers, not three (plan §6.2, T7b): one behind the rocket, one in
+ * front. Each is two clusters so the bank is wider than the frame.
+ */
 export const SMOKE_LAYERS = {
-  far: [
+  back: [
     { left: -220, top: 520, width: 1250 },
     { left: 880, top: 470, width: 1160 },
   ],
-  mid: [
-    { left: -260, top: 600, width: 1290 },
-    { left: 900, top: 540, width: 1180 },
-  ],
-  near: [
+  front: [
     { left: -300, top: 700, width: 1330 },
     { left: 920, top: 630, width: 1220 },
   ],
 } as const;
 
+/**
+ * How far each sand layer sits from the wedge's edge line, design px: the back
+ * bank hides the seam from above, the front bank from below (plan §6.2).
+ */
+export const SMOKE_EDGE_OFFSET = { back: -30, front: 18 } as const;
+
 export const SMOKE_SPRITE_ASPECT = 520 / 300;
 
-export const CROWD = { left: -60, top: 820, width: 720 } as const;
 export const CROWD_SPRITE_ASPECT = 640 / 190;
+
+/**
+ * Crowd placement along the concave arc (L8). Two rows: the back row at the
+ * arc's own scale, the front row 1.08x and nearer the camera. Each placement is
+ * one sprite of the same pose pair, so the crowd costs one asset per pose and
+ * no new art. `feetY` is where the sprite's bottom edge sits.
+ */
+export interface CrowdPlacement {
+  readonly x: number;
+  readonly y: number;
+  readonly w: number;
+  readonly h: number;
+  /** Row index, 0 = back row. Front rows draw over the ones behind them. */
+  readonly row: number;
+  /** Multiplier for the shared crowd asset: this row's tone. */
+  readonly tint: readonly [number, number, number];
+}
+
+/**
+ * Five rows, back to front (plan §6.1). Scale step 0.08 like the prototype, and
+ * the colour ramp `#4a6a6e → #1f3a40` is applied as a tint on one asset pair
+ * rather than five recoloured files: the biggest row renders the art at
+ * `#4a6a6e`, every other row multiplies it down.
+ */
+export const CROWD_BASE_TONE = '#4a6a6e';
+export const CROWD_TINTS: readonly (readonly [number, number, number])[] = [
+  [1, 1, 1],
+  [0.851, 0.906, 0.909],
+  [0.703, 0.792, 0.818],
+  [0.568, 0.67, 0.7],
+  [0.419, 0.547, 0.582],
+];
+
+export const CROWD_ROWS = [
+  { width: 576, step: 470, offset: 0, row: 0 },
+  { width: 627, step: 512, offset: 52, row: 1 },
+  { width: 678, step: 554, offset: 104, row: 2 },
+  { width: 730, step: 596, offset: 156, row: 3 },
+  { width: 781, step: 638, offset: 208, row: 4 },
+] as const;
+
+export function crowdPlacements(): readonly CrowdPlacement[] {
+  const placements: CrowdPlacement[] = [];
+  CROWD_ROWS.forEach((row, index) => {
+    for (let x = -80 + row.offset; x <= 2000; x += row.step) {
+      const h = row.width / CROWD_SPRITE_ASPECT;
+      placements.push({
+        x: x - row.width / 2,
+        y: crowdRowFeetY(x, index) - h + 6,
+        w: row.width,
+        h,
+        row: index,
+        tint: CROWD_TINTS[index],
+      });
+    }
+  });
+  return placements;
+}
 
 /** Denser stars revealed with the deep-space gradient during the transition. */
 export const SPACE_STARS = [
@@ -97,7 +165,8 @@ export const SPACE_STARS = [
 ] as const;
 
 /** Parallax tuning (concept 4.6). */
-export const MAX_SHIFT = 34;
+// Dimensional without exposing the backdrop's overscan at narrow crops.
+export const MAX_SHIFT = 44;
 export const Y_FACTOR = 0.4;
 export const LERP = 0.06;
 /** Rocket tilt follows the cursor, in degrees at full deflection. */
@@ -108,15 +177,13 @@ export const DEPTHS = {
   sky: 0.02,
   stars: 0.04,
   moon: 0.06,
-  sea: 0.1,
-  boat: 0.1,
+  ground: 0.1,
   clouds: 0.12,
   towers: 0.18,
-  smokeFar: 0.25,
+  smokeBack: 0.25,
   rocket: 0.3,
-  smokeMid: 0.4,
-  smokeNear: 0.55,
-  crowd: 0.8,
+  smokeFront: 0.55,
+  crowd: 0.9,
 } as const;
 
 /** Liftoff shift per layer: deeper layers leave the frame faster. */

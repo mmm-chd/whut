@@ -100,6 +100,9 @@ export function SceneBook() {
       </div>
 
       <div className="book-rocket" aria-hidden="true">
+        <span className="book-rocket__trail">
+          <i /><i /><i /><i /><i />
+        </span>
         <img className="book-rocket__flame" src={BOOK_FLAME_URL} alt="" draggable={false} />
         <img className="book-rocket__body" src={BOOK_ROCKET_URL} alt="" draggable={false} />
       </div>

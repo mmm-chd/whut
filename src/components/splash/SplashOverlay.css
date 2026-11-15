@@ -1,4 +1,8 @@
-/* Stage 00 — two-frame splash overlay over the already-mounted homepage. */
+/* Stage 00 — two-frame splash overlay over the already-mounted homepage.
+   The film grain and the display type are shared with the launchpad
+   (src/styles/stage.css); the ground here is the story's own deep space as a
+   flat colour, because the splash is a title card, not a second sky. This file
+   owns only the timing and the layout. */
 
 .splash-overlay {
   position: fixed;
@@ -7,15 +11,10 @@
   display: grid;
   place-items: center;
   padding: 24px;
+  overflow: hidden;
   text-align: center;
-  /* The same Dusk sky the launchpad paints, so the crossfade has no colour jump
-     (concept 12.1: one visual world before the journal opens). */
-  background: linear-gradient(
-    180deg,
-    var(--dusk-violet) 0%,
-    var(--dusk-pink) 48%,
-    var(--horizon-orange) 100%
-  );
+  /* Solid navy from the story's space palette: one colour, no gradient seam. */
+  background-color: var(--deep-space);
   opacity: 1;
   transition: opacity 0.8s ease;
 }
@@ -25,31 +24,18 @@
   pointer-events: none;
 }
 
+/* The text must sit above the grain layer that `.story-grain` paints. */
+.splash-frame {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  animation: splash-frame 3.2s ease both;
+}
+
 /*
  * One keyframe covers the whole frame window (3.2s): fade in ~0.5s, hold,
  * fade out ~0.5s. The element unmounts when the phase advances.
  */
-.splash-frame {
-  margin: 0;
-  color: var(--cream);
-  animation: splash-frame 3.2s ease both;
-}
-
-.splash-frame--hook {
-  font-family: 'DK Cool Crayon', system-ui, sans-serif;
-  font-size: clamp(44px, 7.5vw, 96px);
-  line-height: 1.1;
-  letter-spacing: 0.04em;
-  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
-}
-
-.splash-frame--note {
-  max-width: 560px;
-  font-size: clamp(14px, 1.8vw, 18px);
-  line-height: 1.6;
-  color: color-mix(in srgb, var(--cream) 88%, transparent);
-}
-
 @keyframes splash-frame {
   0% {
     opacity: 0;

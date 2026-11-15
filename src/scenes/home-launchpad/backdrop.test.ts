@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   CLOUD_TONES,
-  DUSK_SKY,
+  HOME_SKY,
   HILL_FAR_KEYS,
   HILL_NEAR_KEYS,
   PAPER_CLOUDS,
-  SEA_KEYS,
-  SEA_STRIPES,
+  CROWD_ARC,
+  crowdFeetY,
+  crowdGroundPolygon,
+  crowdRowFeetY,
   SKY_OVERSCAN,
   SKY_SPARKLES,
   SKY_STARS,
@@ -17,8 +19,8 @@ import {
   offsetPolygon,
   ridgePolygon,
   sparklePolygon,
-  stripPolygon,
 } from './backdrop';
+import { CROWD_ROWS, crowdPlacements } from './layers';
 
 /**
  * The launchpad backdrop is generated geometry now, so the properties the
@@ -34,25 +36,26 @@ const bounds = (points: readonly (readonly [number, number])[]) => {
 
 describe('gradient stops', () => {
   it('shifts design-space stops onto the oversized layer', () => {
-    const stops = layerStops(DUSK_SKY, SKY_OVERSCAN.top);
-    expect(stops).toHaveLength(DUSK_SKY.length);
-    expect(stops[0].at).toBe(DUSK_SKY[0].at - SKY_OVERSCAN.top);
-    expect(stops[0].color).toBe(DUSK_SKY[0].color);
+    const stops = layerStops(HOME_SKY, SKY_OVERSCAN.top);
+    expect(stops).toHaveLength(HOME_SKY.length);
+    expect(stops[0].at).toBe(HOME_SKY[0].at - SKY_OVERSCAN.top);
+    expect(stops[0].color).toBe(HOME_SKY[0].color);
   });
 
   it('starts the sky at the top of the layer, not the top of the frame', () => {
     // The bug this guards: stops authored for y=0 while the layer starts at
     // SKY_OVERSCAN.top, which dropped the violet crown and bled coral upward.
-    const stops = layerStops(DUSK_SKY, SKY_OVERSCAN.top);
+    const stops = layerStops(HOME_SKY, SKY_OVERSCAN.top);
     expect(stops[0].at).toBeGreaterThan(0);
     const offsets = stops.map((stop) => stop.at);
     expect([...offsets].sort((a, b) => a - b)).toEqual(offsets);
   });
 
-  it('keeps the dusk palette ordered from violet to coral', () => {
-    expect(DUSK_SKY[0].color).toBe('#4b3180');
-    expect(DUSK_SKY[DUSK_SKY.length - 1].color).toBe('#f4a07a');
-    const positions = DUSK_SKY.map((stop) => stop.at);
+  it('keeps the clear-day sky ordered, blue crown to pale haze', () => {
+    // Both ends read off the prototype's sky gradient (plan section 4.2).
+    expect(HOME_SKY[0].color).toBe('#6f9bb8');
+    expect(HOME_SKY[HOME_SKY.length - 1].color).toBe('#b9d0d5');
+    const positions = HOME_SKY.map((stop) => stop.at);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
   });
 });
@@ -74,18 +77,62 @@ describe('ridge polygons', () => {
   });
 
   it('spans the full width so the parallax never reveals an edge', () => {
-    const { left, right } = bounds(ridgePolygon(SEA_KEYS, 1500));
+    const { left, right } = bounds(ridgePolygon(HILL_NEAR_KEYS, 1500));
     expect(left).toBeLessThanOrEqual(-320);
     expect(right).toBeGreaterThanOrEqual(2240);
   });
 
-  it('draws a stripe as a band of the requested thickness', () => {
-    const stripe = stripPolygon(SEA_STRIPES[0].keys, SEA_STRIPES[0].thickness);
-    const { top, bottom } = bounds(stripe);
-    expect(bottom - top).toBeGreaterThanOrEqual(SEA_STRIPES[0].thickness);
-    // Upper line and lower line, each smoothed past the raw keys.
-    expect(stripe.length % 2).toBe(0);
-    expect(stripe.length).toBeGreaterThan(SEA_STRIPES[0].keys.length * 4);
+});
+
+describe('crowd arc (L8)', () => {
+  it('puts the trough in the middle and the high ends at the frame edges', () => {
+    // The prototype's arc: centre (960, 480), radii 1100 x 520 (plan L14).
+    expect(CROWD_ARC).toMatchObject({ cx: 960, cy: 480, rx: 1100, ry: 520 });
+    expect(crowdFeetY(CROWD_ARC.cx)).toBeCloseTo(1000, 0);
+    expect(crowdFeetY(0)).toBeCloseTo(733.87, 1);
+    expect(crowdFeetY(1920)).toBeCloseTo(733.87, 1);
+    // Concave: every point between the edges stands lower than the edges.
+    for (let x = 0; x <= 1920; x += 60) {
+      expect(crowdFeetY(x)).toBeGreaterThanOrEqual(733.8);
+      expect(crowdFeetY(x)).toBeLessThanOrEqual(1000.001);
+    }
+  });
+
+  it('holds the arc end height beyond the frame instead of climbing back up', () => {
+    // The ellipse itself ends at y = 480 at x = -140 and 2060.
+    expect(crowdFeetY(-140)).toBeCloseTo(480, 0);
+    expect(crowdFeetY(2060)).toBeCloseTo(480, 0);
+    expect(crowdFeetY(-320)).toBeCloseTo(480, 0);
+    expect(crowdFeetY(2240)).toBeCloseTo(480, 0);
+  });
+
+  it('steps five rows down the bowl, back row highest', () => {
+    expect(crowdRowFeetY(960, 0)).toBeCloseTo(1000, 0);
+    expect(crowdRowFeetY(960, 4)).toBeCloseTo(1136, 0);
+    expect(CROWD_ROWS).toHaveLength(5);
+    const rows = new Set(crowdPlacements().map((spot) => spot.row));
+    expect([...rows].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4]);
+  });
+
+  it('keeps the rocket and the flame clear of every head', () => {
+    // Flame tip at 766 (FLAME.top 552 + 214); the plan keeps heads 24 px below.
+    // Only the sprites that stand under the rocket matter: the bowl rises away
+    // from the middle, so the figures at the frame edges sit higher on purpose.
+    const underRocket = crowdPlacements().filter(
+      (spot) => spot.x + spot.w > 846 && spot.x < 1074,
+    );
+    expect(underRocket.length).toBeGreaterThan(0);
+    for (const spot of underRocket) {
+      expect(spot.y).toBeGreaterThanOrEqual(766 + 24);
+    }
+  });
+
+  it('closes the ground mass below the arc so no gap can open', () => {
+    const ground = crowdGroundPolygon(1500);
+    const { left, right, bottom } = bounds(ground);
+    expect(left).toBeLessThanOrEqual(-320);
+    expect(right).toBeGreaterThanOrEqual(2160);
+    expect(bottom).toBe(1500);
   });
 });
 

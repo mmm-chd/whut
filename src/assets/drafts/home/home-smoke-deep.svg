@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" width="520" height="300">
-  <!-- Back smoke layer: deep violet paper circles, light from top-left. -->
+  <!-- Back smoke layer: the launch site's dust, cooled for distance (P-02 tones). -->
   <g>
-    <circle cx="70" cy="240" r="70" fill="#4B3F9B"/><circle cx="62" cy="230" r="52" fill="#5A4DAE"/>
-    <circle cx="180" cy="210" r="86" fill="#4B3F9B"/><circle cx="170" cy="196" r="62" fill="#5A4DAE"/>
-    <circle cx="310" cy="230" r="76" fill="#4B3F9B"/><circle cx="302" cy="218" r="54" fill="#5A4DAE"/>
-    <circle cx="430" cy="212" r="82" fill="#4B3F9B"/><circle cx="420" cy="198" r="58" fill="#5A4DAE"/>
-    <circle cx="490" cy="262" r="52" fill="#4B3F9B"/><circle cx="484" cy="254" r="36" fill="#5A4DAE"/>
-    <circle cx="125" cy="270" r="54" fill="#433891"/><circle cx="245" cy="282" r="58" fill="#433891"/>
-    <circle cx="375" cy="282" r="56" fill="#433891"/><circle cx="30" cy="282" r="46" fill="#433891"/>
+    <circle cx="70" cy="240" r="70" fill="#e6d9c6"/><circle cx="62" cy="230" r="52" fill="#e9dcc8"/>
+    <circle cx="180" cy="210" r="86" fill="#e6d9c6"/><circle cx="170" cy="196" r="62" fill="#e9dcc8"/>
+    <circle cx="310" cy="230" r="76" fill="#e6d9c6"/><circle cx="302" cy="218" r="54" fill="#e9dcc8"/>
+    <circle cx="430" cy="212" r="82" fill="#e6d9c6"/><circle cx="420" cy="198" r="58" fill="#e9dcc8"/>
+    <circle cx="490" cy="262" r="52" fill="#e6d9c6"/><circle cx="484" cy="254" r="36" fill="#e9dcc8"/>
+    <circle cx="125" cy="270" r="54" fill="#d9c9b3"/><circle cx="245" cy="282" r="58" fill="#d9c9b3"/>
+    <circle cx="375" cy="282" r="56" fill="#d9c9b3"/><circle cx="30" cy="282" r="46" fill="#d9c9b3"/>
   </g>
 </svg>

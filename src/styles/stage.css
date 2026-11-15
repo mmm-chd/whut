@@ -1,0 +1,97 @@
+/*
+ * Shared paint for the stages that come before the story.
+ *
+ * The splash and the launchpad must look like one place: when the splash
+ * crossfades away, nothing about the sky, the paper grain or the display type
+ * may change. So both stages consume these classes instead of each keeping a
+ * private copy of the same gradient and noise. See
+ * src/docs/stage00-01-splash-home-plan.md section 5.
+ */
+
+/*
+ * The launchpad's clear-day sky (plan section 4.2). One definition: the WebGL
+ * backdrop paints the same four stops from `HOME_SKY`, so the DOM and the
+ * canvas cannot drift apart. The splash keeps its own navy card for now, so
+ * nothing else consumes this yet.
+ */
+.story-sky {
+  background: linear-gradient(
+    180deg,
+    var(--day-sky-top) 0%,
+    var(--day-sky-mid) 60%,
+    var(--day-sky-low) 78%,
+    var(--day-sky-low) 100%
+  );
+}
+
+/*
+ * Fine paper grain over the sky only, so the stage reads as printed paper
+ * while the text above it stays crisp. The noise is one inline SVG, so it needs
+ * no network and tiles seamlessly.
+ */
+.story-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.24;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+/*
+ * Display type: the rounded face, weight 600, sitting on the haze. The two
+ * stacked shadows are the paper-cut lift the launchpad uses, retuned to the
+ * day tones so the letters read as cut paper rather than a drop shadow.
+ */
+.story-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(44px, 7.4vw, 104px);
+  line-height: 0.98;
+  letter-spacing: 0.01em;
+  /* The tone is a variable so one surface can be dark without a second copy of
+     these rules (see `.story-on-dark`). */
+  color: var(--story-type, var(--day-ink));
+  text-shadow: var(
+    --story-title-shadow,
+    0 4px 0 color-mix(in srgb, var(--day-sky-top) 34%, transparent),
+    0 9px 0 color-mix(in srgb, var(--day-teal) 22%, transparent)
+  );
+}
+
+/* Body voice under a title: same face, quieter weight. */
+.story-note {
+  margin: 0;
+  max-width: 560px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(15px, 1.7vw, 20px);
+  line-height: 1.6;
+  color: var(--story-note-color, color-mix(in srgb, var(--day-ink) 84%, transparent));
+}
+
+/*
+ * Dark surface tone. The splash is a title card on the story's own deep space
+ * rather than a second copy of the warm launchpad sky, so it flips the type to
+ * the light pair instead of carrying its own colour rules.
+ * Cream on #13243c measures 13.98:1, starlight at 88 % about 9.9:1.
+ */
+.story-on-dark {
+  --story-type: var(--cream);
+  --story-title-shadow:
+    0 4px 0 color-mix(in srgb, var(--space-top) 85%, transparent),
+    0 9px 0 color-mix(in srgb, #000 42%, transparent);
+  --story-note-color: color-mix(in srgb, var(--starlight) 88%, transparent);
+}
+
+/* The story's deep space, as a flat field: no gradient to band on wide screens. */
+.story-space {
+  background-color: var(--deep-space);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The grain is static; nothing to switch off here. */
+}

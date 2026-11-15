@@ -8,6 +8,7 @@ import { homeParallax, layerOffset, pointerTarget, resetParallax, rocketTilt } f
 import { ParallaxDriver } from './ParallaxLayers';
 import { useHomeScene } from './useHomeScene';
 import { HomeWorld } from './World';
+import '../../styles/stage.css';
 import { homeWorldTextureIds } from './assets';
 import './Scene.css';
 
@@ -137,7 +138,7 @@ export function Scene00Home() {
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
   const setStage = useExperienceStore((state) => state.setStage);
   const [nodes] = useState(() => createHomeNodes(reducedMotion));
-  const { phase, countdown, startLaunch } = useHomeScene(nodes, () => setStage('book'));
+  const { phase, startLaunch } = useHomeScene(nodes, () => setStage('book'));
   const [modal, setModal] = useState<'credit' | 'about' | null>(null);
 
   // One pointer listener feeds the shared parallax target (concept 16.4).
@@ -173,11 +174,11 @@ export function Scene00Home() {
   const closeModal = useCallback(() => setModal(null), []);
 
   return (
-    <main className="home-scene" data-scene="home-launchpad" data-phase={phase}>
+    <main className="home-scene story-grain" data-scene="home-launchpad" data-phase={phase}>
       <div className="home-stage">
         <WebGLStage
           label="Paper-cut launchpad illustration: a rocket waiting to launch on the coast at dusk."
-          background="#2a1f63"
+          background="#6f9bb8"
           preload={homeWorldTextureIds}
         >
           <ParallaxDriver reducedMotion={reducedMotion} />
@@ -199,19 +200,11 @@ export function Scene00Home() {
 
         <div className="home-title">
           <span className="home-sticker">INTERACTIVE STORYBOOK</span>
-          <h2 className="home-heading">What Happens Up There?</h2>
+          <h2 className="home-heading">What Happens Up There</h2>
           <p className="home-tagline">Press Play and ride the paper rocket into space.</p>
         </div>
 
         <PlayButton visible={phase === 'idle'} nodes={nodes} onPress={startLaunch} />
-
-        <div className="home-countdown" role="status" aria-live="polite">
-          {countdown ? (
-            <span key={countdown} className="home-countdown__stamp">
-              {countdown}
-            </span>
-          ) : null}
-        </div>
       </div>
 
       {modal ? <InfoModal kind={modal} onClose={closeModal} /> : null}

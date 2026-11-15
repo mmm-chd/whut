@@ -5,6 +5,7 @@ import {
   OneMinusSrcAlphaFactor,
   ShaderMaterial,
   Texture,
+  Vector3,
   Vector4,
 } from 'three';
 
@@ -38,6 +39,8 @@ uniform vec2 uFlip;
 uniform float uFadeX;
 uniform float uFadeBottom;
 uniform float uBrighten;
+/* Multiplied into the texture: lets one asset serve a colour ramp. */
+uniform vec3 uTint;
 varying vec2 vUv;
 
 void main() {
@@ -66,6 +69,7 @@ void main() {
     alpha *= 1.0 - clamp((box.y - uFadeBottom) / (1.0 - uFadeBottom), 0.0, 1.0);
   }
 
+  color.rgb *= uTint;
   color *= alpha;
   color.rgb += uBrighten * color.a;
   gl_FragColor = color;
@@ -97,6 +101,7 @@ export function createSpriteMaterial(blend: BlendMode = 'normal'): ShaderMateria
       uFadeX: { value: 0 },
       uFadeBottom: { value: 1 },
       uBrighten: { value: 0 },
+      uTint: { value: new Vector3(1, 1, 1) },
     },
     transparent: true,
     depthTest: false,

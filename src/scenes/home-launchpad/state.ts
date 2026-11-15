@@ -2,7 +2,7 @@
  * Homepage local presentation phase (own machine, like P-02's state.ts; the
  * engine's idle/playing/waiting/completed does not apply before the story).
  */
-export type HomePhase = 'idle' | 'ignition' | 'countdown' | 'liftoff' | 'exit' | 'done';
+export type HomePhase = 'idle' | 'ignition' | 'liftoff' | 'exit' | 'done';
 
 export interface HomeGuardSnapshot {
   phase: HomePhase;

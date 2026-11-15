@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { PlaneGeometry, type Mesh, type ShaderMaterial } from 'three';
+import { PlaneGeometry, Vector3, type Mesh, type ShaderMaterial } from 'three';
 import {
   computeSpriteFit,
   normaliseCrop,
@@ -31,6 +31,13 @@ export interface SpriteStyleProps {
   flipX?: boolean;
   flipY?: boolean;
   opacity?: number;
+  /**
+   * Multiplier applied to the texture, 0..1 per channel.
+   *
+   * One crowd asset is drawn five times at five tones, so the colour ramp costs
+   * no extra files. The values are the ratios target/asset, not a colour.
+   */
+  tint?: readonly [number, number, number];
   /** Elliptical clip in box fractions: cx, cy, rx, ry. */
   mask?: readonly [number, number, number, number];
   fadeX?: number;
@@ -55,6 +62,7 @@ export function SpriteMesh({
   flipX,
   flipY,
   opacity = 1,
+  tint,
   mask,
   fadeX,
   fadeBottom,
@@ -111,6 +119,11 @@ export function SpriteMesh({
       fadeBottom,
     });
   }, [material, source, layout, mask, flipX, flipY, fadeX, fadeBottom]);
+
+  useLayoutEffect(() => {
+    const [r, g, b] = tint ?? [1, 1, 1];
+    (material.uniforms.uTint.value as Vector3).set(r, g, b);
+  }, [material, tint]);
 
   useFrame((state) => {
     const mesh = meshRef.current;

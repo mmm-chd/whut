@@ -4,6 +4,19 @@
   font-display: swap;
 }
 
+/*
+ * Fredoka (SIL OFL 1.1, Google Fonts), self-hosted so the app still works
+ * offline. It carries the display voice of the splash and the launch/space
+ * surfaces; DK Cool Crayon keeps every handwriting surface.
+ */
+@font-face {
+  font-family: 'Fredoka';
+  src: url('./assets/fonts/fredoka-latin.woff2') format('woff2');
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* --- Global palette (concept 12.2) ---------------------------------------
      One source of truth for every stage. The homepage adds the Dusk palette
@@ -21,16 +34,31 @@
   --terracotta: #b95e43;
   --ink: #493c32;
 
-  /* --- Dusk palette (concept 4.5, homepage only) --------------------------- */
-  --dusk-violet: #6b4a9a;
-  --dusk-pink: #d5507a;
-  --horizon-orange: #f2926e;
+  /* --- Story cream --------------------------------------------------------
+     The one value that outlived the Dusk palette: eight stylesheets use it for
+     light type on dark regolith and on the splash navy, so it stays while the
+     rest of the homepage-only Dusk tokens are gone. */
   --cream: #fff1d6;
-  --silhouette: #2a1f63;
-  --rocket-silver: #d5dcf0;
-  --rocket-navy: #2e3c8c;
-  --flame-yellow: #f5b82e;
-  --blush: #e9bfe0;
+
+  /* --- Clear-day palette (launchpad) --------------------------------------
+     Read from the prototype `docs-base/Cerita Roket (2).html`: a bright day
+     launch site, blue sky and gold pad, so the launchpad finally looks like the
+     scene the rocket is standing in. The journal keeps the Mars paper palette
+     above; the splash keeps its own navy card. See
+     src/docs/stage00-01-splash-home-plan.md section 4.2. */
+  --day-sky-top: #6f9bb8;
+  --day-sky-mid: #8db1c6;
+  --day-sky-low: #b9d0d5;
+  --day-ink: #1b2f33;
+  --day-teal: #2f4f55;
+  --day-cream: #f3e3c3;
+
+  /* --- Type ---------------------------------------------------------------
+     `--font-hand` is the crayon face for handwritten surfaces; `--font-display`
+     is the rounded display face for titles and the launch. They are separate so
+     swapping one never drags the other along. */
+  --font-hand: 'DK Cool Crayon', 'Segoe Print', 'Comic Sans MS', cursive;
+  --font-display: 'Fredoka', 'DK Cool Crayon', system-ui, sans-serif;
 
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;

@@ -20,8 +20,8 @@ import { useP06Intro } from './useP06Intro';
 import { P06World } from './World';
 import './P06.css';
 
-/** How long the closing line is left on screen before the fade starts. */
-export const P06_FINAL_HOLD_MS = 2600;
+/** How long the deck's fade-out has to settle before the exit fade starts. */
+export const P06_FINAL_HOLD_MS = 1000;
 /** The fade to black that ends the chapter. */
 export const P06_EXIT_FADE_MS = 700;
 
@@ -58,8 +58,7 @@ export function Scene07CheyavaFalls() {
 
   // Read fresh from the store at the moment of the press instead of carrying a
   // snapshot that could be a render behind.
-  const visible =
-    typeof document === 'undefined' || document.visibilityState !== 'hidden';
+  const visible = typeof document === 'undefined' || document.visibilityState !== 'hidden';
   const readContext = useCallback((): P06Context => {
     const store = useStoryStore.getState();
     return {
@@ -128,8 +127,9 @@ export function Scene07CheyavaFalls() {
     return () => cancelAnimationFrame(frame);
   }, [run, state.phase]);
 
-  // The closing line is read for a fixed, readable hold. Text-only, so it can
-  // never wait for an `ended` event that will not fire.
+  // The final hold gives the deck's fade-out time to settle before the chapter
+  // ends, without leaving dead air on screen. Text-only, so it can never wait
+  // for an `ended` event that will not fire.
   useEffect(() => {
     if (state.phase !== 'final') {
       return;
@@ -167,10 +167,9 @@ export function Scene07CheyavaFalls() {
     '--cursor-active': 'pointer',
   } as CSSProperties;
 
-  // The deck stays mounted through the closing line so it can fade out; the
+  // The deck stays mounted through the final hold so it can fade out; the
   // player inside it is torn down by `leaving` the moment Continue is accepted.
-  const showDeck =
-    state.phase === 'cards' || state.phase === 'final' || state.phase === 'exit';
+  const showDeck = state.phase === 'cards' || state.phase === 'final' || state.phase === 'exit';
   const leaving = state.phase !== 'cards';
 
   return (
@@ -198,7 +197,9 @@ export function Scene07CheyavaFalls() {
         </div>
       ) : null}
 
-      {showDeck ? <div className="p06-scrim" data-scrim data-leaving={leaving ? 'true' : 'false'} /> : null}
+      {showDeck ? (
+        <div className="p06-scrim" data-scrim data-leaving={leaving ? 'true' : 'false'} />
+      ) : null}
       {showDeck ? (
         <div className="p06-deck" data-deck>
           <p className="p06-invite">{P06_COPY.invite}</p>
@@ -211,15 +212,6 @@ export function Scene07CheyavaFalls() {
             reducedMotion={reducedMotion}
             leaving={leaving}
           />
-        </div>
-      ) : null}
-      {state.phase === 'final' || state.phase === 'exit' ? (
-        <div className="p06-closing" data-closing role="status">
-          <p>
-            Cheyava Falls holds intriguing clues. Scientists need more evidence to understand
-            what they mean. The Sapphire Canyon core is waiting for closer study in laboratories
-            on Earth.
-          </p>
         </div>
       ) : null}
       {state.phase === 'exit' ? <div className="p06-fade" data-exit-fade /> : null}

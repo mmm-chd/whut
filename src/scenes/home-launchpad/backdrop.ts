@@ -35,19 +35,17 @@ export function layerStops(
   return stops.map((stop) => ({ at: stop.at - layerTop, color: stop.color }));
 }
 
-/** Dusk sky (concept 4.5): violet crown, plum and pink middle, coral horizon. */
-export const DUSK_SKY: readonly DesignStop[] = [
-  { at: 0, color: '#4b3180' },
-  { at: 120, color: '#583a8a' },
-  { at: 240, color: '#6b4a9a' },
-  { at: 360, color: '#7c4c9b' },
-  { at: 470, color: '#8f4d97' },
-  { at: 570, color: '#a44f90' },
-  { at: 620, color: '#bd5088' },
-  { at: 680, color: '#d5507a' },
-  { at: 730, color: '#e47275' },
-  { at: 780, color: '#f2926e' },
-  { at: 860, color: '#f4a07a' },
+/**
+ * The launchpad sky, read straight off P-02's `sky.png` (1670x942): #82a5b4 at
+ * the crown, #88acbc at 42 % of the frame, #a5bbc1 at 70 %, #bdc4be at 85 % and
+ * #d6cebb at the horizon. Nothing here is invented — the rows are pixel reads
+ * from the launch-site art the rocket actually stands in.
+ */
+export const HOME_SKY: readonly DesignStop[] = [
+  { at: 0, color: '#6f9bb8' },
+  { at: 648, color: '#8db1c6' },
+  { at: 842, color: '#b9d0d5' },
+  { at: 1080, color: '#b9d0d5' },
 ];
 
 /** Deep space behind the sky, revealed when the rocket leaves (concept 4.7). */
@@ -108,20 +106,6 @@ export function ridgePolygon(
   return [...line, [last[0], baseY] as Point, [first[0], baseY] as Point];
 }
 
-/** Same ridge, but as a thin paper strip of `thickness` below the line. */
-export function stripPolygon(keys: readonly Point[], thickness: number, passes = 2): Polygon {
-  if (keys.length < 2) {
-    return [];
-  }
-  let line = keys.map(([x, y]) => [x, y] as Point);
-  for (let pass = 0; pass < passes; pass++) {
-    line = chaikin(line);
-  }
-  const lower = line.map(([x, y]) => [x, y + thickness] as Point);
-  return [...line, ...lower.reverse()];
-}
-
-/** A regular polygon approximating a circle (paper-cut dots and cloud lobes). */
 export function circlePolygon(cx: number, cy: number, radius: number, segments = 28): Polygon {
   const points: Point[] = [];
   for (let index = 0; index < segments; index++) {
@@ -204,39 +188,62 @@ export const HILL_NEAR_KEYS: readonly Point[] = [
   [2240, 838],
 ];
 
-/** The coral sea, gently undulating, filling the bottom third. */
-export const SEA_KEYS: readonly Point[] = [
-  [-320, 872],
-  [160, 858],
-  [520, 870],
-  [880, 852],
-  [1240, 868],
-  [1600, 850],
-  [1960, 866],
-  [2240, 856],
-];
+/**
+ * The crowd stands along a concave arc (owner lock L8): the feet line is the
+ * lower half of an ellipse, lowest in the middle so the rocket keeps open
+ * ground, and rising toward both edges. Numbers come from the plan
+ * (src/docs/stage00-01-splash-home-plan.md, section 6.1) and are mirrored in
+ * `layers.ts` for placement.
+ */
+export const CROWD_ARC = { cx: 960, cy: 480, rx: 1100, ry: 520 } as const;
 
-/** Wavy stripes across the sea (reference: salmon, pink, pale peach). */
-export interface SeaStripe {
-  keys: readonly Point[];
-  color: string;
-  thickness: number;
+/** Each further row of figures stands this much deeper down the bowl. */
+export const CROWD_ROW_STEP = 34;
+
+/** Feet line of the crowd at design x. Flat below the arc means "inside". */
+export function crowdFeetY(x: number): number {
+  // Clamped to the ellipse's own domain, not the frame: the prototype's arc
+  // ends at y = 480 at x = -140 and 2060, so the overscan outside the frame
+  // holds 480 instead of running up the far side of the ellipse.
+  const frameX = Math.max(CROWD_ARC.cx - CROWD_ARC.rx, Math.min(CROWD_ARC.cx + CROWD_ARC.rx, x));
+  const t = (frameX - CROWD_ARC.cx) / CROWD_ARC.rx;
+  return CROWD_ARC.cy + CROWD_ARC.ry * Math.sqrt(1 - t * t);
 }
 
-function stripeKeys(startY: number, amplitude: number, phase: number): readonly Point[] {
-  const keys: Point[] = [];
-  for (let x = -320; x <= 2240; x += 160) {
-    keys.push([x, startY + Math.sin((x / 260) * Math.PI + phase) * amplitude]);
+/**
+ * Feet line of row `row` (0 = back row). Five rows step 34 design px down the
+ * bowl, so the front row is both lower and larger and reads as nearer.
+ */
+export function crowdRowFeetY(x: number, row: number): number {
+  return crowdFeetY(x) + CROWD_ROW_STEP * row;
+}
+
+/** Tangent of the arc at design x, in degrees, for leaning the ground shadow. */
+export function crowdSlope(x: number): number {
+  const frameX = Math.max(0, Math.min(1920, x));
+  const t = (frameX - CROWD_ARC.cx) / CROWD_ARC.rx;
+  const span = 1 - t * t;
+  if (span <= 0) {
+    return 0;
   }
-  return keys;
+  const dy = (-CROWD_ARC.ry * t) / Math.sqrt(span);
+  return (Math.atan(dy / CROWD_ARC.rx) * 180) / Math.PI;
 }
 
-export const SEA_STRIPES: readonly SeaStripe[] = [
-  { keys: stripeKeys(940, 9, 0), color: '#f2926e', thickness: 12 },
-  { keys: stripeKeys(996, 8, 1.1), color: '#f7a88c', thickness: 10 },
-  { keys: stripeKeys(1046, 7, 2.2), color: '#efd7bd', thickness: 8 },
-  { keys: stripeKeys(1100, 6, 0.6), color: '#e87e6f', thickness: 14 },
-];
+/**
+ * The regolith mass under the crowd: the arc, sampled, closed down to the
+ * bottom of the design frame. No gap can appear under the figures.
+ */
+export function crowdGroundPolygon(baseY = 1500): Polygon {
+  const points: Point[] = [];
+  for (let x = -320; x <= 2240; x += 80) {
+    points.push([x, crowdFeetY(x)]);
+  }
+  // Close the arc down to the bottom of the frame: the mass, not just the line.
+  const first = points[0];
+  const last = points[points.length - 1];
+  return [...points, [last[0], baseY] as Point, [first[0], baseY] as Point];
+}
 
 /** Paper shadow sits this far under each ridge (concept 4.5). */
 export const PAPER_SHADOW = { dx: 0, dy: 18 } as const;
@@ -258,9 +265,9 @@ export const PAPER_CLOUDS: readonly PaperCloud[] = [
 
 /** Cloud paper tones: the fill plus the shadow bar underneath. */
 export const CLOUD_TONES = {
-  cream: { fill: '#fff1d6', shade: '#e9bfe0' },
-  peach: { fill: '#ffe1b8', shade: '#e8b48f' },
-  pink: { fill: '#f7c4d8', shade: '#d9a3bf' },
+  cream: { fill: '#f3e3c3', shade: '#dccfb4' },
+  peach: { fill: '#efe5cf', shade: '#dcd0b4' },
+  pink: { fill: '#e9dcc0', shade: '#cfc0a2' },
 } as const;
 
 /** Crescent moon: upper-left in the reference, clear of the clouds. */

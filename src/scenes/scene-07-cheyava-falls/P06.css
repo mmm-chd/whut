@@ -651,25 +651,7 @@
   padding: 10px 16px;
 }
 
-/* The closing line and the fade that ends the chapter. */
-.p06-closing {
-  position: absolute;
-  inset: auto clamp(16px, 6vw, 90px) clamp(90px, 16vh, 140px);
-  z-index: 3;
-  padding: 16px 20px;
-  border: 2px solid rgb(255 241 214 / 26%);
-  border-radius: 16px;
-  background: rgb(8 24 30 / 88%);
-  box-shadow: 0 18px 34px rgb(3 10 14 / 46%);
-  color: var(--cream);
-  font-size: clamp(0.95rem, 1.9vw, 1.06rem);
-  line-height: 1.62;
-}
-
-.p06-closing p {
-  margin: 0;
-}
-
+/* The fade that ends the chapter. */
 .p06-fade {
   position: absolute;
   inset: 0;

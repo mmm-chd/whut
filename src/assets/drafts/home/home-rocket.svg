@@ -1,43 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 430" width="200" height="430">
-  <!-- Paper-cut rocket: silver body, navy nosecone and bands, teal porthole. -->
-  <!-- Side boosters -->
-  <g>
-    <path d="M40 180 Q40 168 52 168 L58 168 Q70 168 70 180 L70 372 L40 372 Z" fill="#DFE5F4"/>
-    <path d="M40 180 L40 372 L52 372 L52 180 Q52 172 55 170 L52 170 Q42 172 40 180 Z" fill="#F6F8FE"/>
-    <path d="M58 180 L58 372 L70 372 L70 180 Q70 172 62 170 L62 170 Q60 172 58 180 Z" fill="#C4CDE8"/>
-    <path d="M38 174 Q55 138 72 174 L72 186 L38 186 Z" fill="#2E3C8C"/>
-    <path d="M55 150 L55 138 Q56 136 58 138 L58 150 Z" fill="#23306E"/>
-    <rect x="44" y="372" width="22" height="16" rx="4" fill="#2E3C8C"/>
-  </g>
-  <g>
-    <path d="M130 180 Q130 168 142 168 L148 168 Q160 168 160 180 L160 372 L130 372 Z" fill="#DFE5F4"/>
-    <path d="M130 180 L130 372 L142 372 L142 180 Q142 172 145 170 L142 170 Q132 172 130 180 Z" fill="#F6F8FE"/>
-    <path d="M148 180 L148 372 L160 372 L160 180 Q160 172 152 170 L152 170 Q150 172 148 180 Z" fill="#C4CDE8"/>
-    <path d="M128 174 Q145 138 162 174 L162 186 L128 186 Z" fill="#2E3C8C"/>
-    <path d="M145 150 L145 138 Q146 136 148 138 L148 150 Z" fill="#23306E"/>
-    <rect x="134" y="372" width="22" height="16" rx="4" fill="#2E3C8C"/>
-  </g>
-  <!-- Main body -->
-  <path d="M55 96 Q55 88 63 88 L137 88 Q145 88 145 96 L145 380 L55 380 Z" fill="#E9EDF8"/>
-  <path d="M55 96 Q55 88 63 88 L78 88 L78 380 L55 380 Z" fill="#F8FAFF"/>
-  <path d="M128 88 L137 88 Q145 88 145 96 L145 380 L128 380 Z" fill="#CBD4EE"/>
-  <!-- Nosecone -->
-  <path d="M100 6 Q130 34 142 92 L58 92 Q70 34 100 6 Z" fill="#2E3C8C"/>
-  <path d="M100 6 Q78 30 68 74 Q82 52 100 48 Q118 52 132 74 Q122 30 100 6 Z" fill="#3D4CA0" opacity="0.55"/>
-  <!-- Stripes -->
-  <rect x="55" y="104" width="90" height="13" fill="#2E3C8C"/>
-  <rect x="55" y="146" width="90" height="10" fill="#35C4B5"/>
-  <g fill="#E2574C">
-    <circle cx="73" cy="175" r="4"/><circle cx="90" cy="175" r="4"/>
-    <circle cx="110" cy="175" r="4"/><circle cx="127" cy="175" r="4"/>
-  </g>
-  <rect x="55" y="298" width="90" height="14" fill="#2E3C8C"/>
-  <rect x="55" y="320" width="90" height="7" fill="#E2574C"/>
-  <!-- Porthole -->
-  <circle cx="100" cy="128" r="20" fill="#2E3C8C"/>
-  <circle cx="100" cy="128" r="14" fill="#35C4B5"/>
-  <circle cx="95" cy="123" r="4" fill="#A8EFE5"/>
-  <!-- Engine skirt -->
-  <path d="M55 380 L145 380 L145 396 L55 396 Z" fill="#2E3C8C"/>
-  <path d="M70 396 L130 396 L122 424 L78 424 Z" fill="#23306E"/>
+  <!-- Windowless paper-cut launch vehicle. Its opening is a mission bay, not a cockpit. -->
+  <defs><linearGradient id="body" x1="0" x2="1"><stop offset="0" stop-color="#f3e3c3"/><stop offset=".48" stop-color="#ece0c4"/><stop offset="1" stop-color="#d6c8a8"/></linearGradient></defs>
+  <!-- Side boosters with caps, bands and separate engine skirts. -->
+  <g><path d="M30 180Q30 165 43 165H59Q72 165 72 180V365H30Z" fill="#d6c8a8"/><path d="M30 180Q30 165 43 165H51V365H30Z" fill="#f3e3c3"/><path d="M27 175Q42 136 59 165L72 175V189H27Z" fill="#c48d5c"/><path d="M30 242H72V252H30Z" fill="#8a5a3a"/><path d="M35 258H67V264H35Z" fill="#dba474"/><path d="M34 365H68L63 390H39Z" fill="#8a5a3a"/><path d="M39 390H63L58 402H44Z" fill="#c48d5c"/></g>
+  <g><path d="M128 180Q128 165 141 165H157Q170 165 170 180V365H128Z" fill="#d6c8a8"/><path d="M128 180Q128 165 141 165H149V365H128Z" fill="#ece0c4"/><path d="M128 175L141 165Q158 136 173 175V189H128Z" fill="#c48d5c"/><path d="M128 242H170V252H128Z" fill="#8a5a3a"/><path d="M133 258H165V264H133Z" fill="#dba474"/><path d="M132 365H166L161 390H137Z" fill="#8a5a3a"/><path d="M137 390H161L156 402H142Z" fill="#c48d5c"/></g>
+  <!-- Main stage: deliberately solid, with no cockpit glazing. -->
+  <path d="M52 93Q52 85 61 85H139Q148 85 148 93V377H52Z" fill="url(#body)"/><path d="M52 93Q52 85 61 85H75V377H52Z" fill="#fff0cf" opacity=".72"/><path d="M130 85H139Q148 85 148 93V377H130Z" fill="#c9bb98" opacity=".62"/>
+  <path d="M100 5Q132 35 145 90H55Q68 35 100 5Z" fill="#e2d5b8"/><path d="M100 5Q82 28 70 67Q87 50 100 43Q113 50 130 67Q118 28 100 5Z" fill="#efe5cf"/><path d="M55 90H145V104H55Z" fill="#c48d5c"/><path d="M55 104H145V111H55Z" fill="#8a5a3a"/>
+  <!-- Structural panel seams and thermal bands make the body read as a vehicle. -->
+  <g fill="#c9bb98" opacity=".9"><rect x="66" y="122" width="3" height="166"/><rect x="100" y="114" width="3" height="256"/><rect x="132" y="122" width="3" height="166"/></g><path d="M52 156H148V167H52Z" fill="#3f6b70"/><path d="M52 167H148V173H52Z" fill="#2f5256"/><path d="M52 292H148V306H52Z" fill="#c48d5c"/><path d="M52 306H148V313H52Z" fill="#dba474"/><g fill="#dba474"><circle cx="73" cy="188" r="4"/><circle cx="87" cy="188" r="4"/><circle cx="113" cy="188" r="4"/><circle cx="127" cy="188" r="4"/></g>
+  <!-- Open payload / mission bay: Perseverance is cargo, not a person in a window. -->
+  <rect x="68" y="205" width="64" height="65" rx="4" fill="#8a5a3a"/><rect x="72" y="209" width="56" height="57" rx="2" fill="#2f5256"/><path d="M68 205H132L139 198H61Z" fill="#e6d8bb"/><path d="M68 270H132L138 276H62Z" fill="#c48d5c"/>
+  <g fill="#e6d8bb"><path d="M80 246H119L114 230H88Z"/><rect x="91" y="221" width="20" height="8" rx="2"/><path d="M100 221V214L108 209" fill="none" stroke="#e6d8bb" stroke-width="3"/></g><g fill="#1f3a40"><circle cx="87" cy="250" r="6"/><circle cx="100" cy="250" r="6"/><circle cx="113" cy="250" r="6"/></g><path d="M83 239H117" stroke="#dba474" stroke-width="3"/><circle cx="109" cy="208" r="3" fill="#f3e3c3"/>
+  <!-- Fins, interstage and clustered engine nozzles. -->
+  <path d="M52 325L30 365H52Z" fill="#c48d5c"/><path d="M148 325L170 365H148Z" fill="#8a5a3a"/><path d="M52 377H148V394H52Z" fill="#c48d5c"/><path d="M65 394H135L126 421H74Z" fill="#8a5a3a"/><g fill="#2f5256"><path d="M76 398H88L85 416H79Z"/><path d="M94 398H106L103 421H97Z"/><path d="M112 398H124L121 416H115Z"/></g>
 </svg>

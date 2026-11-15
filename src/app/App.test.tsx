@@ -94,7 +94,7 @@ describe('App splash and homepage stages', () => {
     // The homepage is already mounted (preloading) behind the overlay.
     expect(app.container.querySelector('[data-scene="home-launchpad"]')).not.toBeNull();
     expect(app.container.querySelector('.splash-overlay')).not.toBeNull();
-    expect(app.container.textContent).toContain('What happens up there?');
+    expect(app.container.textContent).toContain('What Happens Up There');
 
     // Frame 1 -> frame 2 (the AI note).
     await act(async () => {

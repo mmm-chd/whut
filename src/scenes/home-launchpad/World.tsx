@@ -8,12 +8,11 @@ import { SceneGroup } from '../../three/SceneGroup';
 import { SpriteLayer, SpriteMesh } from '../../three/SpriteLayer';
 import type { LoadedTexture } from '../../three/textures';
 import type { SceneNode } from '../../three/nodeState';
+import { PAD, cloudBands, horizonBand, launchComplex, padGantry, padHills, padSlab } from './padArt';
 import { ParallaxGroup } from './ParallaxLayers';
+import { SpaceWedge } from './SpaceWedge';
 import {
-  BOAT,
-  CROWD,
-  CROWD_SPRITE_ASPECT,
-  DUSK,
+  HOME,
   FLAME,
   ROCKET,
   ROCKET_CENTER,
@@ -28,21 +27,9 @@ import {
 } from './layers';
 import {
   CLOUD_TONES,
-  HILL_FAR_KEYS,
-  HILL_NEAR_KEYS,
   MOON,
   PAPER_CLOUDS,
-  PAPER_SHADOW,
-  SEA_KEYS,
-  SEA_STRIPES,
-  SKY_SPARKLES,
-  SKY_STARS,
   cloudCircles,
-  diamondPolygon,
-  offsetPolygon,
-  ridgePolygon,
-  sparklePolygon,
-  stripPolygon,
 } from './backdrop';
 import { smokeClusterBase, smokeClusterCenter, type HomeNodes } from './nodes';
 
@@ -62,12 +49,28 @@ const ORDER = {
   sea: 5,
   clouds: 8,
   towers: 10,
-  smokeFar: 20,
+  smokeBack: 20,
   flame: 21,
   rocket: 22,
-  smokeMid: 30,
-  smokeNear: 31,
-  crowd: 40,
+  smokeFront: 31,
+  // Quiet foreground launch-site equipment sits in front of the pad, but behind
+  // the wedge, smoke and rocket so the exit still reads as one continuous move.
+  /** The pad the prototype draws: hills, road, gantry, slab (plan T6c). */
+  padClouds: 6.5,
+  padTower: 10.1,
+  padBrace: 10.2,
+  padArm: 10.3,
+  padRail: 10.4,
+  padSlab: 10.5,
+  padSkirt: 10.6,
+  padLeg: 10.7,
+  padShadow: 10.75,
+  padPlatform: 10.8,
+  complex: 11,
+  wedgeShadow: 12,
+  wedgeRim: 12.4,
+  wedgeFill: 12.8,
+  wedgeStar: 13.2,
 } as const;
 
 /** Soft round star drawn once to a small canvas. */
@@ -141,15 +144,21 @@ interface SmokeLayerProps {
   order: number;
 }
 
-/** One smoke depth layer: two sprites, breathing about their centres. */
+/**
+ * One smoke depth layer: two sprites, breathing about their centres.
+ *
+ * Each sprite gets its own group driven by the same motion node, pivoted on
+ * its OWN base. A shared pivot would scale the second cluster away from the
+ * frame — at 5x the offset between clusters becomes thousands of design pixels
+ * and the exit cover only filled a corner.
+ */
 function SmokeLayer({ asset, clusters, motion, idle, depth, order }: SmokeLayerProps) {
   return (
-    <SceneGroup node={motion} pivot={smokeClusterBase(clusters[0])}>
-      <ParallaxGroup depth={depth}>
-        <SceneGroup node={idle} pivot={smokeClusterCenter(clusters[0])}>
-          {clusters.map((cluster, index) => (
+    <ParallaxGroup depth={depth}>
+      {clusters.map((cluster, index) => (
+        <SceneGroup key={index} node={motion} pivot={smokeClusterBase(cluster)}>
+          <SceneGroup node={idle} pivot={smokeClusterCenter(cluster)}>
             <SpriteLayer
-              key={index}
               asset={asset}
               x={cluster.left}
               y={cluster.top}
@@ -157,35 +166,17 @@ function SmokeLayer({ asset, clusters, motion, idle, depth, order }: SmokeLayerP
               h={cluster.width / SMOKE_SPRITE_ASPECT}
               order={order}
             />
-          ))}
+          </SceneGroup>
         </SceneGroup>
-      </ParallaxGroup>
-    </SceneGroup>
+      ))}
+    </ParallaxGroup>
   );
 }
 
 export function HomeWorld({ nodes }: { nodes: HomeNodes }) {
   const spaceDot = useStarDot('rgba(255, 255, 255, 0.95)');
 
-  // Backdrop geometry: built once, the ridge smoothing is the expensive part.
-  const starDiamonds = useMemo(
-    () => SKY_STARS.map(([x, y, radius]) => diamondPolygon(x, y, radius)),
-    [],
-  );
-  const starSparkles = useMemo(
-    () => SKY_SPARKLES.map(([x, y, radius]) => sparklePolygon(x, y, radius)),
-    [],
-  );
-  const hillFar = useMemo(() => ridgePolygon(HILL_FAR_KEYS, 1500), []);
-  const hillNear = useMemo(() => ridgePolygon(HILL_NEAR_KEYS, 1500), []);
-  const sea = useMemo(() => ridgePolygon(SEA_KEYS, 1500), []);
-  const seaStripes = useMemo(
-    () => SEA_STRIPES.map((stripe) => ({
-      color: stripe.color,
-      polygons: [stripPolygon(stripe.keys, stripe.thickness)],
-    })),
-    [],
-  );
+  // Backdrop geometry: built once.
   const cloudShapes = useMemo(
     () => PAPER_CLOUDS.map((cloud) => ({
       fill: cloudCircles(cloud),
@@ -245,12 +236,6 @@ export function HomeWorld({ nodes }: { nodes: HomeNodes }) {
         </ParallaxGroup>
       </SceneGroup>
 
-      {/* Paper stars: cut diamonds for the specks, cut sparkles for the eye. */}
-      <ParallaxGroup depth={0.04}>
-        <FlatShapes polygons={starDiamonds} color={DUSK.cream} order={ORDER.duskStars} />
-        <FlatShapes polygons={starSparkles} color="#ffe1b8" order={ORDER.duskSparkles} />
-      </ParallaxGroup>
-
       {/* Crescent moon. */}
       <SceneGroup node={nodes.moon.motion}>
         <ParallaxGroup depth={0.06}>
@@ -258,41 +243,13 @@ export function HomeWorld({ nodes }: { nodes: HomeNodes }) {
         </ParallaxGroup>
       </SceneGroup>
 
-      {/* Horizon: two stacked paper ridges and a striped sea, each cut-out with
-          its own soft shadow underneath (concept 4.5). */}
-      <SceneGroup node={nodes.sea.motion}>
+      {/* Horizon and the ground plane of the launch complex. */}
+      <SceneGroup node={nodes.ground.motion}>
         <ParallaxGroup depth={0.1}>
-          <FlatShapes
-            polygons={[offsetPolygon(hillFar, 0, PAPER_SHADOW.dy)]}
-            color="#5b3470"
-            order={ORDER.sea - 0.3}
-          />
-          <FlatShapes polygons={[hillFar]} color={DUSK.hillsDark} order={ORDER.sea - 0.2} />
-          <FlatShapes
-            polygons={[offsetPolygon(hillNear, 0, PAPER_SHADOW.dy)]}
-            color="#4a2a5e"
-            order={ORDER.sea - 0.1}
-          />
-          <FlatShapes polygons={[hillNear]} color={DUSK.hills} order={ORDER.sea} />
-          <FlatShapes
-            polygons={[offsetPolygon(sea, 0, PAPER_SHADOW.dy)]}
-            color="#c4576b"
-            order={ORDER.sea + 0.1}
-          />
-          <FlatShapes polygons={[sea]} color={DUSK.sea} order={ORDER.sea + 0.2} />
-          {seaStripes.map((stripe, index) => (
-            <FlatShapes
-              key={`stripe-${index}`}
-              polygons={stripe.polygons}
-              color={stripe.color}
-              order={ORDER.sea + 0.3 + index * 0.01}
-            />
-          ))}
-          <SceneGroup node={nodes.boat.motion}>
-            <SceneGroup node={nodes.boat.idle}>
-              <SpriteLayer asset="home-ship" x={BOAT.left} y={BOAT.top} w={BOAT.width} fit="contain" order={ORDER.sea + 3} />
-            </SceneGroup>
-          </SceneGroup>
+          <FlatShapes rawSrgb polygons={[horizonBand]} color={PAD.horizon} order={ORDER.sea - 0.3} />
+          <FlatShapes rawSrgb polygons={[padHills.far]} color={PAD.hillFar} order={ORDER.sea - 0.2} />
+          <FlatShapes rawSrgb polygons={[padHills.near]} color={PAD.hillNear} order={ORDER.sea - 0.1} />
+          <FlatShapes rawSrgb polygons={[launchComplex.ground]} color={HOME.hills} order={ORDER.sea + 0.1} />
         </ParallaxGroup>
       </SceneGroup>
 
@@ -305,13 +262,38 @@ export function HomeWorld({ nodes }: { nodes: HomeNodes }) {
           <SceneGroup key={`cloud-${index}`} node={nodes.clouds[index].motion}>
             <ParallaxGroup depth={0.12}>
               <SceneGroup node={nodes.clouds[index].idle}>
-                <FlatShapes polygons={shape.shade} color={tone.shade} order={ORDER.clouds} />
-                <FlatShapes polygons={shape.fill} color={tone.fill} order={ORDER.clouds + 0.1} />
+                <FlatShapes rawSrgb polygons={shape.shade} color={tone.shade} order={ORDER.clouds} />
+                <FlatShapes rawSrgb polygons={shape.fill} color={tone.fill} order={ORDER.clouds + 0.1} />
               </SceneGroup>
             </ParallaxGroup>
           </SceneGroup>
         );
       })}
+
+      {/* Separate the broad cloud bands from the sky so they contribute a
+          gentle far-field parallax, rather than moving as a single backdrop. */}
+      <ParallaxGroup depth={0.08}>
+        <FlatShapes rawSrgb polygons={cloudBands} color={HOME.cream} order={ORDER.padClouds} />
+      </ParallaxGroup>
+
+      {/* The launch pad: green foothills, the gantry and the gold slab the rocket
+          stands on. Every polygon is read from the prototype (plan T6c); the pad
+          is paper, so it all takes `rawSrgb`. The prototype's access road is
+          not drawn: in the prototype the crowd mass covers it, here it read as
+          a stray strip. */}
+      <ParallaxGroup depth={0.22}>
+        <SceneGroup node={nodes.ground.idle}>
+          <FlatShapes rawSrgb polygons={[padGantry.tower]} color={PAD.teal} order={ORDER.padTower} />
+          <FlatShapes rawSrgb polygons={padGantry.braces} color={PAD.brace} order={ORDER.padBrace} />
+          <FlatShapes rawSrgb polygons={padGantry.arms} color={PAD.gold} order={ORDER.padArm} />
+          <FlatShapes rawSrgb polygons={padGantry.rails} color={PAD.gold} order={ORDER.padRail} />
+          <FlatShapes rawSrgb polygons={[padSlab.slab]} color={PAD.gold} order={ORDER.padSlab} />
+          <FlatShapes rawSrgb polygons={[padSlab.skirt]} color={PAD.teal} order={ORDER.padSkirt} />
+          <FlatShapes rawSrgb polygons={padSlab.legs} color={PAD.leg} order={ORDER.padLeg} />
+          <FlatShapes rawSrgb polygons={[padSlab.shadow]} color={PAD.shadow} opacity={0.5} order={ORDER.padShadow} />
+          <FlatShapes rawSrgb polygons={[padSlab.platform]} color={PAD.platform} order={ORDER.padPlatform} />
+        </SceneGroup>
+      </ParallaxGroup>
 
       {/* Lattice towers behind the smoke. */}
       <SceneGroup node={nodes.towers.motion}>
@@ -330,14 +312,28 @@ export function HomeWorld({ nodes }: { nodes: HomeNodes }) {
         </ParallaxGroup>
       </SceneGroup>
 
-      {/* Smoke depth stack; the transition scales them over the frame. */}
+      {/* The exit: a jagged space wedge rising behind the rocket, its cream rim
+          hiding the seam with the sky (plan §6.2). */}
+      <SpaceWedge
+        nodes={nodes}
+        dot={spaceDot}
+        orders={{
+          shadow: ORDER.wedgeShadow,
+          rim: ORDER.wedgeRim,
+          fill: ORDER.wedgeFill,
+          star: ORDER.wedgeStar,
+        }}
+      />
+
+      {/* Two sand banks, not three (plan T7b). Both ride the wedge's edge: the
+          back bank hides the seam from above, the front bank from below. */}
       <SmokeLayer
         asset="home-smoke-deep"
-        clusters={SMOKE_LAYERS.far}
-        motion={nodes.smokeFar.motion}
-        idle={nodes.smokeFar.idle}
+        clusters={SMOKE_LAYERS.back}
+        motion={nodes.smokeBack.motion}
+        idle={nodes.smokeBack.idle}
         depth={0.25}
-        order={ORDER.smokeFar}
+        order={ORDER.smokeBack}
       />
 
       {/* Rocket: moves about the nozzle; tilts with the cursor. */}
@@ -372,45 +368,32 @@ export function HomeWorld({ nodes }: { nodes: HomeNodes }) {
       </SceneGroup>
 
       <SmokeLayer
-        asset="home-smoke-mid"
-        clusters={SMOKE_LAYERS.mid}
-        motion={nodes.smokeMid.motion}
-        idle={nodes.smokeMid.idle}
-        depth={0.4}
-        order={ORDER.smokeMid}
-      />
-      <SmokeLayer
         asset="home-smoke-near"
-        clusters={SMOKE_LAYERS.near}
-        motion={nodes.smokeNear.motion}
-        idle={nodes.smokeNear.idle}
+        clusters={SMOKE_LAYERS.front}
+        motion={nodes.smokeFront.motion}
+        idle={nodes.smokeFront.idle}
         depth={0.55}
-        order={ORDER.smokeNear}
+        order={ORDER.smokeFront}
       />
 
-      {/* Waving crowd, closest to the camera; the two poses cross-fade. */}
+      {/* Foreground support equipment replaces the crowd: its road, lights,
+          tanks and vehicle create depth without distracting animated figures. */}
       <SceneGroup node={nodes.crowd.motion}>
-        <ParallaxGroup depth={0.8}>
-          <SceneGroup node={nodes.crowd.poseA}>
-            <SpriteLayer
-              asset="home-crowd-a"
-              x={CROWD.left}
-              y={CROWD.top}
-              w={CROWD.width}
-              h={CROWD.width / CROWD_SPRITE_ASPECT}
-              order={ORDER.crowd}
-            />
-          </SceneGroup>
-          <SceneGroup node={nodes.crowd.poseB}>
-            <SpriteLayer
-              asset="home-crowd-b"
-              x={CROWD.left}
-              y={CROWD.top}
-              w={CROWD.width}
-              h={CROWD.width / CROWD_SPRITE_ASPECT}
-              order={ORDER.crowd}
-            />
-          </SceneGroup>
+        <ParallaxGroup depth={0.9}>
+          <FlatShapes rawSrgb polygons={[launchComplex.road]} color={PAD.road} order={ORDER.complex} />
+          <FlatShapes rawSrgb polygons={launchComplex.roadEdges} color={PAD.gold} order={ORDER.complex + 0.01} />
+          <FlatShapes rawSrgb polygons={[launchComplex.roadCentre]} color={PAD.hillNear} order={ORDER.complex + 0.02} />
+          <FlatShapes rawSrgb polygons={launchComplex.lightPoles} color={PAD.teal} order={ORDER.complex + 0.03} />
+          <FlatShapes rawSrgb polygons={launchComplex.lightCaps} color={PAD.brace} order={ORDER.complex + 0.04} />
+          <FlatShapes rawSrgb polygons={launchComplex.lightFaces} color={HOME.cream} order={ORDER.complex + 0.05} />
+          <FlatShapes rawSrgb polygons={launchComplex.tankBodies} color={HOME.cream} order={ORDER.complex + 0.06} />
+          <FlatShapes rawSrgb polygons={launchComplex.tankRoofs} color={PAD.teal} order={ORDER.complex + 0.07} />
+          <FlatShapes rawSrgb polygons={launchComplex.tankDoors} color={PAD.teal} order={ORDER.complex + 0.08} />
+          <FlatShapes rawSrgb polygons={launchComplex.tankWindows} color={HOME.skyMid1} order={ORDER.complex + 0.09} />
+          <FlatShapes rawSrgb polygons={[launchComplex.truckBody]} color={PAD.gold} order={ORDER.complex + 0.1} />
+          <FlatShapes rawSrgb polygons={[launchComplex.truckCab]} color={HOME.hills} order={ORDER.complex + 0.11} />
+          <FlatShapes rawSrgb polygons={[launchComplex.truckWindow]} color={HOME.skyMid1} order={ORDER.complex + 0.12} />
+          <FlatShapes rawSrgb polygons={launchComplex.truckWheels} color={HOME.silhouette} order={ORDER.complex + 0.13} />
         </ParallaxGroup>
       </SceneGroup>
     </>

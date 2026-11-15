@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useExperienceStore } from '../../app/experience.store';
+import '../../styles/stage.css';
 import './SplashOverlay.css';
 
 /**
@@ -49,14 +50,14 @@ export function SplashOverlay() {
   }, []);
 
   return (
-    <div className="splash-overlay" data-leaving={phase === 'leaving'}>
+    <div className="splash-overlay story-space story-grain story-on-dark" data-leaving={phase === 'leaving'}>
       {phase === 'frame1' ? (
-        <p key="hook" className="splash-frame splash-frame--hook">
-          What happens up there?
+        <p key="hook" className="splash-frame story-title">
+          What happens up there
         </p>
       ) : null}
       {phase === 'frame2' ? (
-        <p key="note" className="splash-frame splash-frame--note">
+        <p key="note" className="splash-frame story-note">
           An AI-assisted creative project.
           <br />
           Some visual assets and illustrations are AI-generated.

@@ -256,7 +256,7 @@ function RunnerRun({ runId }: { readonly runId: number }) {
                   <article key={fact.id} className="p07-fact" data-fact={fact.id} data-read={read}>
                     <h2 className="p07-card-title">{fact.title}</h2>
                     <p>{fact.summary}</p>
-                    {fact.status === 'draft' ? <p className="p07-draft">Source still to be checked.</p> : null}
+                    {/* {fact.status === 'draft' ? <p className="p07-draft">Source still to be checked.</p> : null} */}
                   </article>
                 ) : null,
               )}

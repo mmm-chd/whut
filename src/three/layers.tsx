@@ -5,6 +5,7 @@ import {
   CanvasTexture,
   CustomBlending,
   DoubleSide,
+  LinearSRGBColorSpace,
   Mesh,
   MeshBasicMaterial,
   OneFactor,
@@ -12,6 +13,7 @@ import {
   PlaneGeometry,
   Shape,
   ShapeGeometry,
+  SRGBColorSpace,
   ShaderMaterial,
   Vector2,
   Vector3,
@@ -83,10 +85,25 @@ export function FlatShapes({
   polygons,
   color,
   order,
+  /**
+   * Hand the hex to `MeshBasicMaterial` as a raw sRGB value instead of letting
+   * three decode it to linear.
+   *
+   * `WebGLStage` runs its canvas with `linear` so the sprite shader can blend
+   * raw sRGB the way the browser blends <img> layers. That also turns colour
+   * management ON for string colours, which decodes `#bd9a50` to linear and
+   * never encodes it back — the shape lands ~48 % too dark (`#bd9a50` renders
+   * as `#835315`). Pass this when the hex is meant to be the colour on screen.
+   */
+  rawSrgb = false,
+  opacity = 1,
 }: {
   polygons: readonly Polygon[];
   color: string;
   order: number;
+  rawSrgb?: boolean;
+  /** Fill alpha; used by the wedge's soft shadow, which is a tint, not a paint. */
+  opacity?: number;
 }) {
   const geometry = useMemo<BufferGeometry | null>(() => {
     const parts = polygons
@@ -103,17 +120,18 @@ export function FlatShapes({
     return merged;
   }, [polygons]);
 
-  const material = useMemo(
-    () => new MeshBasicMaterial({
-        color,
-        side: DoubleSide,
-        // Transparent puts it in the sorted pass, so renderOrder holds against sprites.
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-      }),
-    [color],
-  );
+  const material = useMemo(() => {
+    const created = new MeshBasicMaterial({
+      side: DoubleSide,
+      // Transparent puts it in the sorted pass, so renderOrder holds against sprites.
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    });
+    created.color.setStyle(color, rawSrgb ? LinearSRGBColorSpace : SRGBColorSpace);
+    created.opacity = opacity;
+    return created;
+  }, [color, rawSrgb, opacity]);
 
   useEffect(
     () => () => {
@@ -124,6 +142,115 @@ export function FlatShapes({
   useEffect(() => () => material.dispose(), [material]);
 
   if (!geometry) {
+    return null;
+  }
+  return <mesh geometry={geometry} material={material} renderOrder={order} frustumCulled={false} />;
+}
+
+// --- Shaped gradient (the space wedge) ---------------------------------------
+
+const shapedVertex = /* glsl */ `
+varying float vWorldY;
+void main() {
+  vec4 world = modelMatrix * vec4(position, 1.0);
+  vWorldY = world.y;
+  gl_Position = projectionMatrix * viewMatrix * world;
+}
+`;
+
+const shapedFragment = /* glsl */ `
+uniform sampler2D map;
+uniform float uTop;
+uniform float uBottom;
+varying float vWorldY;
+void main() {
+  float t = clamp((vWorldY - uTop) / (uBottom - uTop), 0.0, 1.0);
+  gl_FragColor = texture2D(map, vec2(0.5, 1.0 - t));
+}
+`;
+
+/**
+ * A filled polygon carrying a **screen-locked** vertical gradient.
+ *
+ * The wedge moves up as the rocket climbs, but the space behind it must not: it
+ * is the same space the journal sits in. So the gradient is sampled from the
+ * fragment's world y, not from the polygon's own height — the shape can slide
+ * through the gradient without dragging it along.
+ *
+ * The canvas is `linear` (see `WebGLStage`) and sibling shapes use `rawSrgb`, so
+ * the texture stores sRGB bytes and is sampled raw: what the stops say is what
+ * lands on screen.
+ */
+export function ShapedGradient({
+  polygon,
+  stops,
+  top,
+  bottom,
+  order,
+}: {
+  polygon: Polygon;
+  stops: readonly GradientStop[];
+  /** Design y of the gradient's 0 end and 1 end. */
+  top: number;
+  bottom: number;
+  order: number;
+}) {
+  const geometry = useMemo<BufferGeometry | null>(() => {
+    if (polygon.length < 3) {
+      return null;
+    }
+    const shape = new Shape(polygon.map(([x, y]) => new Vector2(x, toWorldY(y))));
+    return new ShapeGeometry(shape);
+  }, [polygon]);
+
+  const texture = useMemo<CanvasTexture | null>(() => {
+    const height = Math.max(2, Math.min(4096, Math.round(Math.abs(bottom - top))));
+    const canvas = document.createElement('canvas');
+    canvas.width = 4;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      return null;
+    }
+    const gradient = context.createLinearGradient(0, 0, 0, height);
+    for (const stop of stops) {
+      gradient.addColorStop(Math.min(1, Math.max(0, stop.at)), stop.color);
+    }
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 4, height);
+    const created = new CanvasTexture(canvas);
+    created.colorSpace = LinearSRGBColorSpace;
+    created.needsUpdate = true;
+    return created;
+  }, [stops, top, bottom]);
+
+  const material = useMemo(() => {
+    const created = new ShaderMaterial({
+      vertexShader: shapedVertex,
+      fragmentShader: shapedFragment,
+      uniforms: {
+        map: { value: texture },
+        uTop: { value: toWorldY(top) },
+        uBottom: { value: toWorldY(bottom) },
+      },
+      side: DoubleSide,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    });
+    return created;
+  }, [texture, top, bottom]);
+
+  useEffect(
+    () => () => {
+      geometry?.dispose();
+    },
+    [geometry],
+  );
+  useEffect(() => () => texture?.dispose(), [texture]);
+  useEffect(() => () => material.dispose(), [material]);
+
+  if (!geometry || !texture) {
     return null;
   }
   return <mesh geometry={geometry} material={material} renderOrder={order} frustumCulled={false} />;

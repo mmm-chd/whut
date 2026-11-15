@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100" width="140" height="100">
   <!-- Tiny paper boat silhouette on the horizon. -->
-  <g fill="#2A1F63">
+  <g fill="#2b3330">
     <path d="M28 66 L112 66 L98 84 L42 84 Z"/>
     <rect x="68" y="20" width="5" height="46"/>
     <path d="M73 22 L73 60 L106 54 Z"/>

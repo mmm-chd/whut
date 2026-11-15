@@ -3,16 +3,10 @@ import { useStoryStore } from '../../stores/story.store';
 import { resetParallax } from './parallax';
 import { resetHomeNodes, type HomeNodes } from './nodes';
 import { canStartLaunch, type HomePhase } from './state';
-import {
-  createHomeIdleLoops,
-  createHomeLaunchTimeline,
-  type HomeCountdown,
-  type HomeLaunchTimeline,
-} from './timeline';
+import { createHomeIdleLoops, createHomeLaunchTimeline, type HomeLaunchTimeline } from './timeline';
 
 export interface HomeSceneApi {
   phase: HomePhase;
-  countdown: HomeCountdown;
   startLaunch: () => void;
 }
 
@@ -24,7 +18,6 @@ export interface HomeSceneApi {
 export function useHomeScene(nodes: HomeNodes, onComplete: () => void): HomeSceneApi {
   const reducedMotion = useStoryStore((state) => state.settings.reducedMotion);
   const [phase, setPhase] = useState<HomePhase>('idle');
-  const [countdown, setCountdown] = useState<HomeCountdown>(null);
 
   const phaseRef = useRef<HomePhase>('idle');
   const driverRef = useRef<HomeLaunchTimeline | null>(null);
@@ -80,12 +73,11 @@ export function useHomeScene(nodes: HomeNodes, onComplete: () => void): HomeScen
         phaseRef.current = next;
         setPhase(next);
       },
-      onCountdown: (value) => setCountdown(value),
       onComplete: () => onCompleteRef.current(),
     });
     driverRef.current = driver;
     driver.play(0);
   }, [nodes]);
 
-  return { phase, countdown, startLaunch };
+  return { phase, startLaunch };
 }
